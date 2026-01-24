@@ -102,8 +102,10 @@ func (s *Server) setupRoutes() {
 
 // graphQLHandler handles GraphQL requests
 func (s *Server) graphQLHandler(w http.ResponseWriter, r *http.Request) {
-	// Create a new GraphQL handler with the generated schema
-	resolver := &resolvers.Resolver{}
+	// Create resolver with database client for health monitoring (T088)
+	resolver := &resolvers.Resolver{
+		DBClient: s.dbClient,
+	}
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 	srv.ServeHTTP(w, r)
 }

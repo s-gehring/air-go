@@ -24,3 +24,8 @@ resolver:
 # if they match it will use them, otherwise it will generate new ones
 autobind:
   - "github.com/yourusername/air-go/internal/graphql/resolvers"
+
+# Custom scalar type mappings
+models:
+  Long:
+    model: github.com/99designs/gqlgen/graphql.Int64

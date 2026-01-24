@@ -361,6 +361,11 @@ func (r *queryResolver) Alive(ctx context.Context) (bool, error) {
 	return false, nil
 }
 
+// Health is the resolver for the health field.
+func (r *queryResolver) Health(ctx context.Context) (*generated.Health, error) {
+	return r.Resolver.resolveHealth(ctx)
+}
+
 // ErrorCodeMetadataGet is the resolver for the errorCodeMetadataGet field.
 func (r *queryResolver) ErrorCodeMetadataGet(ctx context.Context) ([]*generated.ErrorCodeMetadata, error) {
 	return nil, nil
@@ -387,7 +392,7 @@ func (r *queryResolver) ReferencePortfolioByKeysGet(ctx context.Context, identif
 }
 
 // ReferencePortfolioSearch is the resolver for the referencePortfolioSearch field.
-func (r *queryResolver) ReferencePortfolioSearch(ctx context.Context, where *generated.ReferencePortfolioQueryFilterInput, order []*generated.ReferencePortfolioQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfReferencePortfolioOutput, error) {
+func (r *queryResolver) ReferencePortfolioSearch(ctx context.Context, where *generated.ReferencePortfolioQueryFilterInput, order []*generated.ReferencePortfolioQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfReferencePortfolioOutput, error) {
 	return nil, nil
 }
 
@@ -467,7 +472,7 @@ func (r *queryResolver) ByKeysGet(ctx context.Context, identifiers []string, ord
 }
 
 // Search is the resolver for the search field.
-func (r *queryResolver) Search(ctx context.Context, where *generated.InventoryQueryFilterInput, order []*generated.InventoryQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfInventory, error) {
+func (r *queryResolver) Search(ctx context.Context, where *generated.InventoryQueryFilterInput, order []*generated.InventoryQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfInventory, error) {
 	return nil, nil
 }
 
@@ -482,7 +487,7 @@ func (r *queryResolver) ExecutionPlanByKeysGet(ctx context.Context, identifiers 
 }
 
 // ExecutionPlanSearch is the resolver for the executionPlanSearch field.
-func (r *queryResolver) ExecutionPlanSearch(ctx context.Context, where *generated.ExecutionPlanQueryFilterInput, order []*generated.ExecutionPlanQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfExecutionPlan, error) {
+func (r *queryResolver) ExecutionPlanSearch(ctx context.Context, where *generated.ExecutionPlanQueryFilterInput, order []*generated.ExecutionPlanQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfExecutionPlan, error) {
 	return nil, nil
 }
 
@@ -537,7 +542,7 @@ func (r *queryResolver) CustomerByKeysGet(ctx context.Context, identifiers []str
 }
 
 // CustomerSearch is the resolver for the customerSearch field.
-func (r *queryResolver) CustomerSearch(ctx context.Context, where *generated.CustomerQueryFilterInput, order []*generated.CustomerQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfCustomer, error) {
+func (r *queryResolver) CustomerSearch(ctx context.Context, where *generated.CustomerQueryFilterInput, order []*generated.CustomerQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfCustomer, error) {
 	return nil, nil
 }
 
@@ -557,22 +562,22 @@ func (r *queryResolver) EmployeeByKeysGet(ctx context.Context, identifiers []str
 }
 
 // EmployeeSearch is the resolver for the employeeSearch field.
-func (r *queryResolver) EmployeeSearch(ctx context.Context, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfEmployee, error) {
+func (r *queryResolver) EmployeeSearch(ctx context.Context, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfEmployee, error) {
 	return nil, nil
 }
 
 // EmployeeAllWithRoleGet is the resolver for the employeeAllWithRoleGet field.
-func (r *queryResolver) EmployeeAllWithRoleGet(ctx context.Context, roles []generated.EmployeeGroup, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfEmployee, error) {
+func (r *queryResolver) EmployeeAllWithRoleGet(ctx context.Context, roles []generated.EmployeeGroup, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfEmployee, error) {
 	return nil, nil
 }
 
 // EmployeeAllByTeamleadGet is the resolver for the employeeAllByTeamleadGet field.
-func (r *queryResolver) EmployeeAllByTeamleadGet(ctx context.Context, teamleadID string, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfEmployee, error) {
+func (r *queryResolver) EmployeeAllByTeamleadGet(ctx context.Context, teamleadID string, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfEmployee, error) {
 	return nil, nil
 }
 
 // EmployeeAllByTeamleadAndTeamGet is the resolver for the employeeAllByTeamleadAndTeamGet field.
-func (r *queryResolver) EmployeeAllByTeamleadAndTeamGet(ctx context.Context, teamleadID string, teamID string, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfEmployee, error) {
+func (r *queryResolver) EmployeeAllByTeamleadAndTeamGet(ctx context.Context, teamleadID string, teamID string, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfEmployee, error) {
 	return nil, nil
 }
 
@@ -582,7 +587,7 @@ func (r *queryResolver) EmployeeTeamLeadForTeamGet(ctx context.Context, teamID s
 }
 
 // EmployeeTeamMembersForTeamGet is the resolver for the employeeTeamMembersForTeamGet field.
-func (r *queryResolver) EmployeeTeamMembersForTeamGet(ctx context.Context, teamID string, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfEmployee, error) {
+func (r *queryResolver) EmployeeTeamMembersForTeamGet(ctx context.Context, teamID string, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfEmployee, error) {
 	return nil, nil
 }
 
@@ -597,7 +602,7 @@ func (r *queryResolver) TeamByKeysGet(ctx context.Context, identifiers []string,
 }
 
 // TeamSearch is the resolver for the teamSearch field.
-func (r *queryResolver) TeamSearch(ctx context.Context, where *generated.TeamQueryFilterInput, order []*generated.TeamQuerySorterInput, first *string, after *string, last *string, before *string) (*generated.QueryOutputOfTeamQueryOutput, error) {
+func (r *queryResolver) TeamSearch(ctx context.Context, where *generated.TeamQueryFilterInput, order []*generated.TeamQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfTeamQueryOutput, error) {
 	return nil, nil
 }
 

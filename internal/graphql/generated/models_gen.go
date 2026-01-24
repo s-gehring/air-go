@@ -12,8 +12,8 @@ import (
 type Account struct {
 	ToJSON            string              `json:"toJson"`
 	AccountType       AccountType         `json:"accountType"`
-	ID                string              `json:"id"`
-	BankConnectionID  string              `json:"bankConnectionId"`
+	ID                int64               `json:"id"`
+	BankConnectionID  int64               `json:"bankConnectionId"`
 	AccountName       string              `json:"accountName"`
 	Iban              string              `json:"iban"`
 	AccountNumber     string              `json:"accountNumber"`
@@ -181,7 +181,7 @@ type Attachment struct {
 	Area                    *AttachmentArea          `json:"area,omitempty"`
 	Filename                *string                  `json:"filename,omitempty"`
 	ContentType             *string                  `json:"contentType,omitempty"`
-	ContentLength           *string                  `json:"contentLength,omitempty"`
+	ContentLength           *int64                   `json:"contentLength,omitempty"`
 	NodeID                  *string                  `json:"nodeId,omitempty"`
 	ContainerName           *string                  `json:"containerName,omitempty"`
 	BlobName                *string                  `json:"blobName,omitempty"`
@@ -222,7 +222,7 @@ type AttachmentUploadOutput struct {
 
 type Bank struct {
 	ToJSON     string           `json:"toJson"`
-	ID         string           `json:"id"`
+	ID         int64            `json:"id"`
 	Name       string           `json:"name"`
 	Bic        string           `json:"bic"`
 	Blz        string           `json:"blz"`
@@ -239,7 +239,7 @@ type Bank struct {
 
 type BankBankGroup struct {
 	ToJSON string `json:"toJson"`
-	ID     string `json:"id"`
+	ID     int64  `json:"id"`
 	Name   string `json:"name"`
 }
 
@@ -247,17 +247,17 @@ type BankConnection struct {
 	ToJSON               string                     `json:"toJson"`
 	UpdateStatus         UpdateStatusEnum           `json:"updateStatus"`
 	CategorizationStatus CategorizationStatus       `json:"categorizationStatus"`
-	ID                   string                     `json:"id"`
+	ID                   int64                      `json:"id"`
 	Name                 string                     `json:"name"`
 	Interfaces           []*BankConnectionInterface `json:"interfaces"`
-	AccountIds           []string                   `json:"accountIds"`
+	AccountIds           []int64                    `json:"accountIds"`
 	Owners               []*BankConnectionOwner     `json:"owners"`
 	Bank                 *BankConnectionBank        `json:"bank"`
 }
 
 type BankConnectionBank struct {
 	ToJSON     string           `json:"toJson"`
-	ID         string           `json:"id"`
+	ID         int64            `json:"id"`
 	Name       string           `json:"name"`
 	Bic        string           `json:"bic"`
 	Blz        string           `json:"blz"`
@@ -374,7 +374,7 @@ type BankInterfacePaymentConstraints struct {
 
 type BankInterfaceTppAuthenticationGroup struct {
 	ToJSON string `json:"toJson"`
-	ID     string `json:"id"`
+	ID     int64  `json:"id"`
 	Name   string `json:"name"`
 }
 
@@ -882,13 +882,13 @@ type CashAssetReferenceOutput struct {
 }
 
 type Category struct {
-	ToJSON     string   `json:"toJson"`
-	ID         string   `json:"id"`
-	Name       string   `json:"name"`
-	ParentID   string   `json:"parentId"`
-	ParentName string   `json:"parentName"`
-	IsCustom   bool     `json:"isCustom"`
-	Children   []string `json:"children"`
+	ToJSON     string  `json:"toJson"`
+	ID         int64   `json:"id"`
+	Name       string  `json:"name"`
+	ParentID   int64   `json:"parentId"`
+	ParentName string  `json:"parentName"`
+	IsCustom   bool    `json:"isCustom"`
+	Children   []int64 `json:"children"`
 }
 
 type Child struct {
@@ -1311,13 +1311,13 @@ type CustomerUpdateMutationInput struct {
 }
 
 type DailyBalance struct {
-	ToJSON                   string   `json:"toJson"`
-	Date                     string   `json:"date"`
-	Balance                  string   `json:"balance"`
-	Income                   string   `json:"income"`
-	Spending                 string   `json:"spending"`
-	InternalAdjustingEntries string   `json:"internalAdjustingEntries"`
-	Transactions             []string `json:"transactions"`
+	ToJSON                   string  `json:"toJson"`
+	Date                     string  `json:"date"`
+	Balance                  string  `json:"balance"`
+	Income                   string  `json:"income"`
+	Spending                 string  `json:"spending"`
+	InternalAdjustingEntries string  `json:"internalAdjustingEntries"`
+	Transactions             []int64 `json:"transactions"`
 }
 
 type DailyBalanceList struct {
@@ -1332,7 +1332,19 @@ type DailyBalanceListPaging struct {
 	Page       int    `json:"page"`
 	PerPage    int    `json:"perPage"`
 	PageCount  int    `json:"pageCount"`
-	TotalCount string `json:"totalCount"`
+	TotalCount int64  `json:"totalCount"`
+}
+
+// DatabaseHealth represents database connectivity status (T084)
+type DatabaseHealth struct {
+	// Status of the database connection: connected, disconnected, or error
+	Status string `json:"status"`
+	// Human-readable status message
+	Message string `json:"message"`
+	// Ping latency in milliseconds
+	LatencyMs int64 `json:"latencyMs"`
+	// Error details if status is error
+	Error *string `json:"error,omitempty"`
 }
 
 type DemandConceptExtensions struct {
@@ -1852,6 +1864,16 @@ type GoalsOutput struct {
 	IsConsistent       *bool         `json:"isConsistent,omitempty"`
 	IsComplete         *bool         `json:"isComplete,omitempty"`
 	AttachmentCount    *int          `json:"attachmentCount,omitempty"`
+}
+
+// Health represents the overall system health status (T085)
+type Health struct {
+	// Overall system status: ok or degraded
+	Status string `json:"status"`
+	// RFC3339 timestamp of the health check
+	Timestamp string `json:"timestamp"`
+	// Database health status (optional, only included when database client is configured)
+	Database *DatabaseHealth `json:"database,omitempty"`
 }
 
 type Icon struct {
@@ -2680,7 +2702,7 @@ type KeyValuePairOfYearMonthAndLifestyleInvValuesInput struct {
 
 type Label struct {
 	ToJSON string `json:"toJson"`
-	ID     string `json:"id"`
+	ID     int64  `json:"id"`
 	Name   string `json:"name"`
 }
 
@@ -2696,16 +2718,16 @@ type Lifestyle struct {
 	Add3            *LifestyleAddSpendings `json:"add3,omitempty"`
 	Add4            *LifestyleAddSpendings `json:"add4,omitempty"`
 	Add5            *LifestyleAddSpendings `json:"add5,omitempty"`
-	Food            *string                `json:"food,omitempty"`
-	Utility         *string                `json:"utility,omitempty"`
-	Rent            *string                `json:"rent,omitempty"`
-	Clothing        *string                `json:"clothing,omitempty"`
-	Education       *string                `json:"education,omitempty"`
-	Media           *string                `json:"media,omitempty"`
-	Vacation        *string                `json:"vacation,omitempty"`
-	Mobility        *string                `json:"mobility,omitempty"`
-	Miscellaneous   *string                `json:"miscellaneous,omitempty"`
-	Buffer          *string                `json:"buffer,omitempty"`
+	Food            *int64                 `json:"food,omitempty"`
+	Utility         *int64                 `json:"utility,omitempty"`
+	Rent            *int64                 `json:"rent,omitempty"`
+	Clothing        *int64                 `json:"clothing,omitempty"`
+	Education       *int64                 `json:"education,omitempty"`
+	Media           *int64                 `json:"media,omitempty"`
+	Vacation        *int64                 `json:"vacation,omitempty"`
+	Mobility        *int64                 `json:"mobility,omitempty"`
+	Miscellaneous   *int64                 `json:"miscellaneous,omitempty"`
+	Buffer          *int64                 `json:"buffer,omitempty"`
 	Total           *OverwritableAmount    `json:"total,omitempty"`
 	ValDate         *string                `json:"valDate,omitempty"`
 	Identifier      string                 `json:"identifier"`
@@ -2797,16 +2819,16 @@ type LifestyleMutationInput struct {
 	Add3            *LifestyleAddSpendingsInput      `json:"add3,omitempty"`
 	Add4            *LifestyleAddSpendingsInput      `json:"add4,omitempty"`
 	Add5            *LifestyleAddSpendingsInput      `json:"add5,omitempty"`
-	Food            *string                          `json:"food,omitempty"`
-	Utility         *string                          `json:"utility,omitempty"`
-	Rent            *string                          `json:"rent,omitempty"`
-	Clothing        *string                          `json:"clothing,omitempty"`
-	Education       *string                          `json:"education,omitempty"`
-	Media           *string                          `json:"media,omitempty"`
-	Vacation        *string                          `json:"vacation,omitempty"`
-	Mobility        *string                          `json:"mobility,omitempty"`
-	Miscellaneous   *string                          `json:"miscellaneous,omitempty"`
-	Buffer          *string                          `json:"buffer,omitempty"`
+	Food            *int64                           `json:"food,omitempty"`
+	Utility         *int64                           `json:"utility,omitempty"`
+	Rent            *int64                           `json:"rent,omitempty"`
+	Clothing        *int64                           `json:"clothing,omitempty"`
+	Education       *int64                           `json:"education,omitempty"`
+	Media           *int64                           `json:"media,omitempty"`
+	Vacation        *int64                           `json:"vacation,omitempty"`
+	Mobility        *int64                           `json:"mobility,omitempty"`
+	Miscellaneous   *int64                           `json:"miscellaneous,omitempty"`
+	Buffer          *int64                           `json:"buffer,omitempty"`
 	Total           *OverwritableAmountMutationInput `json:"total,omitempty"`
 	Identifier      string                           `json:"identifier"`
 	ActionIndicator ActionIndicator                  `json:"actionIndicator"`
@@ -2818,16 +2840,16 @@ type LifestyleOutput struct {
 	Add3            *LifestyleAddSpendingsOutput `json:"add3,omitempty"`
 	Add4            *LifestyleAddSpendingsOutput `json:"add4,omitempty"`
 	Add5            *LifestyleAddSpendingsOutput `json:"add5,omitempty"`
-	Food            *string                      `json:"food,omitempty"`
-	Utility         *string                      `json:"utility,omitempty"`
-	Rent            *string                      `json:"rent,omitempty"`
-	Clothing        *string                      `json:"clothing,omitempty"`
-	Education       *string                      `json:"education,omitempty"`
-	Media           *string                      `json:"media,omitempty"`
-	Vacation        *string                      `json:"vacation,omitempty"`
-	Mobility        *string                      `json:"mobility,omitempty"`
-	Miscellaneous   *string                      `json:"miscellaneous,omitempty"`
-	Buffer          *string                      `json:"buffer,omitempty"`
+	Food            *int64                       `json:"food,omitempty"`
+	Utility         *int64                       `json:"utility,omitempty"`
+	Rent            *int64                       `json:"rent,omitempty"`
+	Clothing        *int64                       `json:"clothing,omitempty"`
+	Education       *int64                       `json:"education,omitempty"`
+	Media           *int64                       `json:"media,omitempty"`
+	Vacation        *int64                       `json:"vacation,omitempty"`
+	Mobility        *int64                       `json:"mobility,omitempty"`
+	Miscellaneous   *int64                       `json:"miscellaneous,omitempty"`
+	Buffer          *int64                       `json:"buffer,omitempty"`
 	Total           *OverwritableAmountOutput    `json:"total,omitempty"`
 	ValDate         *string                      `json:"valDate,omitempty"`
 	Identifier      string                       `json:"identifier"`
@@ -3744,9 +3766,9 @@ type PageInfo struct {
 type Payload struct {
 	ToJSON           string          `json:"toJson"`
 	ErrorCode        *ErrorCodeEnumX `json:"errorCode,omitempty"`
-	BankConnectionID *string         `json:"bankConnectionId,omitempty"`
-	PaymentID        *string         `json:"paymentId,omitempty"`
-	StandingOrderID  *string         `json:"standingOrderId,omitempty"`
+	BankConnectionID *int64          `json:"bankConnectionId,omitempty"`
+	PaymentID        *int64          `json:"paymentId,omitempty"`
+	StandingOrderID  *int64          `json:"standingOrderId,omitempty"`
 	ErrorMessage     string          `json:"errorMessage"`
 }
 
@@ -4341,8 +4363,8 @@ type ProcessedAccount struct {
 }
 
 type ProcessedSecurity struct {
-	SecurityID    *string `json:"securityId,omitempty"`
-	AccountID     *string `json:"accountId,omitempty"`
+	SecurityID    *int64  `json:"securityId,omitempty"`
+	AccountID     *int64  `json:"accountId,omitempty"`
 	Isin          *string `json:"isin,omitempty"`
 	Wkn           *string `json:"wkn,omitempty"`
 	QuoteType     *string `json:"quoteType,omitempty"`
@@ -4352,8 +4374,8 @@ type ProcessedSecurity struct {
 }
 
 type ProcessedTransaction struct {
-	TransactionID            *string             `json:"transactionId,omitempty"`
-	AccountID                *string             `json:"accountId,omitempty"`
+	TransactionID            *int64              `json:"transactionId,omitempty"`
+	AccountID                *int64              `json:"accountId,omitempty"`
 	Amount                   *string             `json:"amount,omitempty"`
 	Purpose                  *string             `json:"purpose,omitempty"`
 	CounterpartName          *string             `json:"counterpartName,omitempty"`
@@ -4367,8 +4389,8 @@ type ProcessedTransaction struct {
 }
 
 type ProcessedTransactionInput struct {
-	TransactionID            *string             `json:"transactionId,omitempty"`
-	AccountID                *string             `json:"accountId,omitempty"`
+	TransactionID            *int64              `json:"transactionId,omitempty"`
+	AccountID                *int64              `json:"accountId,omitempty"`
 	Amount                   *string             `json:"amount,omitempty"`
 	Purpose                  *string             `json:"purpose,omitempty"`
 	CounterpartName          *string             `json:"counterpartName,omitempty"`
@@ -4406,45 +4428,45 @@ type Query struct {
 }
 
 type QueryOutputOfCustomer struct {
-	Count      string      `json:"count"`
+	Count      int64       `json:"count"`
 	Data       []*Customer `json:"data"`
 	Paging     *PageInfo   `json:"paging"`
-	TotalCount string      `json:"totalCount"`
+	TotalCount int64       `json:"totalCount"`
 }
 
 type QueryOutputOfEmployee struct {
-	Count      string      `json:"count"`
+	Count      int64       `json:"count"`
 	Data       []*Employee `json:"data"`
 	Paging     *PageInfo   `json:"paging"`
-	TotalCount string      `json:"totalCount"`
+	TotalCount int64       `json:"totalCount"`
 }
 
 type QueryOutputOfExecutionPlan struct {
-	Count      string           `json:"count"`
+	Count      int64            `json:"count"`
 	Data       []*ExecutionPlan `json:"data"`
 	Paging     *PageInfo        `json:"paging"`
-	TotalCount string           `json:"totalCount"`
+	TotalCount int64            `json:"totalCount"`
 }
 
 type QueryOutputOfInventory struct {
-	Count      string       `json:"count"`
+	Count      int64        `json:"count"`
 	Data       []*Inventory `json:"data"`
 	Paging     *PageInfo    `json:"paging"`
-	TotalCount string       `json:"totalCount"`
+	TotalCount int64        `json:"totalCount"`
 }
 
 type QueryOutputOfReferencePortfolioOutput struct {
-	Count      string                      `json:"count"`
+	Count      int64                       `json:"count"`
 	Data       []*ReferencePortfolioOutput `json:"data"`
 	Paging     *PageInfo                   `json:"paging"`
-	TotalCount string                      `json:"totalCount"`
+	TotalCount int64                       `json:"totalCount"`
 }
 
 type QueryOutputOfTeamQueryOutput struct {
-	Count      string             `json:"count"`
+	Count      int64              `json:"count"`
 	Data       []*TeamQueryOutput `json:"data"`
 	Paging     *PageInfo          `json:"paging"`
-	TotalCount string             `json:"totalCount"`
+	TotalCount int64              `json:"totalCount"`
 }
 
 type RealEstate struct {
@@ -5051,8 +5073,8 @@ type Security struct {
 	ToJSON              string                               `json:"toJson"`
 	QuoteType           *SecurityPositionQuoteType           `json:"quoteType,omitempty"`
 	QuantityNominalType *SecurityPositionQuantityNominalType `json:"quantityNominalType,omitempty"`
-	ID                  string                               `json:"id"`
-	AccountID           string                               `json:"accountId"`
+	ID                  int64                                `json:"id"`
+	AccountID           int64                                `json:"accountId"`
 	Name                string                               `json:"name"`
 	Isin                string                               `json:"isin"`
 	Wkn                 string                               `json:"wkn"`
@@ -5275,7 +5297,7 @@ type TariffView struct {
 type TaskPayload struct {
 	ToJSON           string         `json:"toJson"`
 	ErrorCode        *ErrorCodeEnum `json:"errorCode,omitempty"`
-	BankConnectionID string         `json:"bankConnectionId"`
+	BankConnectionID int64          `json:"bankConnectionId"`
 	WebForm          *WebFormInfo   `json:"webForm"`
 	ErrorMessage     string         `json:"errorMessage"`
 }
@@ -5409,9 +5431,9 @@ type Transaction struct {
 	Currency                       *Currency                     `json:"currency,omitempty"`
 	OriginalCurrency               *Currency                     `json:"originalCurrency,omitempty"`
 	FeeCurrency                    *Currency                     `json:"feeCurrency,omitempty"`
-	ID                             string                        `json:"id"`
-	ParentID                       string                        `json:"parentId"`
-	AccountID                      string                        `json:"accountId"`
+	ID                             int64                         `json:"id"`
+	ParentID                       int64                         `json:"parentId"`
+	AccountID                      int64                         `json:"accountId"`
 	ValueDate                      string                        `json:"valueDate"`
 	BankBookingDate                string                        `json:"bankBookingDate"`
 	FinapiBookingDate              string                        `json:"finapiBookingDate"`
@@ -5440,7 +5462,7 @@ type Transaction struct {
 	IsAdjustingEntry               bool                          `json:"isAdjustingEntry"`
 	IsNew                          bool                          `json:"isNew"`
 	ImportDate                     string                        `json:"importDate"`
-	Children                       []string                      `json:"children"`
+	Children                       []int64                       `json:"children"`
 	PaypalData                     *PendingTransactionPaypalData `json:"paypalData"`
 	CertisData                     *PendingTransactionCertisData `json:"certisData"`
 	EndToEndReference              string                        `json:"endToEndReference"`
@@ -5452,13 +5474,13 @@ type Transaction struct {
 }
 
 type TransactionCategory struct {
-	ToJSON     string   `json:"toJson"`
-	ID         string   `json:"id"`
-	Name       string   `json:"name"`
-	ParentID   string   `json:"parentId"`
-	ParentName string   `json:"parentName"`
-	IsCustom   bool     `json:"isCustom"`
-	Children   []string `json:"children"`
+	ToJSON     string  `json:"toJson"`
+	ID         int64   `json:"id"`
+	Name       string  `json:"name"`
+	ParentID   int64   `json:"parentId"`
+	ParentName string  `json:"parentName"`
+	IsCustom   bool    `json:"isCustom"`
+	Children   []int64 `json:"children"`
 }
 
 type TwoStepProcedure struct {

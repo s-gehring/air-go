@@ -23,8 +23,38 @@ enum ApplyPolicy {
   VALIDATION
 }
 
+"""
+DatabaseHealth represents database connectivity status (T084)
+"""
+type DatabaseHealth {
+  """Status of the database connection: connected, disconnected, or error"""
+  status: String!
+  """Human-readable status message"""
+  message: String!
+  """Ping latency in milliseconds"""
+  latencyMs: Long!
+  """Error details if status is error"""
+  error: String
+}
+
+"""
+Health represents the overall system health status (T085)
+"""
+type Health {
+  """Overall system status: ok or degraded"""
+  status: String!
+  """RFC3339 timestamp of the health check"""
+  timestamp: String!
+  """Database health status (optional, only included when database client is configured)"""
+  database: DatabaseHealth
+}
+
 type Query {
   alive: Boolean!
+  """
+  Health check query that returns system health status including database connectivity
+  """
+  health: Health!
   errorCodeMetadataGet: [ErrorCodeMetadata!]!
   inconsistencyMetadataGet: [InconsistencyMetadata!]!
   documentMetadataGet: [BizDocMetadata!]!
