@@ -24,16 +24,32 @@ import (
 
 // Server represents the HTTP server
 type Server struct {
-	config *config.Config
-	router *chi.Mux
-	srv    *http.Server
+	config   *config.Config
+	router   *chi.Mux
+	srv      *http.Server
+	dbClient health.DBHealthChecker // Database client for health checks
+}
+
+// Option is a function that configures the server
+type Option func(*Server)
+
+// WithDatabaseClient sets the database client for health checks
+func WithDatabaseClient(dbClient health.DBHealthChecker) Option {
+	return func(s *Server) {
+		s.dbClient = dbClient
+	}
 }
 
 // New creates a new HTTP server with configured routes and middleware
-func New(cfg *config.Config) *Server {
+func New(cfg *config.Config, opts ...Option) *Server {
 	s := &Server{
 		config: cfg,
 		router: chi.NewRouter(),
+	}
+
+	// Apply options
+	for _, opt := range opts {
+		opt(s)
 	}
 
 	s.setupMiddleware()
@@ -73,7 +89,8 @@ func (s *Server) setupMiddleware() {
 // setupRoutes configures all HTTP routes
 func (s *Server) setupRoutes() {
 	// Health check endpoint (no authentication required)
-	s.router.Get("/health", health.Handler())
+	// Passes database client if available for health monitoring
+	s.router.Get("/health", health.Handler(s.dbClient))
 
 	// GraphQL endpoint (authentication required)
 	// This will be implemented in later phases (T025)

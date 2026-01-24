@@ -38,6 +38,103 @@ func StartTestContainer(ctx context.Context) (*mongo.Client, func(), error) {
 	return StartTestContainerWithConfig(ctx, DefaultTestContainerConfig())
 }
 
+// StartTestContainerWithURI starts a MongoDB test container and returns both client and URI
+// Returns: (*mongo.Client, URI string, cleanup function, error)
+// This is useful for tests that need to create their own db.Client instances
+func StartTestContainerWithURI(ctx context.Context) (*mongo.Client, string, func(), error) {
+	client, uri, cleanup, err := StartTestContainerWithConfigAndURI(ctx, DefaultTestContainerConfig())
+	return client, uri, cleanup, err
+}
+
+// StartTestContainerWithConfigAndURI starts a MongoDB test container with custom configuration
+// Returns: (*mongo.Client, URI string, cleanup function, error)
+func StartTestContainerWithConfigAndURI(ctx context.Context, config *TestContainerConfig) (*mongo.Client, string, func(), error) {
+	if config == nil {
+		config = DefaultTestContainerConfig()
+	}
+
+	// Create container request
+	req := testcontainers.ContainerRequest{
+		Image:        config.Image,
+		ExposedPorts: []string{config.Port},
+		WaitingFor: wait.ForLog("Waiting for connections").
+			WithStartupTimeout(config.StartTimeout),
+		Env: map[string]string{
+			"MONGO_INITDB_DATABASE": config.Database,
+		},
+	}
+
+	// Start container
+	mongoContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+	if err != nil {
+		return nil, "", nil, fmt.Errorf("failed to start MongoDB container: %w", err)
+	}
+
+	// Get container host and port
+	host, err := mongoContainer.Host(ctx)
+	if err != nil {
+		mongoContainer.Terminate(ctx)
+		return nil, "", nil, fmt.Errorf("failed to get container host: %w", err)
+	}
+
+	mappedPort, err := mongoContainer.MappedPort(ctx, "27017")
+	if err != nil {
+		mongoContainer.Terminate(ctx)
+		return nil, "", nil, fmt.Errorf("failed to get mapped port: %w", err)
+	}
+
+	// Build connection string
+	uri := fmt.Sprintf("mongodb://%s:%s", host, mappedPort.Port())
+
+	// Connect to MongoDB
+	clientOptions := options.Client().
+		ApplyURI(uri).
+		SetServerSelectionTimeout(10 * time.Second).
+		SetConnectTimeout(10 * time.Second)
+
+	client, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		mongoContainer.Terminate(ctx)
+		return nil, "", nil, fmt.Errorf("failed to connect to MongoDB: %w", err)
+	}
+
+	// Verify connection
+	pingCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	err = client.Ping(pingCtx, nil)
+	cancel()
+
+	if err != nil {
+		client.Disconnect(ctx)
+		mongoContainer.Terminate(ctx)
+		return nil, "", nil, fmt.Errorf("failed to ping MongoDB: %w", err)
+	}
+
+	// Cleanup function
+	cleanup := func() {
+		// Cleanup database before disconnecting (if in drop mode)
+		if config.CleanupMode == "drop" {
+			cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 5*time.Second)
+			_ = CleanupTestDatabase(cleanupCtx, client, config.Database)
+			cleanupCancel()
+		}
+
+		// Disconnect client
+		disconnectCtx, disconnectCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		_ = client.Disconnect(disconnectCtx)
+		disconnectCancel()
+
+		// Terminate container
+		terminateCtx, terminateCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		_ = mongoContainer.Terminate(terminateCtx)
+		terminateCancel()
+	}
+
+	return client, uri, cleanup, nil
+}
+
 // StartTestContainerWithConfig starts a MongoDB test container with custom configuration
 func StartTestContainerWithConfig(ctx context.Context, config *TestContainerConfig) (*mongo.Client, func(), error) {
 	if config == nil {

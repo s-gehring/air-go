@@ -82,8 +82,8 @@ func main() {
 		dbClient.Close()
 	}()
 
-	// Create and start HTTP server
-	srv := server.New(cfg)
+	// Create and start HTTP server with database client
+	srv := server.New(cfg, server.WithDatabaseClient(dbClient))
 
 	log.Info().
 		Dur("startup_time", time.Since(startTime)).
