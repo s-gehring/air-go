@@ -68,9 +68,13 @@ func (c *Client) IsConnected() bool {
 	return c.connected.Load()
 }
 
-// Database returns the database instance for admin operations
-func (c *Client) Database() *mongo.Database {
-	return c.database
+// Database returns the database instance for admin operations (T073)
+// Returns a Database interface for admin-level operations
+func (c *Client) Database() Database {
+	if c.database == nil {
+		return nil
+	}
+	return newDatabase(c.database, c.config.OperationTimeout, c.logger)
 }
 
 // Connect establishes connection to MongoDB with automatic retry logic
@@ -297,12 +301,15 @@ func (c *Client) HealthStatus(ctx context.Context) (*HealthStatus, error) {
 	return status, nil
 }
 
-// Collection returns a collection accessor for database operations
-func (c *Client) Collection(name string) *mongo.Collection {
+// Collection returns a collection accessor for database operations (T059)
+// Returns a Collection interface with timeout enforcement and structured logging
+func (c *Client) Collection(name string) Collection {
 	if c.database == nil {
 		panic("database not initialized: call Connect() first")
 	}
-	return c.database.Collection(name)
+
+	mongoCollection := c.database.Collection(name)
+	return newCollection(mongoCollection, c.config.OperationTimeout, c.logger)
 }
 
 // Close gracefully shuts down the client and cancels the context
