@@ -1,0 +1,26 @@
+# GraphQL schema location
+schema:
+  - schema.graphqls
+
+# Where should the generated server code go?
+exec:
+  filename: internal/graphql/generated/exec.go
+  package: generated
+
+# Where should any generated models go?
+model:
+  filename: internal/graphql/generated/models_gen.go
+  package: generated
+
+# Where should the resolver implementations go?
+# Put resolvers in a separate package to avoid import cycles
+resolver:
+  layout: follow-schema
+  dir: internal/graphql/resolvers
+  package: resolvers
+  filename_template: "{name}.resolvers.go"
+
+# gqlgen will search for any type names in the schema in these go packages
+# if they match it will use them, otherwise it will generate new ones
+autobind:
+  - "github.com/yourusername/air-go/internal/graphql/resolvers"

@@ -1,0 +1,7648 @@
+type BizDocMetadata {
+  type: String
+  projections: [KeyValuePairOfTypeAndBizDocProjectionMetadata!]!
+}
+
+type BizDocRelationMetadata {
+  from: String
+  to: String
+  direction: String
+  relation: String
+  depth: String
+  isSet: Boolean
+}
+
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
+enum ApplyPolicy {
+  BEFORE_RESOLVER
+  AFTER_RESOLVER
+  VALIDATION
+}
+
+type Query {
+  alive: Boolean!
+  errorCodeMetadataGet: [ErrorCodeMetadata!]!
+  inconsistencyMetadataGet: [InconsistencyMetadata!]!
+  documentMetadataGet: [BizDocMetadata!]!
+  referencePortfolioGet(identifier: UUID!): ReferencePortfolioOutput
+  referencePortfolioByKeysGet(
+    identifiers: [UUID!]!
+    order: [ReferencePortfolioQuerySorterInput!]
+  ): [ReferencePortfolioOutput!]!
+  referencePortfolioSearch(
+    where: ReferencePortfolioQueryFilterInput
+    order: [ReferencePortfolioQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfReferencePortfolioOutput!
+  referencePortfolioDownloadAttachment(
+    attachmentId: UUID!
+    overrideFilename: String
+    directDownload: Boolean
+  ): String!
+  referencePortfolioGetAttachments(
+    identifier: UUID!
+    nodeId: UUID
+  ): [Attachment!]!
+  referencePortfolioActiveForCustomerGet(
+    customerId: UUID!
+  ): ReferencePortfolioOutput
+  referencePortfoliosForCustomerGet(
+    customerId: UUID!
+    active: ActiveStatus
+  ): [ReferencePortfolioListView!]!
+  referencePortfolioGetWealthForecast(
+    identifier: UUID!
+  ): [KeyValuePairOfInt32AndWealthForecastResult!]!
+  referencePortfolioGetLiquidityForecast(
+    identifier: UUID!
+  ): [KeyValuePairOfInt32AndLiquidityForecastResult!]!
+  referencePortfolioSimulateUpdate(
+    referencePortfolioInput: ReferencePortfolioMutationInput!
+  ): ReferencePortfolioOutput
+  refPortConstantsAndDefaultsGet: Constants!
+  referencePortfolioDemandConceptGet(
+    identifier: UUID!
+  ): ReferencePortfolioOutput
+  referencePortfolioIncompleteNodesGet(
+    identifier: UUID!
+  ): [IncompleteNodeRefPort!]
+  inventoryGet(identifier: UUID!): Inventory
+  inventoryForCustomerGet(customerId: UUID!): Inventory
+  inventoryGetAttachments(identifier: UUID!, nodeId: UUID): [Attachment!]!
+  inventoryDownloadAttachment(
+    attachmentId: UUID!
+    overrideFilename: String
+    directDownload: Boolean
+  ): String!
+  byKeysGet(
+    identifiers: [UUID!]!
+    order: [InventoryQuerySorterInput!]
+  ): [Inventory!]!
+  search(
+    where: InventoryQueryFilterInput
+    order: [InventoryQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfInventory!
+  executionPlanGet(identifier: UUID!): ExecutionPlan
+  executionPlanByKeysGet(
+    identifiers: [UUID!]!
+    order: [ExecutionPlanQuerySorterInput!]
+  ): [ExecutionPlan!]!
+  executionPlanSearch(
+    where: ExecutionPlanQueryFilterInput
+    order: [ExecutionPlanQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfExecutionPlan!
+  executionPlanForCustomerGet(customerId: UUID!): ExecutionPlan
+  planActualAdjustmentForCustomerGet(customerId: UUID!): PlanActualAdjustment
+  executionPlanGetAttachments(identifier: UUID!, nodeId: UUID): [Attachment!]!
+  executionPlanDownloadAttachment(
+    attachmentId: UUID!
+    overrideFilename: String
+    directDownload: Boolean
+  ): String!
+  userInfoGet: AirIdentityView!
+  otherUserInfoGet(identifier: UUID!): AirIdentityView!
+  userSigninActivitiesGet: [SigninActivity!]
+  otherUserSigninActivitiesGet(identifier: UUID!): [SigninActivity!]
+  customerGet(identifier: UUID!): Customer
+  customerByKeysGet(
+    identifiers: [UUID!]!
+    order: [CustomerQuerySorterInput!]
+  ): [Customer!]!
+  customerSearch(
+    where: CustomerQueryFilterInput
+    order: [CustomerQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfCustomer!
+  customerGetCrispIdentity: CrispIdentity
+  employeeGet(identifier: UUID!): Employee
+  employeeByKeysGet(
+    identifiers: [UUID!]!
+    order: [EmployeeQuerySorterInput!]
+  ): [Employee!]!
+  employeeSearch(
+    where: EmployeeQueryFilterInput
+    order: [EmployeeQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfEmployee!
+  employeeAllWithRoleGet(
+    roles: [EmployeeGroup!]!
+    where: EmployeeQueryFilterInput
+    order: [EmployeeQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfEmployee!
+  employeeAllByTeamleadGet(
+    teamleadId: UUID!
+    where: EmployeeQueryFilterInput
+    order: [EmployeeQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfEmployee!
+  employeeAllByTeamleadAndTeamGet(
+    teamleadId: UUID!
+    teamId: UUID!
+    where: EmployeeQueryFilterInput
+    order: [EmployeeQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfEmployee!
+  employeeTeamLeadForTeamGet(teamId: UUID!): Employee!
+  employeeTeamMembersForTeamGet(
+    teamId: UUID!
+    where: EmployeeQueryFilterInput
+    order: [EmployeeQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfEmployee!
+  teamGet(identifier: UUID!): TeamQueryOutput
+  teamByKeysGet(
+    identifiers: [UUID!]!
+    order: [TeamQuerySorterInput!]
+  ): [TeamQueryOutput!]!
+  teamSearch(
+    where: TeamQueryFilterInput
+    order: [TeamQuerySorterInput!]
+    first: Long
+    after: String
+    last: Long
+    before: String
+  ): QueryOutputOfTeamQueryOutput!
+  teamByLeaderGet(leaderEmployeeId: UUID!): [TeamQueryOutput!]!
+  teamByMemberGet(memberEmployeeId: UUID!): [TeamQueryOutput!]!
+  tariffsVersionGet: String!
+  workInabilityGet(
+    wiType: WorkInabilityType!
+    physicalWork: Boolean!
+    smoking: Boolean!
+    entryAge: Int!
+    endAge: Int!
+    performance: Int!
+  ): TariffView
+  paymentCustomerPortal(
+    queryInput: PaymentCustomerPortalQueryInput!
+  ): PaymentCustomerPortalQueryOutput!
+  customerOpenBankingProcessedDataGet(
+    fromDate: Date!
+  ): [OpenBankingProcessedData!]!
+  customerOpenBankingMappingRulesGet: [OpenBankingMappingRule!]!
+  openBankingLabelsGet: [Label!]!
+  openBankingUsersGet: [UserInfo!]!
+  openBankingUserGet: UserInfo
+  openBankingAuthorizedUserGet: User!
+  openBankingTransactionsGet(
+    fromDate: String!
+    toDate: String!
+  ): [Transaction!]!
+  openBankingSecuritiesGet: [Security!]!
+  openBankingCategoriesGet: [Category!]!
+  openBankingBanksGet: [Bank!]!
+  openBankingClientConfigurationGet: ClientConfiguration!
+  openBankingDailyBalancesGet(page: Int!): DailyBalanceList!
+  openBankingProfilesGet: [Profile!]!
+  openBankingProfileGet(profileId: String!): Profile
+  openBankingWebFormsGet: [WebForm!]!
+  openBankingWebFormGet(webFormId: String!): WebForm
+  openBankingUserVerify: Boolean!
+  openBankingTasksGet: [TaskX!]!
+  openBankingTaskGet(taskId: String!): TaskX
+  openBankingAccountsGet: [Account!]!
+  mmInsurerGet(insType: InsuranceType!): [MMInsuranceProvider!]
+  mmConditionStatesGet(
+    insType: InsuranceType!
+    insurerId: String!
+  ): [MMTariffState!]
+  mmTariffsGet(
+    insType: InsuranceType!
+    insurerId: String!
+    condStateId: String!
+    tariffVariantId: String
+  ): [MMInsuranceTariff!]
+  mmTariffVariantsGet(
+    insType: InsuranceType!
+    insurerId: String!
+    condStateId: String!
+    tariffId: String
+  ): [MMTariffVariant!]
+  mmRisksGet(
+    insType: InsuranceType!
+    insurerId: String!
+    condStateId: String!
+    tariffId: String!
+    tariffVariantId: String!
+  ): [MMTariffRisks!]
+  mmCoveragesGet(
+    insType: InsuranceType!
+    insurerId: String!
+    condStateId: String!
+    tariffId: String!
+    tariffVariantId: String!
+  ): [MMTariffCoverage!]
+  mmTariffsRating(
+    insType: InsuranceType!
+    insurerId: String!
+    condStateId: String!
+    tariffId: String!
+    tariffVariantId: String!
+    tariffIDs: [String!]
+    coverages: [String!]
+    risks: [String!]
+    applicableQuestionIds: [String!]
+  ): MMTariffComparisionResult
+  mmGetCoverageQuestions(
+    insType: InsuranceType!
+  ): [MMCoverageQuestionGroupsOverall!]!
+  planActualComparisonGet(customerID: UUID!): PlanActualComparisonResult!
+  nodeMetadataAllNamesGet: [InstanceInfo!]!
+  nodeMetadataAllJsonSchemasGet: [JsonSchemaInfo!]!
+  nodeMetadataJsonSchemaGet(instanceInfo: InstanceInfoInput!): JsonSchemaInfo!
+}
+
+type Mutation {
+  ping(ping: String!): String!
+  referencePortfolioCreate(
+    referencePortfolioInput: ReferencePortfolioMutationInput!
+  ): ReferencePortfolioOutput
+  referencePortfolioUpdate(
+    referencePortfolioInput: ReferencePortfolioMutationInput!
+  ): ReferencePortfolioOutput
+  referencePortfolioConfirmAttachment(attachmentId: UUID!): Attachment!
+  referencePortfolioUploadAttachment(
+    input: AttachmentUploadInput!
+  ): AttachmentUploadOutput!
+  referencePortfolioDelete(identifier: UUID!): Boolean!
+  referencePortfolioReleaseToExecution(
+    referencePortfolioID: UUID!
+    attachmentId: UUID!
+  ): ReferencePortfolioOutput
+  referencePortfolioResetExecution(
+    referencePortfolioID: UUID!
+  ): ReferencePortfolioOutput
+  referencePortfolioConfirmExecution(
+    referencePortfolioID: UUID!
+  ): ReferencePortfolioOutput
+  create(mutationInput: ReferencePortfolioMutationInput!): ReferencePortfolio!
+  update(mutationInput: ReferencePortfolioMutationInput!): ReferencePortfolio!
+  inventoryCreate(inventoryInput: InventoryCreateInput!): Inventory!
+  inventoryUpdate(inventoryInput: InventoryMutationInput!): Inventory!
+  inventoryConfirmAttachment(attachmentId: UUID!): Attachment!
+  inventoryUploadAttachment(
+    input: AttachmentUploadInput!
+  ): AttachmentUploadOutput!
+  inventoryDelete(identifier: UUID!): Boolean!
+  executionPlanCreate(input: ExecutionPlanCreateInput!): ExecutionPlan!
+  executionPlanUpdate(input: ExecutionPlanMutationInput!): ExecutionPlan!
+  executionPlanDelete(identifier: UUID!): Boolean!
+  executionPlanUploadAttachment(
+    input: AttachmentUploadInput!
+  ): AttachmentUploadOutput!
+  executionPlanConfirmAttachment(attachmentId: UUID!): Attachment!
+  openBankingRawDataInsert: Boolean!
+  openBankingRawDataProcess: Boolean!
+  openBankingInventoryUpdate: Boolean!
+  userSignup(signupInput: SignupMutationInput!): InviteStatus!
+  userSignupOnlyForTestPerformance(
+    signupInput: SignupMutationInput!
+    password: String!
+  ): Boolean!
+  userSignin(userEmail: String!, password: String!): UserToken!
+  userSigninLocal(userEmail: String!, password: String!): UserToken!
+  userSigninWithIdpToken(idpToken: String!): UserToken!
+  userSetPassword(token: String!, password: String!): UserToken!
+  userSetPrivacyConsent(token: String!): Boolean!
+  userIsActivatedMFA(userEmail: String!): Boolean!
+  userChangeMFAStatus(userEmail: String!, enableMFA: Boolean!): Boolean!
+  userResetMFA(userEmail: String!): Boolean!
+  userRequestForChangeUserEmail(newUserEmail: String!): Boolean!
+  userApplyChangeUserEmail(token: String!, password: String!): Boolean!
+  userValidateToken(token: String!): TokenValidationResult!
+  userSendInvitationAgain(userEmail: String!): Boolean!
+  customerCreate(customerInput: CustomerMutationInput!): Customer!
+  customerUpdate(customerInput: CustomerUpdateMutationInput!): Customer!
+  customerDelete(identifier: UUID!): Boolean!
+  employeeCreate(employeeInput: EmployeeMutationInput!): Employee!
+  employeeUpdate(employeeInput: EmployeeUpdateMutationInput!): Employee!
+  employeeDelete(identifier: UUID!): Boolean!
+  employeeLock(employeeInput: EmployeeLockMutationInput!): Boolean!
+  employeeInvite(employeeId: UUID!): Boolean!
+  employeeReInvite(employeeId: UUID!): Boolean!
+  employeeChangeGroup(
+    employeeInput: EmployeeChangeGroupMutationInput!
+  ): Boolean!
+  teamCreate(teamInput: TeamMutationInput!): TeamQueryOutput!
+  teamUpdate(teamInput: TeamUpdateMutationInput!): TeamQueryOutput!
+  teamDelete(identifier: UUID!): Boolean!
+  teamAssign(teamAssignInput: TeamAssignMutationInput!): Boolean!
+  tariffsImport(version: String!): Boolean!
+  tariffsFillGap(version: String!): Boolean!
+  paymentCreateCheckout(
+    mutationInput: PaymentCreateCheckoutMutationInput!
+  ): PaymentCreateCheckoutMutationOutput!
+  paymentResetCustomer(customerId: String!): Boolean!
+  paymentPromoteCustomerToLifetime(
+    customerId: UUID!
+    lifetime: Boolean!
+  ): Boolean!
+  paymentUpgradeToLifetime: Boolean!
+  openBankingUserCreate: Boolean!
+  openBankingUserDelete: Boolean!
+  openBankingProfileCreate: Profile
+  openBankingProfileDelete(profileId: String!): Boolean
+  openBankingForBankConnectionImportCreate: WebForm
+  openBankingBankConnectionTaskUpdate: TaskX
+  openBankingCategorizationTrigger: Boolean
+  openBankingAllBankConnectionsGet: [BankConnection!]!
+  openBankingDefaultMappingRulesCreate: Boolean!
+  openBankingMappingRuleCreate(
+    mappingRuleInput: OpenBankingMappingRuleMutationInput!
+  ): Boolean!
+  openBankingMappingRuleDelete(identifier: UUID!): Boolean!
+}
+
+type KeyValuePairOfTypeAndBizDocProjectionMetadata {
+  value: BizDocProjectionMetadata!
+}
+
+input ExecutionPlanQueryFilterInput {
+  and: [ExecutionPlanQueryFilterInput!]
+  or: [ExecutionPlanQueryFilterInput!]
+  customerId: ComparableFilterOfNullableOfGuidInput
+}
+
+type QueryOutputOfExecutionPlan {
+  count: Long!
+  data: [ExecutionPlan!]!
+  paging: PageInfo!
+  totalCount: Long!
+}
+
+input ExecutionPlanQuerySorterInput {
+  customerId: SortEnumType
+}
+
+type ExecutionPlan {
+  customerId: UUID
+  key: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [Inconsistency!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+input InventoryMutationInput {
+  lifestyle: LifestyleInvMutationInput
+  pensProvs: [PensionProvisionInvMutationInput!]
+  fixedAssets: [FixedAssetInvMutationInput!]
+  liqAssets: [LiquidAssetInvMutationInput!]
+  cashAssets: [CashAssetInvMutationInput!]
+  loans: [LoanInvMutationInput!]
+  insurances: [InsuranceInvMutationInput!]
+  insGroups: [InsuranceGroupInvMutationInput!]
+  identifier: UUID!
+}
+
+input InventoryCreateInput {
+  customerId: UUID!
+  lifestyle: LifestyleInvMutationInput
+  pensProvs: [PensionProvisionInvMutationInput!]
+  fixedAssets: [FixedAssetInvMutationInput!]
+  liqAssets: [LiquidAssetInvMutationInput!]
+  cashAssets: [CashAssetInvMutationInput!]
+  loans: [LoanInvMutationInput!]
+  insurances: [InsuranceInvMutationInput!]
+  insGroups: [InsuranceGroupInvMutationInput!]
+  identifier: UUID!
+}
+
+input InventoryQueryFilterInput {
+  and: [InventoryQueryFilterInput!]
+  or: [InventoryQueryFilterInput!]
+  customerId: ComparableFilterOfNullableOfGuidInput
+}
+
+type QueryOutputOfInventory {
+  count: Long!
+  data: [Inventory!]!
+  paging: PageInfo!
+  totalCount: Long!
+}
+
+input InventoryQuerySorterInput {
+  customerId: SortEnumType
+}
+
+type Inventory {
+  contact: MemberInv
+  partner: MemberInv
+  children: [ChildInv!]
+  lifestyle: LifestyleInv
+  vehicles: [VehicleInv!]
+  pensProvs: [PensionProvisionInv!]
+  rentedHomes: [RentedHomeInv!]
+  properties: [RealEstateInv!]
+  fixedAssets: [FixedAssetInv!]
+  liqAssets: [LiquidAssetInv!]
+  cashAssets: [CashAssetInv!]
+  loans: [LoanInv!]
+  insurances: [InsuranceInv!]
+  insGroups: [InsuranceGroupInv!]
+  customerId: UUID
+  refPortId: UUID
+  key: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [Inconsistency!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type ReferencePortfolio {
+  actionCode: ActionCodes
+  onBBDdata: ProgressBData
+  onBABoard: ProgressABoard
+  onBProgress: ProgressOnboarding
+  onBStrategy: ProgressStrategy
+  description: String
+  customerId: UUID
+  inventoryId: UUID
+  civilStatus: CivilStatus
+  marriageDate: Date
+  userName: String
+  email: String
+  tarriffVersion: String
+  ignorePartner: Boolean
+  riskTolInv: RiskTolerance
+  fmEduDate: Date
+  complPerc: Decimal
+  strategy: Strategy
+  liquidity: Liquidity
+  pensionGap: PensionGapHH
+  penGoal: PensionGoal
+  dogs: Int
+  horses: Int
+  contact: Member
+  partner: Member
+  lifestyleCurrent: Lifestyle
+  lifestyleMinimum: Lifestyle
+  lifestyleRetirement: Lifestyle
+  children: Children
+  rentedHomes: RentedHomes
+  vehicles: Vehicles
+  goals: Goals
+  properties: RealEstates
+  fixedAssets: FixedAssets
+  loans: Loans
+  liquidAssets: LiquidAssets
+  insurances: Insurances
+  bioInsurances: BiometricInsurances
+  calcValReference: CalculatedValuesRefPort
+  calcValInventory: CalculatedValuesRefPort
+  payment: Payment
+  incompleteNodes: [IncompleteNodeRefPort!]
+  status: RefPortStatusObject
+  key: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [Inconsistency!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+input AttachmentUploadInput {
+  area: AttachmentArea!
+  filename: String!
+  documentId: UUID!
+  nodeId: UUID
+}
+
+type AttachmentUploadOutput {
+  url: String!
+  attachmentId: UUID!
+}
+
+type IncompleteNodeRefPort {
+  nodeType: RefPortIncompleteNodeTypes
+  identifier: UUID!
+  typeName: String
+  propertyName: String
+  path: String
+}
+
+type Constants {
+  maxConsideredAgeMember: ConstantsInt!
+  minConsideredAgeMember: ConstantsInt!
+  minRetirementAge: ConstantsInt!
+  maxRetirementAge: ConstantsInt!
+  minMarriageAge: ConstantsInt!
+  defaultPensionEntryAge: ConstantsInt!
+  maxDueYearFromToday: ConstantsInt!
+  childGrownUpAge: ConstantsInt!
+  feeDynamics: ConstantsDec!
+  inflationRate: ConstantsDec!
+  increasePensionRate: ConstantsDec!
+  publicHealthInsuranceTreshold: ConstantsDec!
+  maxSalaryMiniJob: ConstantsDec!
+  volHealthInsSalaryTreshold: ConstantsDec!
+  familyHInsMaxMSalaryStudent: ConstantsDec!
+  familyHInsMaxMSalaryMinJob: ConstantsDec!
+  familyHInsMaxMSalaryEmpl: ConstantsDec!
+  healthContributionPercentage: ConstantsDec!
+  generalContrRateHealthIns: ConstantsDec!
+  avAddContrRateHealthIns: ConstantsDec!
+  contrRateCompCare: ConstantsDec!
+  addContrRateCompCareChildless: ConstantsDec!
+  netPensionGapThreshold: ConstantsDec!
+  investmentContractCosts: ConstantsDec!
+  withholdingTax: ConstantsDec!
+  pensionContractCosts: ConstantsDec!
+  conversionFactorGrossToNetPaymentPension: ConstantsDec!
+  conversionFactorGrossToNetPaymentBAV: ConstantsDec!
+  minimumEmployerContributionBAV: ConstantsDec!
+  defaultInterestRateFixedAsset: ConstantsDec!
+  defaultInterestRateBuildingsContract: ConstantsDec!
+  defaultInterestRateCashAsset: ConstantsDec!
+  defaultInterestRatePropertyForRent: ConstantsDec!
+  interestRateCLV: ConstantsDec!
+  defaultAppreciationProperty: ConstantsDec!
+  minimumNetIncomeForRiskLife: ConstantsDec!
+  factorForLifeLongPension: ConstantsDec!
+  factorForLifeLongPensionGross: ConstantsDec!
+  minLifeMinIncome: ConstantsDec!
+  maxPercOfNetIncomeForInabilities: ConstantsDec!
+  accInsuranceMinimalAmountInsured: ConstantsDec!
+  accInsuranceMaximalAmountInsured: ConstantsDec!
+  accInsuranceDefaultProgression: ConstantsDec!
+  addNurseCareInsuranceAverageOwnContribution: ConstantsDec!
+  baseInterestRatePensionProducts: ConstantsDec!
+  factorImputedIncomeCompanyCar: ConstantsDec!
+  defaultOriginalPriceCompanyCar: ConstantsDec!
+  defaultYearlyCostOfPrivateCar: ConstantsDec!
+  defaultYearlyAnnuityForLoan: ConstantsDec!
+  defaultInterestRateForLoan: ConstantsDec!
+  pensionIncreaseInRetirement: ConstantsDec!
+  increaseInPrivateHealthCosts: ConstantsDec!
+  childBenefit: ConstantsDec!
+  initialDateValue: ConstantsDate!
+  initialMaxDateValue: ConstantsDate!
+  initialYearValue: ConstantsInt!
+  initialMaxYearValue: ConstantsInt!
+  workInabMinUntilAge: ConstantsInt!
+  workInabMaxUntilAge: ConstantsInt!
+}
+
+input ReferencePortfolioMutationInput {
+  actionCode: RefPortActionCodeExt
+  onBBDdata: ProgressBData
+  onBABoard: ProgressABoard
+  onBProgress: ProgressOnboarding
+  onBStrategy: ProgressStrategy
+  description: String
+  customerId: UUID
+  inventoryId: UUID
+  civilStatus: CivilStatus
+  marriageDate: Date
+  userName: String
+  email: String
+  tarriffVersion: String
+  ignorePartner: Boolean
+  fmEduDate: Date
+  strategy: StrategyMutationInput
+  dogs: Int
+  horses: Int
+  contact: MemberMutationInput
+  partner: MemberMutationInput
+  lifestyleCurrent: LifestyleMutationInput
+  lifestyleMinimum: LifestyleMutationInput
+  lifestyleRetirement: LifestyleMutationInput
+  children: ChildrenMutationInput
+  rentedHomes: RentedHomesMutationInput
+  vehicles: VehiclesMutationInput
+  goals: GoalsMutationInput
+  properties: RealEstatesMutationInput
+  fixedAssets: FixedAssetsMutationInput
+  loans: LoansMutationInput
+  liquidAssets: LiquidAssetsMutationInput
+  insurances: InsurancesMutationInput
+  bioInsurances: BiometricInsurancesMutationInput
+  insTariffRecalc: Boolean
+  identifier: UUID!
+}
+
+type KeyValuePairOfInt32AndLiquidityForecastResult {
+  key: Int!
+  value: LiquidityForecastResult!
+}
+
+type KeyValuePairOfInt32AndWealthForecastResult {
+  key: Int!
+  value: WealthForecastResult!
+}
+
+enum ActiveStatus {
+  INIT
+  ACTIVE
+}
+
+type ReferencePortfolioListView {
+  identifier: UUID!
+  description: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  deleted: DeleteStatus
+}
+
+type Attachment {
+  area: AttachmentArea
+  filename: String
+  contentType: String
+  contentLength: Long
+  nodeId: UUID
+  containerName: String
+  blobName: String
+  status: AttachmentStatusObject
+  demandConceptExtensions: DemandConceptExtensions
+  actionCode: ActionCodes
+  key: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [Inconsistency!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+"""
+The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1.
+"""
+scalar Long
+
+input ReferencePortfolioQueryFilterInput {
+  and: [ReferencePortfolioQueryFilterInput!]
+  or: [ReferencePortfolioQueryFilterInput!]
+  customerId: ComparableFilterOfNullableOfGuidInput
+}
+
+type QueryOutputOfReferencePortfolioOutput {
+  count: Long!
+  data: [ReferencePortfolioOutput!]!
+  paging: PageInfo!
+  totalCount: Long!
+}
+
+input ReferencePortfolioQuerySorterInput {
+  customerId: SortEnumType
+}
+
+scalar UUID @specifiedBy(url: "https://tools.ietf.org/html/rfc4122")
+
+type ReferencePortfolioOutput {
+  onBBDdata: ProgressBData
+  onBABoard: ProgressABoard
+  onBProgress: ProgressOnboarding
+  onBStrategy: ProgressStrategy
+  description: String
+  customerId: UUID
+  inventoryId: UUID
+  civilStatus: CivilStatus
+  marriageDate: Date
+  userName: String
+  email: String
+  tarriffVersion: String
+  ignorePartner: Boolean
+  riskTolInv: RiskTolerance
+  fmEduDate: Date
+  complPerc: Decimal
+  strategy: StrategyOutput
+  liquidity: LiquidityOutput
+  pensionGap: PensionGapHHOutput
+  penGoal: PensionGoalOutput
+  dogs: Int
+  horses: Int
+  contact: MemberOutput
+  partner: MemberOutput
+  lifestyleCurrent: LifestyleOutput
+  lifestyleMinimum: LifestyleOutput
+  lifestyleRetirement: LifestyleOutput
+  children: ChildrenOutput
+  rentedHomes: RentedHomesOutput
+  vehicles: VehiclesOutput
+  goals: GoalsOutput
+  properties: RealEstatesOutput
+  fixedAssets: FixedAssetsOutput
+  loans: LoansOutput
+  liquidAssets: LiquidAssetsOutput
+  insurances: InsurancesOutput
+  bioInsurances: BiometricInsurancesOutput
+  calcValReference: CalculatedValuesRefPortOutput
+  calcValInventory: CalculatedValuesRefPortOutput
+  payment: PaymentOutput
+  insTariffRecalc: Boolean
+  incompleteNodes: [IncompleteNodeRefPort!]
+  status: RefPortStatusObjectOutput
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [InconsistencyOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type InconsistencyMetadata {
+  code: String!
+  message: String!
+}
+
+type ErrorCodeMetadata {
+  code: String!
+  message: String!
+  category: String!
+}
+
+type PlanActualAdjustment {
+  refId: UUID
+  invId: UUID
+  insurances: [PAAInsurance!]
+}
+
+input ExecutionPlanCreateInput {
+  customerId: UUID!
+  identifier: UUID!
+}
+
+input ExecutionPlanMutationInput {
+  identifier: UUID!
+}
+
+type AirIdentityView {
+  identifier: UUID!
+  userEmail: String
+  firstName: String
+  lastName: String
+  relevantEntityName: String
+  currentStatus: AirCurrentStatus
+  airGroups: [AirGroup!]
+  preference: Preference
+  deleted: DeleteStatus
+  consentStatus: ConsentStatus
+  consentVersion: Date
+  userLanguage: AirLanguage
+  crispDisabled: Boolean
+  basicLTDisabled: Boolean
+}
+
+type SigninActivity {
+  createdDateTime: DateTime!
+  signinStatus: UserSigninStatus!
+  ipAddress: String!
+  location: String!
+  browser: String!
+  operatingSystem: String!
+}
+
+enum InviteStatus {
+  INIT
+  INVITED
+  RESENT_INVITATION
+}
+
+input SignupMutationInput {
+  identifier: UUID!
+  userEmail: String
+  firstName: String
+  lastName: String
+  preference: PreferenceInput
+}
+
+type UserToken {
+  token: String
+  expireDate: DateTime!
+}
+
+type TokenValidationResult {
+  result: Boolean!
+  userEmail: String!
+  userLanguage: AirLanguage!
+}
+
+type Customer {
+  employeeId: UUID
+  employeeEmail: String
+  firstName: String
+  lastName: String
+  birthDate: Date
+  userEmail: String
+  isShared: Boolean
+  customerGroups: [CustomerGroup!]
+  payment: CustomerPayment
+  preference: Preference
+  consentVersion: Date
+  status: CustomerStatusObject
+  openBanking: CustomerOpenBanking
+  actionCode: ActionCodes
+  key: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [Inconsistency!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+input CustomerQuerySorterInput {
+  payment: CustomerPaymentObjectSorterInput
+  employeeId: SortEnumType
+  employeeEmail: SortEnumType
+  firstName: SortEnumType
+  lastName: SortEnumType
+  birthDate: SortEnumType
+  userEmail: SortEnumType
+  isShared: SortEnumType
+  createDate: SortEnumType
+}
+
+type QueryOutputOfCustomer {
+  count: Long!
+  data: [Customer!]!
+  paging: PageInfo!
+  totalCount: Long!
+}
+
+input CustomerQueryFilterInput {
+  and: [CustomerQueryFilterInput!]
+  or: [CustomerQueryFilterInput!]
+  employeeId: ComparableFilterOfNullableOfGuidInput
+  employeeEmail: StringFilterInput
+  status: CustomerStatusObjectFilterInput
+  payment: CustomerPaymentObjectFilterInput
+  isShared: BooleanFilterInput
+  createDate: ComparableFilterOfNullableOfDateTimeInput
+  firstName: StringFilterInput
+  lastName: StringFilterInput
+  userEmail: StringFilterInput
+  customerGroups: CollectionFilterOfCustomerGroupInput
+}
+
+type CrispIdentity {
+  identifier: UUID!
+  onCreate: Boolean
+  onDelete: Boolean
+  crispToken: UUID
+  crispSignature: String
+}
+
+input CustomerMutationInput {
+  employeeId: UUID
+  firstName: String
+  lastName: String
+  birthDate: Date
+  userEmail: String
+  isShared: Boolean
+  preference: PreferenceInput
+  identifier: UUID!
+}
+
+input CustomerUpdateMutationInput {
+  employeeId: UUID
+  firstName: String
+  lastName: String
+  birthDate: Date
+  isShared: Boolean
+  preference: PreferenceInput
+  actionCode: CustomerActionCodes
+  identifier: UUID!
+}
+
+type Employee {
+  firstName: String
+  lastName: String
+  birthDate: Date
+  userEmail: String
+  employeeGroups: [EmployeeGroup!]
+  preference: Preference
+  actionCode: ActionCodes
+  status: EmployeeStatusObject
+  key: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [Inconsistency!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+input EmployeeQuerySorterInput {
+  firstName: SortEnumType
+  lastName: SortEnumType
+  birthDate: SortEnumType
+  userEmail: SortEnumType
+}
+
+type QueryOutputOfEmployee {
+  count: Long!
+  data: [Employee!]!
+  paging: PageInfo!
+  totalCount: Long!
+}
+
+input EmployeeQueryFilterInput {
+  firstName: StringFilterInput
+  lastName: StringFilterInput
+  userEmail: StringFilterInput
+  employeeGroups: CollectionFilterOfEmployeeGroupInput
+  and: [EmployeeQueryFilterInput!]
+  or: [EmployeeQueryFilterInput!]
+  status: EmployeeStatusObjectFilterInput
+}
+
+enum EmployeeGroup {
+  AIR_EMPLOYEE_ADMIN
+  AIR_EMPLOYEE_TEAM_LEAD
+  AIR_EMPLOYEE_COMPANION
+  AIR_EMPLOYEE_SERVICE
+  AIR_EMPLOYEE_TEST_ORGANIZER
+}
+
+input EmployeeMutationInput {
+  firstName: String
+  lastName: String
+  birthDate: Date
+  userEmail: String
+  employeeGroups: [EmployeeGroup!]
+  preference: PreferenceInput
+  identifier: UUID!
+}
+
+input EmployeeUpdateMutationInput {
+  firstName: String
+  lastName: String
+  birthDate: Date
+  preference: PreferenceInput
+  actionCode: EmployeeActionCodes
+  identifier: UUID!
+}
+
+input EmployeeLockMutationInput {
+  actionCode: EmployeeActionCodes
+  identifier: UUID!
+}
+
+input EmployeeChangeGroupMutationInput {
+  identifier: UUID!
+  employeeGroups: [EmployeeGroup!]
+}
+
+type TeamQueryOutput {
+  teamLeader: RelatedDocument
+  teamMembers: RelatedDocumentSet
+  name: String
+  description: String
+  isShared: Boolean
+  isDefaultTeam: Boolean
+  actionCode: ActionCodes
+  employeeId: UUID
+  status: TeamStatusObject
+  teamCustomization: TeamCustomization
+  key: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [Inconsistency!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+input TeamQuerySorterInput {
+  name: SortEnumType
+  description: SortEnumType
+  isShared: SortEnumType
+  employeeId: SortEnumType
+}
+
+type QueryOutputOfTeamQueryOutput {
+  count: Long!
+  data: [TeamQueryOutput!]!
+  paging: PageInfo!
+  totalCount: Long!
+}
+
+input TeamQueryFilterInput {
+  name: StringFilterInput
+  description: StringFilterInput
+  and: [TeamQueryFilterInput!]
+  or: [TeamQueryFilterInput!]
+  status: TeamStatusObjectFilterInput
+  isShared: BooleanFilterInput
+}
+
+input TeamMutationInput {
+  name: String
+  description: String
+  isShared: Boolean
+  isDefaultTeam: Boolean
+  employeeId: UUID
+  identifier: UUID!
+  teamCustomization: TeamCustomizationInput
+}
+
+input TeamUpdateMutationInput {
+  name: String
+  description: String
+  isShared: Boolean
+  isDefaultTeam: Boolean
+  actionCode: TeamActionCodes
+  employeeId: UUID
+  identifier: UUID!
+  teamCustomization: TeamCustomizationInput
+}
+
+input TeamAssignMutationInput {
+  actionCode: TeamAssignActionCodes
+  employeeId: UUID
+  identifier: UUID!
+}
+
+type TariffView {
+  insuranceProductId: String
+  periodOfPay: PeriodOfPay
+  basicPerformance: Int
+  performance: Int
+  insuranceCompany: String
+  companyTariffType: String
+  calculatedPaymentContributionPerMonth: Decimal
+  validFrom: Date
+  source: String
+}
+
+enum WorkInabilityType {
+  WORK_INABILITY_DISABILITY
+  WORK_INABILITY_INCAPACITY
+  WORK_INABILITY_BASIC
+}
+
+type PaymentCustomerPortalQueryOutput {
+  url: String!
+}
+
+input PaymentCustomerPortalQueryInput {
+  customerId: UUID!
+  returnUrl: String
+}
+
+type PaymentCreateCheckoutMutationOutput {
+  id: String!
+  clientReferenceId: String!
+  clientSecret: String!
+  url: String!
+}
+
+input PaymentCreateCheckoutMutationInput {
+  customerId: UUID!
+  product: PaymentProduct!
+  subscriptionTier: PaymentSubscriptionTier!
+  billingPeriod: PaymentBillingPeriod!
+  successUrl: String!
+  cancelUrl: String!
+}
+
+type OpenBankingProcessedData {
+  customerId: UUID
+  fromDate: Date!
+  toDate: Date!
+  processedAccounts: [ProcessedAccount!]
+  processedSecurities: [ProcessedSecurity!]
+  processedTransactions: [ProcessedTransaction!]
+  status: OpenBankingProcessedDataStatusObject
+  actionCode: ActionCodes
+  key: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [Inconsistency!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+"""
+The `Date` scalar represents an ISO-8601 compliant date type.
+"""
+scalar Date
+
+type OpenBankingMappingRule {
+  evaluate(transaction: ProcessedTransactionInput!): Boolean!
+  customerId: UUID
+  ruleName: String!
+  priority: Int!
+  targetInvEntity: TargetInvEntity!
+  targetInvIdentifier: UUID
+  logicalOperator: LogicalOperator!
+  conditions: RuleCondition!
+  status: OpenBankingMappingRuleStatusObject
+  actionCode: ActionCodes
+  key: String
+  createDate: DateTime
+  createdByUser: String
+  lastUpdateDate: DateTime
+  lastUpdatedByUser: String
+  inconsistencies: [Inconsistency!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Label {
+  toJson: String!
+  id: Long!
+  name: String!
+}
+
+type UserInfo {
+  toJson: String!
+  userId: String!
+  registrationDate: DateTime!
+  deletionDate: DateTime!
+  lastActiveDate: DateTime!
+  bankConnectionCount: Int!
+  latestBankConnectionImportDate: DateTime!
+  latestBankConnectionDeletionDate: DateTime!
+  monthlyStats: [MonthlyUserStats!]!
+  isLocked: Boolean!
+}
+
+type User {
+  toJson: String!
+  id: String!
+  password: String!
+  email: String!
+  phone: String!
+  isAutoUpdateEnabled: Boolean!
+}
+
+type Transaction {
+  toJson: String!
+  currency: Currency
+  originalCurrency: Currency
+  feeCurrency: Currency
+  id: Long!
+  parentId: Long!
+  accountId: Long!
+  valueDate: DateTime!
+  bankBookingDate: DateTime!
+  finapiBookingDate: DateTime!
+  amount: Decimal!
+  purpose: String!
+  counterpartName: String!
+  counterpartAccountNumber: String!
+  counterpartIban: String!
+  counterpartBlz: String!
+  counterpartBic: String!
+  counterpartBankName: String!
+  counterpartMandateReference: String!
+  counterpartCustomerReference: String!
+  counterpartCreditorId: String!
+  counterpartDebitorId: String!
+  type: String!
+  typeCodeZka: String!
+  typeCodeSwift: String!
+  sepaPurposeCode: String!
+  bankTransactionCode: String!
+  bankTransactionCodeDescription: String!
+  primanota: String!
+  category: TransactionCategory!
+  labels: [Label!]!
+  isPotentialDuplicate: Boolean!
+  isAdjustingEntry: Boolean!
+  isNew: Boolean!
+  importDate: DateTime!
+  children: [Long!]!
+  paypalData: PendingTransactionPaypalData!
+  certisData: PendingTransactionCertisData!
+  endToEndReference: String!
+  compensationAmount: Decimal!
+  originalAmount: Decimal!
+  feeAmount: Decimal!
+  differentDebitor: String!
+  differentCreditor: String!
+}
+
+type Security {
+  toJson: String!
+  quoteType: SecurityPositionQuoteType
+  quantityNominalType: SecurityPositionQuantityNominalType
+  id: Long!
+  accountId: Long!
+  name: String!
+  isin: String!
+  wkn: String!
+  quote: Decimal!
+  quoteCurrency: String!
+  quoteDate: DateTime!
+  quantityNominal: Decimal!
+  marketValue: Decimal!
+  marketValueCurrency: String!
+  entryQuote: Decimal!
+  entryQuoteCurrency: String!
+  profitOrLoss: Decimal!
+}
+
+type Category {
+  toJson: String!
+  id: Long!
+  name: String!
+  parentId: Long!
+  parentName: String!
+  isCustom: Boolean!
+  children: [Long!]!
+}
+
+type Bank {
+  toJson: String!
+  id: Long!
+  name: String!
+  bic: String!
+  blz: String!
+  location: String!
+  city: String!
+  isTestBank: Boolean!
+  popularity: Int!
+  interfaces: [BankInterface!]!
+  bankGroup: BankBankGroup!
+  isBeta: Boolean!
+  logo: BankLogo!
+  icon: BankIcon!
+}
+
+type ClientConfiguration {
+  toJson: String!
+  mandatorLicense: MandatorLicense!
+  preferredConsentType: PreferredConsentType!
+  pfmServicesEnabled: Boolean!
+  isAutomaticBatchUpdateEnabled: Boolean!
+  isDevelopmentModeEnabled: Boolean!
+  isNonEuroAccountsSupported: Boolean!
+  isAutoCategorizationEnabled: Boolean!
+  userNotificationCallbackUrl: String!
+  userSynchronizationCallbackUrl: String!
+  refreshTokensValidityPeriod: Int!
+  userAccessTokensValidityPeriod: Int!
+  clientAccessTokensValidityPeriod: Int!
+  maxUserLoginAttempts: Int!
+  transactionImportLimitation: Int!
+  isUserAutoVerificationEnabled: Boolean!
+  isMandatorAdmin: Boolean!
+  isWebScrapingEnabled: Boolean!
+  aisEnabled: Boolean!
+  paymentsEnabled: Boolean!
+  isStandalonePaymentsEnabled: Boolean!
+  availableBankGroups: [String!]!
+  products: [Product!]!
+  enabledProducts: EnabledProducts!
+  finTSProductRegistrationNumber: String!
+  aisViaWebForm: Boolean!
+  pisViaWebForm: Boolean!
+  pisStandaloneViaWebForm: Boolean!
+  betaBanksEnabled: Boolean!
+  categoryRestrictionsEnabled: Boolean!
+  categoryRestrictions: [Category!]!
+  accountTypeRestrictions: [AccountType!]!
+  corsAllowedOrigins: [String!]!
+}
+
+type DailyBalanceList {
+  toJson: String!
+  latestCommonBalanceTimestamp: DateTime!
+  dailyBalances: [DailyBalance!]!
+  paging: DailyBalanceListPaging!
+}
+
+type Profile {
+  toJson: String!
+  id: String!
+  label: String!
+  createdAt: DateTime!
+  default: Boolean!
+  brand: Brand!
+  functionality: Functionality!
+  aspect: Aspect!
+}
+
+type WebForm {
+  toJson: String!
+  type: WebFormType!
+  status: WebFormStatus!
+  id: String!
+  url: String!
+  createdAt: DateTime!
+  expiresAt: DateTime!
+  payload: Payload!
+}
+
+type TaskX {
+  toJson: String!
+  type: TaskTypeX!
+  status: TaskStatusX!
+  id: String!
+  createdAt: DateTime!
+  payload: TaskPayload!
+}
+
+type Account {
+  toJson: String!
+  accountType: AccountType!
+  id: Long!
+  bankConnectionId: Long!
+  accountName: String!
+  iban: String!
+  accountNumber: String!
+  subAccountNumber: String!
+  accountHolderName: String!
+  accountHolderId: String!
+  accountCurrency: String!
+  balance: Decimal!
+  overdraft: Decimal!
+  overdraftLimit: Decimal!
+  availableFunds: Decimal!
+  isNew: Boolean!
+  interfaces: [AccountInterface!]!
+  isSeized: Boolean!
+}
+
+type BankConnection {
+  toJson: String!
+  updateStatus: UpdateStatusEnum!
+  categorizationStatus: CategorizationStatus!
+  id: Long!
+  name: String!
+  interfaces: [BankConnectionInterface!]!
+  accountIds: [Long!]!
+  owners: [BankConnectionOwner!]!
+  bank: BankConnectionBank!
+}
+
+input OpenBankingMappingRuleMutationInput {
+  identifier: UUID!
+  ruleName: String!
+  priority: Int!
+  targetInvEntity: TargetInvEntity!
+  targetInvIdentifier: UUID
+  logicalOperator: LogicalOperator!
+  conditions: RuleConditionInput!
+}
+
+type MMInsuranceProvider {
+  name: String!
+  id: String!
+}
+
+enum InsuranceType {
+  HEALTH
+  SICKPAY
+  COMPCARE
+  INTHEALTH
+  ADDAMB
+  ADDSTAT
+  ADDDENT
+  ADDNURSECARE
+  RISKLIFE
+  WORKINAB
+  PRIVATELIAB
+  BUILDERLIAB
+  PHOTOLIAB
+  HONORARYLIAB
+  WATERDAMLIAB
+  LANDOWNLIAB
+  DOGLIAB
+  HORSELIAB
+  HUNTERLIAB
+  CAR
+  LEGALEXP
+  HOUSECONTENT
+  ACCIDENT
+  PROPERTYDAM
+  OTHERS
+  PHENTITLEMENT
+}
+
+type MMTariffState {
+  name: String!
+  id: String!
+}
+
+type MMInsuranceTariff {
+  name: String!
+  id: String
+  children: [MMInsuranceTariff!]!
+}
+
+type MMTariffVariant {
+  name: String!
+  id: String!
+}
+
+type MMTariffRisks {
+  name: String!
+  id: String!
+}
+
+type MMTariffCoverage {
+  name: String!
+  description: String!
+  id: String!
+}
+
+type MMTariffComparisionResult {
+  providerName: String!
+  tariffState: String!
+  variantName: String!
+  endOfDistribution: DateTime
+  performance: TariffComparisionPerformance!
+}
+
+type MMCoverageQuestionGroupsOverall {
+  questions: [MMCoverageQuestionsOverall!]
+  shortDescription: String!
+  longDescription: String!
+  id: Int!
+  parentQuestionGroupId: Int!
+  sortOrder: Int!
+}
+
+type PlanActualComparisonResult {
+  balance: PACBalance
+  current: PACLifestyle
+  retirement: PACLifestyle
+  minSickContact: PACLifestyle
+  minInabContact: PACLifestyle
+  minDeathContact: PACLifestyle
+  minSickPartner: PACLifestyle
+  minInabPartner: PACLifestyle
+  minDeathPartner: PACLifestyle
+  goals: PACGoals
+  liquidity: PACLiquidities
+  insurances: PACInsurances
+  fixedAssets: PACFixedAssets
+  loans: PACLoans
+}
+
+type InstanceInfo {
+  name: String!
+  namespace: String!
+  assemblyName: String!
+}
+
+type JsonSchemaInfo {
+  nodeMetadataName: String!
+  jsonSchema: String!
+}
+
+input InstanceInfoInput {
+  name: String!
+  namespace: String!
+  assemblyName: String!
+}
+
+type BizDocProjectionMetadata {
+  members: [KeyValuePairOfStringAndBizDocMemberMetadata!]!
+}
+
+type BiometricInsurancesOutput {
+  totalCostMinL: Decimal
+  totalCostMinLInv: Decimal
+  entries: [BioInsuranceReferenceOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type InsurancesOutput {
+  totalCost: Decimal
+  totalCostRet: Decimal
+  savRateYPayments: Decimal
+  totalCostInv: Decimal
+  totalCostRetInv: Decimal
+  entries: [InsuranceReferenceOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type LiquidAssetsOutput {
+  totalAmount: Decimal
+  totalAmountInv: Decimal
+  liqAssets: LiquidAssetReferenceOutput
+  cashAssets: CashAssetReferenceOutput
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type LoansOutput {
+  totalAmount: Decimal
+  totalRepaymentRate: Decimal
+  totalAmHome: Decimal
+  totalRepHome: Decimal
+  totalAmRent: Decimal
+  totalRepRent: Decimal
+  totalAmFA: Decimal
+  totalRepFA: Decimal
+  latestDueYear: Int
+  entries: [LoanOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type FixedAssetsOutput {
+  totalAmount: Decimal
+  totalIncome: Decimal
+  totalSavRate: Decimal
+  totalAmountActive: Decimal
+  totalIncomeActive: Decimal
+  retDepot: RetirementDepositReferenceOutput
+  entries: [FixedAssetOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type RealEstatesOutput {
+  totalAmount: Decimal
+  totalRent: Decimal
+  totalAmountSelf: Decimal
+  landLord: Boolean
+  entries: [RealEstateOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type GoalsOutput {
+  totalAmount: Decimal
+  totalSavingRate: Decimal
+  totalAmountInv: Decimal
+  totalSavingRateInv: Decimal
+  maxGoalID: UUID
+  valDate: Date
+  entries: [GoalOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type VehiclesOutput {
+  entries: [VehicleOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type RentedHomesOutput {
+  tmRent: Decimal
+  entries: [RentedHomeOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type ChildrenOutput {
+  numOfOwnChild: Int
+  entries: [ChildOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type LifestyleOutput {
+  add1: LifestyleAddSpendingsOutput
+  add2: LifestyleAddSpendingsOutput
+  add3: LifestyleAddSpendingsOutput
+  add4: LifestyleAddSpendingsOutput
+  add5: LifestyleAddSpendingsOutput
+  food: Long
+  utility: Long
+  rent: Long
+  clothing: Long
+  education: Long
+  media: Long
+  vacation: Long
+  mobility: Long
+  miscellaneous: Long
+  buffer: Long
+  total: OverwritableAmountOutput
+  valDate: Date
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type MemberOutput {
+  jobs: JobsOutput
+  otherIncomes: OtherIncomesOutput
+  pensionProvisions: PensionProvisionsOutput
+  addGrossPensions: AddGrossPensionsOutput
+  type: MemberType
+  salutation: String
+  firstName: String
+  lastName: String
+  birthday: Date
+  gender: Gender
+  pensionEntryYear: Int
+  inRetirement: Boolean
+  retirementType: RetirementType
+  strategy: MemberStrategyOutput
+  paysChurchTax: Boolean
+  smoker: Boolean
+  hunter: Boolean
+  honorary: Boolean
+  totalIncome: Decimal
+  pensionGap: PensionGapOutput
+  workInabGap: WorkInabilityGapOutput
+  sickPayGap: SickPayGapOutput
+  riskLifeGap: RiskLifeGapOutput
+  statutoryPensionAmount: StatutoryPensionAmountOutput
+  supplPensionAmount: SupplementaryPensionAmountOutput
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type PensionGoalOutput {
+  amountCommon: Decimal
+  savRatCommon: Decimal
+  inflationGap: Decimal
+  inflationGapRed: Decimal
+  savRatInfGap: Decimal
+  firstYearInfGap: Int
+  firstYearInfGapIB: Int
+  lastYearInfGapIB: Int
+  infGapSeries: [KeyValuePairOfInt32AndDecimal!]
+  factorInfGap: Decimal
+  offestInfGap: Decimal
+  factorInfGapIB: Decimal
+  offestInfGapIB: Decimal
+  amountLLPContact: Decimal
+  savRatLLPContact: Decimal
+  expNetPensContact: Decimal
+  amountLLPPartner: Decimal
+  savRatLLPPartner: Decimal
+  expNetPensPartner: Decimal
+  valDate: Date
+}
+
+type PensionGapHHOutput {
+  incFromLiq: Decimal
+  incFromRetDep: Decimal
+  pensEntryYear: Int
+  netPensionGap: Decimal
+  goalToday: Decimal
+  goal: Decimal
+  grPens: Decimal
+  netPens: Decimal
+  addGrInc: Decimal
+  addNetInc: Decimal
+  phiCosts: Decimal
+  phiContrEmpl: Decimal
+  netIncBefPE: Decimal
+}
+
+type LiquidityOutput {
+  liqAfterGoals: Decimal
+  goalYear: Int
+  liqAfterPens: Decimal
+  liqConsByPens: Decimal
+  pensIncomeFromLiq: Decimal
+  incFromRetDep: Decimal
+  incFromRetDepPart4Cont: Decimal
+  retDepConsByPens: Decimal
+  retDepPartConsByPens4Cont: Decimal
+  liqAfterPensPart: Decimal
+  liqConsByPensPart: Decimal
+  pensIncomeFromLiqPart: Decimal
+  incFromRetDepPart: Decimal
+  retDepConsByPensPart: Decimal
+  incFromRetDepCont4Part: Decimal
+  retDepContConsByPens4Part: Decimal
+  retDepHHCons: Decimal
+  retDepHHConsPart: Decimal
+  liqAfterRet: Decimal
+  liqConsByRet: Decimal
+  retDepAfterRet: Decimal
+  retDepConsByRet: Decimal
+  liqRetValYear: Int
+}
+
+type StrategyOutput {
+  r_PensBuf: Decimal
+  r_Household: Boolean
+  r_InflGap: Boolean
+  r_ConsLiq: Boolean
+  w_RiskProf: Boolean
+  w_RiskBuf: Decimal
+  w_RiskTol: RiskTolerance
+  w_LiqRate: Decimal
+  w_TmpCons4Life: Consumption4LifeOutput
+  w_InvType: InvestmentType
+  p_Treshold: Decimal
+  p_Deduct: RiskDeductible
+  r_LifeShare: Decimal
+  m_Partner: Boolean
+  m_Loans: Boolean
+  m_Asset: Boolean
+  m_Pens: Boolean
+}
+
+type DemandConceptExtensions {
+  execution: ExecutionStatus
+  readyDate: DateTime
+  inExecutionDate: DateTime
+  executedDate: DateTime
+}
+
+type AttachmentStatusObject {
+  upload: UploadStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+enum AttachmentArea {
+  NONE
+  DOCUMENT
+  DEMAND_CONCEPT
+  EXECUTION_PLAN
+}
+
+enum DeleteStatus {
+  INIT
+  DELETED
+}
+
+type WealthForecastResult {
+  loans: WealthForecastResultItem!
+  ownHomes: WealthForecastResultItem!
+  fixedAssets: WealthForecastResultItem!
+  liquidityDeviation: WealthForecastResultLiquididyDeviation!
+  liquidAssets: WealthForecastResultItem!
+  retirementBuffer: WealthForecastResultItem!
+  assetsReservedForRetirement: WealthForecastResultItem!
+  equityCapital: WealthForecastResultItem!
+  events: [WealthForecastResultEvent!]!
+}
+
+type LiquidityForecastResult {
+  netIncome: LiquidityForecastResultItem!
+  expensesLifestyle: LiquidityForecastResultItem!
+  expensesInsurances: LiquidityForecastResultItem!
+  expensesFinancing: LiquidityForecastResultItem!
+  expensesGoals: LiquidityForecastResultItem!
+  total: Decimal!
+  events: [LiquidityForecastResultEvent!]!
+}
+
+input BiometricInsurancesMutationInput {
+  entries: [BioInsuranceReferenceMutationInput!]
+}
+
+input InsurancesMutationInput {
+  entries: [InsuranceReferenceMutationInput!]
+}
+
+input LiquidAssetsMutationInput {
+  liqAssets: LiquidAssetReferenceMutationInput
+  cashAssets: CashAssetReferenceMutationInput
+}
+
+input LoansMutationInput {
+  entries: [LoanMutationInput!]
+}
+
+input FixedAssetsMutationInput {
+  totalSavRate: Decimal
+  totalIncomeActive: Decimal
+  retDepot: RetirementDepositReferenceMutationInput
+  entries: [FixedAssetMutationInput!]
+}
+
+input RealEstatesMutationInput {
+  entries: [RealEstateMutationInput!]
+}
+
+input GoalsMutationInput {
+  totalAmountInv: Decimal
+  maxGoalID: UUID
+  valDate: Date
+  entries: [GoalMutationInput!]
+}
+
+input VehiclesMutationInput {
+  entries: [VehicleMutationInput!]
+}
+
+input RentedHomesMutationInput {
+  entries: [RentedHomeMutationInput!]
+}
+
+input ChildrenMutationInput {
+  entries: [ChildMutationInput!]
+}
+
+input LifestyleMutationInput {
+  add1: LifestyleAddSpendingsInput
+  add2: LifestyleAddSpendingsInput
+  add3: LifestyleAddSpendingsInput
+  add4: LifestyleAddSpendingsInput
+  add5: LifestyleAddSpendingsInput
+  food: Long
+  utility: Long
+  rent: Long
+  clothing: Long
+  education: Long
+  media: Long
+  vacation: Long
+  mobility: Long
+  miscellaneous: Long
+  buffer: Long
+  total: OverwritableAmountMutationInput
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input MemberMutationInput {
+  jobs: JobsMutationInput
+  otherIncomes: OtherIncomesMutationInput
+  pensionProvisions: PensionProvisionsMutationInput
+  addGrossPensions: AddGrossPensionsMutationInput
+  salutation: String
+  firstName: String
+  lastName: String
+  birthday: Date
+  gender: Gender
+  inRetirement: Boolean
+  retirementType: RetirementType
+  strategy: MemberStrategyInput
+  paysChurchTax: Boolean
+  smoker: Boolean
+  hunter: Boolean
+  honorary: Boolean
+  riskLifeGap: RiskLifeGapMutationInput
+  statutoryPensionAmount: StatutoryPensionAmountMutationInput
+  supplPensionAmount: SupplementaryPensionAmountMutationInput
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input StrategyMutationInput {
+  r_PensBuf: Decimal
+  r_Household: Boolean
+  r_InflGap: Boolean
+  r_ConsLiq: Boolean
+  w_RiskProf: Boolean
+  w_RiskBuf: Decimal
+  w_RiskTol: RiskTolerance
+  w_LiqRate: Decimal
+  w_TmpCons4Life: Consumption4LifeMutationInput
+  w_InvType: InvestmentType
+  p_Treshold: Decimal
+  p_Deduct: RiskDeductible
+  r_LifeShare: Decimal
+  m_Partner: Boolean
+  m_Loans: Boolean
+  m_Asset: Boolean
+  m_Pens: Boolean
+}
+
+enum CivilStatus {
+  UNKNOWN
+  SINGLE
+  MARRIED
+  COUPLE
+}
+
+enum ProgressStrategy {
+  ONBOARDING
+  ASSETS
+  BASICSECURITY
+  PROVISION
+  RISKCOVERAGE
+  OFFBOARDING
+  COMPLETED
+  CAPITALMARKETEDUCATION1
+  CAPITALMARKETEDUCATION2
+  CAPITALMARKETEDUCATION3
+  CAPITALMARKETEDUCATION4
+  CAPITALMARKETEDUCATION5
+  PREPROVISION
+  PREBASICSECURITY
+}
+
+enum ProgressOnboarding {
+  HOUSEHOLDONBOARING
+  CONTACT
+  PARTNER
+  CHILDREN
+  PETS
+  VEHICLES
+  RENTEDHOMES
+  HOUSEHOLDOFFBOARDING
+  LIFESTYLEONBOARDING
+  CURRENT
+  RETIREMENT
+  MINIMUM
+  GOALS
+  LIFESTYLEOFFBOARDING
+  ASSETONBOARDING
+  OWNEROCCUPIEDHOME
+  FIXEDASSETS
+  LOANS
+  LIQUIDASSETS
+  CASHASSETS
+  ASSETOFFBOARDING
+  INCOMEONBOARDING
+  MAINJOB
+  SECONDARYJOB
+  OTHERINCOME
+  WITHDRAWALFROMDEPOSITS
+  INCOMEOFFBOARDING
+  PENSIONONBOARDING
+  ADDGROSSPENSION
+  PENSIONOFFBOARDING
+  COMPLETED
+}
+
+enum ProgressABoard {
+  ONBOARDING
+  COMPLETED
+  CURRENT
+  RETIREMENT
+  MINIMUM
+  GOALS
+  RISKS
+  FIXEDASSETS
+  LOANS
+  OWNEROCCUPIEDHOME
+  LIQUIDASSETS
+  CASHASSETS
+  ASSETDISTRIBUTION
+  INCOME
+  SPENDING
+  POSTINCOME
+  OFFBOARDING
+  POSTSPENDING
+  POSTASSETDISTRIBUTION
+  MINIMUMPROTECTION
+  PLANSELECTION
+  RETIREMENTPROVISIONS
+  PREPLANSELECTION
+  PREINCOME
+  PREOWNEROCCUPIEDHOME
+}
+
+enum ProgressBData {
+  ONBOARDING
+  IN_PROGRESS
+  COMPLETED
+  CONTACT
+  PARTNER
+  CHILDREN
+  HOUSEHOLD
+  OFFBOARDING
+}
+
+enum RefPortActionCodeExt {
+  ACTIVATE
+  RECALC_INSURANCES
+  RECALC_REFPORT
+  CHECKCOMPLETENESS
+}
+
+type ConstantsDate {
+  value: Date!
+  description: String!
+}
+
+type ConstantsDec {
+  value: Decimal!
+  description: String!
+}
+
+type ConstantsInt {
+  value: Int!
+  description: String!
+}
+
+enum RefPortIncompleteNodeTypes {
+  REFERENCE_PORTFOLIO
+  MEMBER
+  JOB
+  OTHER_INCOME
+  RETIREMENT_DEPOSIT_REFERENCE
+  PENSION_PROVISION_INVENTORY
+  ADD_GROSS_PENSION
+  LIFESTYLE
+  CHILD
+  RENTED_HOME
+  VEHICLE
+  GOAL
+  REAL_ESTATE
+  FIXED_ASSET
+  LOAN
+  LIQUID_ASSET_REFERENCE
+  CASH_ASSET_REFERENCE
+  INSURANCE_REFERENCE
+}
+
+type RefPortStatusObject {
+  activation: ActiveStatus
+  consistency: ConsistencyStatus
+  tarriff: ActualizeStatus
+  retirementGap: RetirementGapStatus
+  execution: ExecutionStatus
+  completeness: CompletenessStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type Payment {
+  status: PaymentStatus
+  paidAt: DateTime
+  expiresAt: DateTime
+  subscriptionTier: PaymentSubscriptionTier
+  billingPeriod: PaymentBillingPeriod
+  promoteToLifetime: Boolean
+  isCancelableDuringFirstYear: Boolean
+}
+
+type CalculatedValuesRefPort {
+  totalNetAssets: Decimal
+  totalAssets: Decimal
+  totalGrossIncome: Decimal
+  totalActiveIncome: Decimal
+  totalIncomeAssets: Decimal
+  totalPension: Decimal
+  totalPensionCost: Decimal
+  overallPension: Decimal
+  netIncome: Decimal
+  totalNetIncome: Decimal
+  childBenefits: Decimal
+  totalNetAvailableMoney: Decimal
+  totalGrAvailableMoney: Decimal
+  totalSpendingsLiving: Decimal
+  totalBalance: Decimal
+}
+
+type BiometricInsurances {
+  totalCostMinL: Decimal
+  totalCostMinLInv: Decimal
+  entries: [BioInsuranceReference!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Insurances {
+  totalCost: Decimal
+  totalCostRet: Decimal
+  savRateYPayments: Decimal
+  totalCostInv: Decimal
+  totalCostRetInv: Decimal
+  entries: [InsuranceReference!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type LiquidAssets {
+  totalAmount: Decimal
+  totalAmountInv: Decimal
+  liqAssets: LiquidAssetReference
+  cashAssets: CashAssetReference
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Loans {
+  totalAmount: Decimal
+  totalRepaymentRate: Decimal
+  totalAmHome: Decimal
+  totalRepHome: Decimal
+  totalAmRent: Decimal
+  totalRepRent: Decimal
+  totalAmFA: Decimal
+  totalRepFA: Decimal
+  latestDueYear: Int
+  entries: [Loan!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type FixedAssets {
+  totalAmount: Decimal
+  totalIncome: Decimal
+  totalSavRate: Decimal
+  totalAmountActive: Decimal
+  totalIncomeActive: Decimal
+  retDepot: RetirementDepositReference
+  entries: [FixedAsset!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type RealEstates {
+  totalAmount: Decimal
+  totalRent: Decimal
+  totalAmountSelf: Decimal
+  landLord: Boolean
+  entries: [RealEstate!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Goals {
+  totalAmount: Decimal
+  totalSavingRate: Decimal
+  totalAmountInv: Decimal
+  totalSavingRateInv: Decimal
+  maxGoalID: UUID
+  valDate: Date
+  entries: [Goal!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Vehicles {
+  entries: [Vehicle!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type RentedHomes {
+  tmRent: Decimal
+  entries: [RentedHome!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Children {
+  numOfOwnChild: Int
+  entries: [Child!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Lifestyle {
+  add1: LifestyleAddSpendings
+  add2: LifestyleAddSpendings
+  add3: LifestyleAddSpendings
+  add4: LifestyleAddSpendings
+  add5: LifestyleAddSpendings
+  food: Long
+  utility: Long
+  rent: Long
+  clothing: Long
+  education: Long
+  media: Long
+  vacation: Long
+  mobility: Long
+  miscellaneous: Long
+  buffer: Long
+  total: OverwritableAmount
+  valDate: Date
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Member {
+  jobs: Jobs
+  otherIncomes: OtherIncomes
+  pensionProvisions: PensionProvisions
+  addGrossPensions: AddGrossPensions
+  salutation: String
+  firstName: String
+  lastName: String
+  birthday: Date
+  civilStatus: CivilStatus
+  marriageDate: Date
+  gender: Gender
+  pensionEntryYear: Int
+  inRetirement: Boolean
+  retirementType: RetirementType
+  strategy: MemberStrategy
+  paysChurchTax: Boolean
+  hInsType: HealthInsuranceType
+  entDailySick: Boolean
+  privateHealthCost: Decimal
+  compCareCost: Decimal
+  smoker: Boolean
+  hunter: Boolean
+  honorary: Boolean
+  totalIncome: Decimal
+  pensionGap: PensionGap
+  workInabGap: WorkInabilityGap
+  sickPayGap: SickPayGap
+  riskLifeGap: RiskLifeGap
+  statutoryPensionAmount: StatutoryPensionAmount
+  supplPensionAmount: SupplementaryPensionAmount
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type PensionGoal {
+  amountCommon: Decimal
+  savRatCommon: Decimal
+  inflationGap: Decimal
+  inflationGapRed: Decimal
+  savRatInfGap: Decimal
+  firstYearInfGap: Int
+  firstYearInfGapIB: Int
+  lastYearInfGapIB: Int
+  infGapSeries: [KeyValuePairOfInt32AndDecimal!]
+  factorInfGap: Decimal
+  offestInfGap: Decimal
+  factorInfGapIB: Decimal
+  offestInfGapIB: Decimal
+  amountLLPContact: Decimal
+  savRatLLPContact: Decimal
+  expNetPensContact: Decimal
+  amountLLPPartner: Decimal
+  savRatLLPPartner: Decimal
+  expNetPensPartner: Decimal
+  valDate: Date
+}
+
+type PensionGapHH {
+  incFromLiq: Decimal
+  incFromRetDep: Decimal
+  pensEntryYear: Int
+  netPensionGap: Decimal
+  goalToday: Decimal
+  goal: Decimal
+  grPens: Decimal
+  netPens: Decimal
+  addGrInc: Decimal
+  addNetInc: Decimal
+  phiCosts: Decimal
+  phiContrEmpl: Decimal
+  netIncBefPE: Decimal
+}
+
+type Liquidity {
+  liqAfterGoals: Decimal
+  goalYear: Int
+  liqAfterPens: Decimal
+  liqConsByPens: Decimal
+  pensIncomeFromLiq: Decimal
+  incFromRetDep: Decimal
+  incFromRetDepPart4Cont: Decimal
+  retDepConsByPens: Decimal
+  retDepPartConsByPens4Cont: Decimal
+  liqAfterPensPart: Decimal
+  liqConsByPensPart: Decimal
+  pensIncomeFromLiqPart: Decimal
+  incFromRetDepPart: Decimal
+  retDepConsByPensPart: Decimal
+  incFromRetDepCont4Part: Decimal
+  retDepContConsByPens4Part: Decimal
+  retDepHHCons: Decimal
+  retDepHHConsPart: Decimal
+  liqAfterRet: Decimal
+  liqConsByRet: Decimal
+  retDepAfterRet: Decimal
+  retDepConsByRet: Decimal
+  liqRetValYear: Int
+}
+
+type Strategy {
+  r_PensDist: Decimal
+  r_PensBuf: Decimal
+  r_Household: Boolean
+  r_InflGap: Boolean
+  r_ConsLiq: Boolean
+  w_RiskProf: Boolean
+  w_RiskBuf: Decimal
+  w_RiskTol: RiskTolerance
+  w_LiqRate: Decimal
+  w_TmpCons4Life: Consumption4Life
+  w_InvType: InvestmentType
+  p_Treshold: Decimal
+  p_Deduct: RiskDeductible
+  r_LifeShare: Decimal
+  m_Partner: Boolean
+  m_Loans: Boolean
+  m_Asset: Boolean
+  m_Pens: Boolean
+}
+
+"""
+The built-in `Decimal` scalar type.
+"""
+scalar Decimal
+
+enum RiskTolerance {
+  UNKNOWN
+  VERY_CONSERVATIVE
+  CONSERVATIVE
+  BALANCED
+  GROWTH_ORIENTED
+  REVENUE_ORIENTED
+}
+
+enum ActionCodes {
+  MARK_AS_DELETE
+  MARK_AS_UNDELETE
+  LOCK
+  ACCEPT
+  DISCARD
+  ACTIVATE
+  TEAM_LEAD_ASSIGN
+  TEAM_LEAD_REMOVE
+  TEAM_MEMBER_ASSIGN
+  TEAM_MEMBER_REMOVE
+  USER_INVITE
+  USER_RESEND_INVITE
+  USER_BLOCK
+  USER_UNBLOCK
+  CUSTOMER_ACCEPT_BPOA
+  CUSTOMER_REMOVE_BPOA
+  CUSTOMER_ACCEPT_PRIVACY_CONSENT
+  CUSTOMER_REMOVE_PRIVACY_CONSENT
+  DECOMMISSION
+  UNDECOMMISSION
+  APPROVE
+  REJECT
+  CONFIRM
+  CANCEL
+  RECALC_INSURANCES
+  RECALC_REFPORT
+  CLOSE_RETIREMENT_GAP
+  CUSTOMER_REFRESH_PRIVACY_CONSENT
+  DEACTIVATE
+  EXECUTE
+  RESETEXECUTE
+  CONFIRMEXECUTE
+  CHECKCOMPLETENESS
+  RESET
+  OPTIMIZE
+  HANDOVER
+  START
+  CHECK
+}
+
+type InsuranceGroupInv {
+  type: InsuranceGroupType
+  insurer: String
+  feePay: FeePayTerm
+  fee: Decimal
+  payTerm: PaymentTermsType
+  note: String
+  valDate: Date
+  insurances: [InsuranceGroupItemInv!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type InsuranceInv {
+  actionCode: ActionCodes
+  name: String
+  insType: InsuranceType
+  severity: SeverityLevel
+  riskCategory: RiskCategory
+  wiType: WorkInabilityType
+  riskOrg: RiskOriginator
+  riskOrgID: UUID
+  riskOrgEntId: UUID
+  feePay: FeePayTerm
+  amIns: Decimal
+  valDate: Date
+  insurer: InsInvSelection
+  condState: InsInvSelection
+  tariff: InsInvSelectionChildren
+  tariffVariant: InsInvSelection
+  risks: [InsInvSelection!]
+  coverages: [InsInvSelection!]
+  tariffs: [InsInvSelectionChildren!]
+  score: InsScore
+  note: String
+  cascoType: CascoType
+  noClBonus: NoClaimsBonusType
+  deductible: Decimal
+  famStat: FamilyStatusInv
+  pensionIncr: Decimal
+  untilAge: Int
+  status: InsuranceInvStatus
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type LoanInv {
+  loanType: LoanType
+  grossIncomeType: GrossIncomeType
+  repaymentRate: Decimal
+  interestRate: Decimal
+  interestChangeYear: Int
+  remAmountAtPE: Decimal
+  redIns: RedemptionInsurance
+  linkToAsset: UUID
+  valDate: Date
+  repYear: OverwritableInteger
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type CashAssetInv {
+  caType: CashAssetType
+  name: String
+  amount: Decimal
+  savingsRate: Decimal
+  accNumber: String
+  valDate: Date
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type LiquidAssetInv {
+  name: String
+  amount: Decimal
+  savingsRate: Decimal
+  retirement: Boolean
+  isin: String
+  accNum: String
+  shareRatio: Decimal
+  assTo: LiquidAssetAssignmentType
+  valDate: Date
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type FixedAssetInv {
+  actionCode: ActionCodes
+  fixedAssetType: FixedAssetType
+  phType: PassiveHoldingType
+  grossIncomeType: GrossIncomeType
+  appreciation: Decimal
+  savingsRate: Decimal
+  income: Decimal
+  yield: Decimal
+  yieldAm: Decimal
+  reInvesting: Boolean
+  notForPension: Boolean
+  valueAtDueYear: Decimal
+  valDate: Date
+  status: FixedAssetStatus
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type RealEstateInv {
+  propertyType: PropertyType
+  propertyUsage: PropertyUsageType
+  grossIncomeType: GrossIncomeType
+  appreciation: Decimal
+  rent: Decimal
+  newBuildValue: Decimal
+  livingSpace: Decimal
+  notForPension: Boolean
+  address: Address
+  oilTank: Boolean
+  photolVolt: Boolean
+  renovMeasure: Boolean
+  propInsOA: Boolean
+  landOwnOA: Boolean
+  valDate: Date
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type RentedHomeInv {
+  name: String
+  mRent: Decimal
+  livingSpace: Decimal
+  notes: String
+  address: Address
+  valDate: Date
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type PensionProvisionInv {
+  memberType: MemberType
+  actionCode: ActionCodes
+  pppSubType: PrivatePensionProvisionSubType
+  expAmount: Decimal
+  expGrPension: Decimal
+  dueYear: Int
+  assToLoan: Boolean
+  valDate: Date
+  status: PensInvStatus
+  ppType: PensionProvisionType
+  withGuarantee: Boolean
+  name: String
+  amount: Decimal
+  payment: Decimal
+  netPayment: Decimal
+  payEmp: Decimal
+  payEmpPerc: Decimal
+  grossPension: Decimal
+  netPension: Decimal
+  payIncr: Decimal
+  before2005: Boolean
+  startYear: Int
+  irr: Decimal
+  distribution: LiquidAssetDistribution
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type VehicleInv {
+  name: String
+  yearlyCosts: Decimal
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type LifestyleInv {
+  food: Decimal
+  utility: Decimal
+  rent: Decimal
+  clothing: Decimal
+  education: Decimal
+  media: Decimal
+  vacation: Decimal
+  mobility: Decimal
+  miscellaneous: Decimal
+  buffer: Decimal
+  total: OverwritableAmount
+  valDate: Date
+  history: [KeyValuePairOfYearMonthAndLifestyleInvValues!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type ChildInv {
+  firstName: String
+  lastName: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type MemberInv {
+  firstName: String
+  lastName: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+input InsuranceGroupInvMutationInput {
+  type: InsuranceGroupType
+  insurer: String
+  feePay: FeePayTermMutationInput
+  fee: Decimal
+  payTerm: PaymentTermsType
+  note: String
+  valDate: Date
+  insurances: [InsuranceGroupItemInvMutationInput!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input InsuranceInvMutationInput {
+  actionCode: InsuranceInvActionCode
+  name: String
+  insType: InsuranceType
+  wiType: WorkInabilityType
+  riskOrg: RiskOriginator
+  riskOrgID: UUID
+  riskOrgEntId: UUID
+  feePay: FeePayTermMutationInput
+  amIns: Decimal
+  insurer: InsInvSelectionInput
+  condState: InsInvSelectionInput
+  tariff: InsInvSelectionChildrenInput
+  tariffVariant: InsInvSelectionInput
+  risks: [InsInvSelectionInput!]
+  coverages: [InsInvSelectionInput!]
+  tariffs: [InsInvSelectionChildrenInput!]
+  note: String
+  cascoType: CascoType
+  noClBonus: NoClaimsBonusType
+  deductible: Decimal
+  famStat: FamilyStatusInv
+  pensionIncr: Decimal
+  untilAge: Int
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input LoanInvMutationInput {
+  loanType: LoanType
+  grossIncomeType: GrossIncomeType
+  repaymentRate: Decimal
+  interestRate: Decimal
+  interestChangeYear: Int
+  remAmountAtPE: Decimal
+  redIns: RedemptionInsuranceInput
+  linkToAsset: UUID
+  repYear: OverwritableIntegerInput
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  triggerDeterminations: Boolean
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input CashAssetInvMutationInput {
+  caType: CashAssetType
+  name: String
+  amount: Decimal
+  savingsRate: Decimal
+  accNumber: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input LiquidAssetInvMutationInput {
+  name: String
+  amount: Decimal
+  savingsRate: Decimal
+  retirement: Boolean
+  isin: String
+  accNum: String
+  shareRatio: Decimal
+  assTo: LiquidAssetAssignmentType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input FixedAssetInvMutationInput {
+  actionCode: ActionCodes
+  fixedAssetType: FixedAssetType
+  phType: PassiveHoldingType
+  grossIncomeType: GrossIncomeType
+  appreciation: Decimal
+  savingsRate: Decimal
+  yield: Decimal
+  yieldAm: Decimal
+  reInvesting: Boolean
+  notForPension: Boolean
+  valueAtDueYear: Decimal
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input PensionProvisionInvMutationInput {
+  memberType: MemberType
+  actionCode: ActionCodes
+  pppSubType: PrivatePensionProvisionSubType
+  expAmount: Decimal
+  expGrPension: Decimal
+  dueYear: Int
+  ppType: PensionProvisionType
+  withGuarantee: Boolean
+  name: String
+  amount: Decimal
+  payment: Decimal
+  payEmp: Decimal
+  payEmpPerc: Decimal
+  grossPension: Decimal
+  payIncr: Decimal
+  before2005: Boolean
+  startYear: Int
+  distribution: LiquidAssetDistribution
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input LifestyleInvMutationInput {
+  history: [KeyValuePairOfYearMonthAndLifestyleInvValuesInput!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+enum ActionIndicator {
+  NONE
+  CREATE
+  UPDATE
+  DELETE
+}
+
+type Inconsistency {
+  code: String!
+  message: String!
+  params: [KeyValuePairOfStringAndString!]
+  identifiers: [IdentifierType!]
+}
+
+"""
+The `DateTime` scalar represents an ISO-8601 compliant date time type.
+"""
+scalar DateTime @specifiedBy(url: "https://www.graphql-scalars.com/date-time")
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+input ComparableFilterOfNullableOfGuidInput {
+  and: [ComparableFilterOfNullableOfGuidInput!]
+  or: [ComparableFilterOfNullableOfGuidInput!]
+  eq: UUID
+  neq: UUID
+  in: [UUID]
+  nin: [UUID]
+  gt: UUID
+  ngt: UUID
+  gte: UUID
+  ngte: UUID
+  lt: UUID
+  nlt: UUID
+  lte: UUID
+  nlte: UUID
+}
+
+type CalculatedValuesRefPortOutput {
+  totalNetAssets: Decimal
+  totalAssets: Decimal
+  totalGrossIncome: Decimal
+  totalActiveIncome: Decimal
+  totalIncomeAssets: Decimal
+  totalPension: Decimal
+  totalPensionCost: Decimal
+  overallPension: Decimal
+  netIncome: Decimal
+  totalNetIncome: Decimal
+  childBenefits: Decimal
+  totalNetAvailableMoney: Decimal
+  totalGrAvailableMoney: Decimal
+  totalSpendingsLiving: Decimal
+  totalBalance: Decimal
+}
+
+type PaymentOutput {
+  status: PaymentStatus
+  paidAt: DateTime
+  expiresAt: DateTime
+  subscriptionTier: PaymentSubscriptionTier
+  billingPeriod: PaymentBillingPeriod
+  promoteToLifetime: Boolean
+  isCancelableDuringFirstYear: Boolean
+}
+
+type RefPortStatusObjectOutput {
+  activation: ActiveStatus
+  consistency: ConsistencyStatus
+  tarriff: ActualizeStatus
+  retirementGap: RetirementGapStatus
+  execution: ExecutionStatus
+  completeness: CompletenessStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type InconsistencyOutput {
+  code: String
+  message: String
+  params: [KeyValuePairOfStringAndString!]
+  identifiers: [IdentifierType!]
+}
+
+type PAAInsurance {
+  assignment: AssignmentLink
+  reference: InsuranceReference
+  inventory: [InsuranceInv!]
+}
+
+enum AirCurrentStatus {
+  PREDEFINED
+  INVITED
+  RESENT_INVITATION
+  ACTIVATED
+  BLOCKED
+}
+
+enum AirGroup {
+  AIR_EMPLOYEE_ADMIN
+  AIR_EMPLOYEE_TEAM_LEAD
+  AIR_EMPLOYEE_COMPANION
+  AIR_EMPLOYEE_SERVICE
+  AIR_EMPLOYEE_TEST_ORGANIZER
+  AIR_CUSTOMER
+}
+
+type Preference {
+  language: AirLanguage
+  theme: AirTheme
+}
+
+enum ConsentStatus {
+  INIT
+  AGREED
+  WITHDRAWN
+  WAITINGFORAGREEMENT
+  WAITINGFORREFRESH
+}
+
+enum AirLanguage {
+  ENGLISH
+  GERMAN
+  GERMAN_INFORMAL
+}
+
+enum UserSigninStatus {
+  SUCCESS
+  UNSUCCESS
+}
+
+input PreferenceInput {
+  language: AirLanguage
+  theme: AirTheme
+}
+
+enum CustomerGroup {
+  AIR_CUSTOMER
+}
+
+type CustomerPayment {
+  customerId: String
+  status: PaymentStatus
+  paidAt: DateTime
+  expiresAt: DateTime
+  subscriptionTier: PaymentSubscriptionTier
+  billingPeriod: PaymentBillingPeriod
+  lastEventId: String
+  lastEventCreatedAt: DateTime
+  promoteToLifetime: Boolean
+  isCancelableDuringFirstYear: Boolean
+}
+
+type CustomerStatusObject {
+  activation: UserStatus
+  consent: ConsentStatus
+  invitation: InviteStatus
+  brokerAuthorization: BPoAGrantStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type CustomerOpenBanking {
+  userId: String
+  status: OpenBankingStatus
+  userStatus: OpenBankingUserStatus
+  registrationDate: DateTime
+  deletionDate: DateTime
+  latestBankConnectionImportDate: DateTime
+}
+
+input CustomerPaymentObjectSorterInput {
+  status: SortEnumType
+  paidAt: SortEnumType
+  expiresAt: SortEnumType
+  subscriptionTier: SortEnumType
+  billingPeriod: SortEnumType
+  promoteToLifetime: SortEnumType
+  isCancelableDuringFirstYear: SortEnumType
+}
+
+input StringFilterInput {
+  and: [StringFilterInput!]
+  or: [StringFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+}
+
+input CustomerStatusObjectFilterInput {
+  and: [CustomerStatusObjectFilterInput!]
+  or: [CustomerStatusObjectFilterInput!]
+  creation: EnumFilterOfNullableOfCreateStatusInput
+  deletion: EnumFilterOfNullableOfDeleteStatusInput
+  activation: EnumFilterOfNullableOfUserStatusInput
+  consent: EnumFilterOfNullableOfConsentStatusInput
+  invitation: EnumFilterOfNullableOfInviteStatusInput
+  brokerAuthorization: EnumFilterOfNullableOfBPoAGrantStatusInput
+}
+
+input CustomerPaymentObjectFilterInput {
+  and: [CustomerPaymentObjectFilterInput!]
+  or: [CustomerPaymentObjectFilterInput!]
+  status: EnumFilterOfNullableOfPaymentStatusInput
+  paidAt: ComparableFilterOfNullableOfDateTimeInput
+  expiresAt: ComparableFilterOfNullableOfDateTimeInput
+  subscriptionTier: EnumFilterOfNullableOfPaymentSubscriptionTierInput
+  billingPeriod: EnumFilterOfNullableOfPaymentBillingPeriodInput
+}
+
+input BooleanFilterInput {
+  and: [BooleanFilterInput!]
+  or: [BooleanFilterInput!]
+  eq: Boolean
+  neq: Boolean
+}
+
+input ComparableFilterOfNullableOfDateTimeInput {
+  and: [ComparableFilterOfNullableOfDateTimeInput!]
+  or: [ComparableFilterOfNullableOfDateTimeInput!]
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime]
+  nin: [DateTime]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+input CollectionFilterOfCustomerGroupInput {
+  and: [CollectionFilterOfCustomerGroupInput!]
+  or: [CollectionFilterOfCustomerGroupInput!]
+  in: [CustomerGroup!]
+  nin: [CustomerGroup!]
+}
+
+enum CustomerActionCodes {
+  MARK_AS_DELETE
+  MARK_AS_UNDELETE
+  USER_INVITE
+  USER_RESEND_INVITE
+  USER_BLOCK
+  USER_UNBLOCK
+  CUSTOMER_ACCEPT_BPOA
+  CUSTOMER_REMOVE_BPOA
+  CUSTOMER_ACCEPT_PRIVACY_CONSENT
+  CUSTOMER_REMOVE_PRIVACY_CONSENT
+  CUSTOMER_REFRESH_PRIVACY_CONSENT
+}
+
+type EmployeeStatusObject {
+  activation: UserStatus
+  invitation: InviteStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+input CollectionFilterOfEmployeeGroupInput {
+  and: [CollectionFilterOfEmployeeGroupInput!]
+  or: [CollectionFilterOfEmployeeGroupInput!]
+  in: [EmployeeGroup!]
+  nin: [EmployeeGroup!]
+}
+
+input EmployeeStatusObjectFilterInput {
+  and: [EmployeeStatusObjectFilterInput!]
+  or: [EmployeeStatusObjectFilterInput!]
+  creation: EnumFilterOfNullableOfCreateStatusInput
+  deletion: EnumFilterOfNullableOfDeleteStatusInput
+  activation: EnumFilterOfNullableOfUserStatusInput
+  invitation: EnumFilterOfNullableOfInviteStatusInput
+}
+
+enum EmployeeActionCodes {
+  MARK_AS_DELETE
+  MARK_AS_UNDELETE
+  USER_INVITE
+  USER_RESEND_INVITE
+  USER_BLOCK
+  USER_UNBLOCK
+}
+
+type RelatedDocument {
+  nodeType: String!
+  key: UUID
+}
+
+type RelatedDocumentSet {
+  nodeType: String!
+  keys: [UUID!]!
+}
+
+type TeamStatusObject {
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type TeamCustomization {
+  senderEmail: String
+  executionReceiverEmail: String
+  emailTemplatesPath: String
+  userInvitationSubject: String
+  executionAirboardSubject: String
+  basicLTDisabled: Boolean
+}
+
+input TeamStatusObjectFilterInput {
+  and: [TeamStatusObjectFilterInput!]
+  or: [TeamStatusObjectFilterInput!]
+  creation: EnumFilterOfNullableOfCreateStatusInput
+  deletion: EnumFilterOfNullableOfDeleteStatusInput
+}
+
+input TeamCustomizationInput {
+  senderEmail: String
+  executionReceiverEmail: String
+  emailTemplatesPath: String
+  userInvitationSubject: String
+  executionAirboardSubject: String
+  basicLTDisabled: Boolean
+}
+
+enum TeamActionCodes {
+  MARK_AS_DELETE
+  MARK_AS_UNDELETE
+}
+
+enum TeamAssignActionCodes {
+  TEAM_LEAD_ASSIGN
+  TEAM_LEAD_REMOVE
+  TEAM_MEMBER_ASSIGN
+  TEAM_MEMBER_REMOVE
+}
+
+enum PeriodOfPay {
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentProduct {
+  NONE
+  AIRBOARD
+}
+
+enum PaymentSubscriptionTier {
+  NONE
+  BASIC
+  BASIC_PLUS
+  CONTROL
+}
+
+enum PaymentBillingPeriod {
+  NONE
+  MONTHLY
+  QUATERLY
+  SEMI_ANNUALLY
+  ANNUALLY
+  LIFETIME
+}
+
+type ProcessedAccount {
+  accountType: AccountType
+  accountName: String
+  iban: String
+  accountNumber: String
+  accountHolderName: String
+  balance: Decimal
+}
+
+type ProcessedSecurity {
+  securityId: Long
+  accountId: Long
+  isin: String
+  wkn: String
+  quoteType: String
+  quoteCurrency: String
+  quote: Decimal
+  marketValue: Decimal
+}
+
+type ProcessedTransaction {
+  transactionId: Long
+  accountId: Long
+  amount: Decimal
+  purpose: String
+  counterpartName: String
+  counterpartAccountNumber: String
+  counterpartIban: String
+  counterpartBankName: String
+  categoryId: FinApiCategoryType
+  currency: Currency
+  targetInvEntity: TargetInvEntity
+  targetInvIdentifier: UUID
+}
+
+type OpenBankingProcessedDataStatusObject {
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+input ProcessedTransactionInput {
+  transactionId: Long
+  accountId: Long
+  amount: Decimal
+  purpose: String
+  counterpartName: String
+  counterpartAccountNumber: String
+  counterpartIban: String
+  counterpartBankName: String
+  categoryId: FinApiCategoryType
+  currency: Currency
+  targetInvEntity: TargetInvEntity
+  targetInvIdentifier: UUID
+}
+
+enum TargetInvEntity {
+  LIFESTYLE
+  LOAN
+  INSURANCE
+}
+
+enum LogicalOperator {
+  AND
+  OR
+}
+
+type RuleCondition {
+  evaluate(
+    processedTransaction: ProcessedTransactionInput!
+    logicalOperator: LogicalOperator!
+  ): Boolean!
+  categoryId: FinApiCategoryType
+  categoryIdOperator: EnumOperator
+  amount: Decimal
+  amountOperator: NumericOperator
+  purpose: String
+  purposeOperator: StringOperator
+  counterpartName: String
+  counterpartNameOperator: StringOperator
+  counterpartAccountNumber: String
+  counterpartAccountNumberOperator: StringOperator
+  counterpartIban: String
+  counterpartIbanOperator: StringOperator
+  counterpartBankName: String
+  counterpartBankNameOperator: StringOperator
+}
+
+type OpenBankingMappingRuleStatusObject {
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type MonthlyUserStats {
+  toJson: String!
+  month: String!
+  minBankConnectionCount: Int!
+  maxBankConnectionCount: Int!
+}
+
+enum Currency {
+  AED
+  AFN
+  ALL
+  AMD
+  ANG
+  AOA
+  ARS
+  AUD
+  AWG
+  AZN
+  BAM
+  BBD
+  BDT
+  BGN
+  BHD
+  BIF
+  BMD
+  BND
+  BOB
+  BOV
+  BRL
+  BSD
+  BTN
+  BWP
+  BYN
+  BZD
+  CAD
+  CDF
+  CHE
+  CHF
+  CHN
+  CHW
+  CLF
+  CLP
+  CNY
+  COP
+  COU
+  CRC
+  CUC
+  CUP
+  CVE
+  CZK
+  DJF
+  DKK
+  DOP
+  DZD
+  EGP
+  ERN
+  ETB
+  EUR
+  FJD
+  FKP
+  GBP
+  GEL
+  GGP
+  GHS
+  GIP
+  GMD
+  GNF
+  GTQ
+  GYD
+  HKD
+  HNL
+  HRK
+  HTG
+  HUF
+  IDR
+  ILS
+  IMP
+  INR
+  IQD
+  IRR
+  ISK
+  JEP
+  JMD
+  JOD
+  JPY
+  KES
+  KGS
+  KHR
+  KID
+  KMF
+  KPW
+  KRW
+  KWD
+  KYD
+  KZT
+  LAK
+  LBP
+  LKR
+  LRD
+  LSL
+  LYD
+  MAD
+  MDL
+  MGA
+  MKD
+  MMK
+  MNT
+  MOP
+  MRU
+  MUR
+  MVR
+  MWK
+  MXN
+  MXV
+  MYR
+  MZN
+  NAD
+  NGN
+  NIO
+  NIS
+  NOK
+  NPR
+  NTD
+  NZD
+  OMR
+  PAB
+  PEN
+  PGK
+  PHP
+  PKR
+  PLN
+  PRB
+  PYG
+  QAR
+  RMB
+  RON
+  RSD
+  RUB
+  RWF
+  SAR
+  SBD
+  SCR
+  SDG
+  SEK
+  SGD
+  SHP
+  SLL
+  SLS
+  SOS
+  SRD
+  SSP
+  STN
+  SVC
+  SYP
+  SZL
+  THB
+  TJS
+  TMT
+  TND
+  TOP
+  TRY
+  TTD
+  TVD
+  TWD
+  TZS
+  UAH
+  UGX
+  USD
+  USN
+  UYI
+  UYU
+  UYW
+  UZS
+  VEF
+  VES
+  VND
+  VUV
+  WST
+  XAF
+  XAG
+  XAU
+  XBA
+  XBB
+  XBC
+  XBD
+  XCD
+  XDR
+  XOF
+  XPD
+  XPF
+  XPT
+  XSU
+  XTS
+  XUA
+  XXX
+  YER
+  ZAR
+  ZMW
+  ZWB
+  ZWL
+}
+
+type TransactionCategory {
+  toJson: String!
+  id: Long!
+  name: String!
+  parentId: Long!
+  parentName: String!
+  isCustom: Boolean!
+  children: [Long!]!
+}
+
+type PendingTransactionPaypalData {
+  toJson: String!
+  invoiceNumber: String!
+  fee: Decimal!
+  net: Decimal!
+}
+
+type PendingTransactionCertisData {
+  toJson: String!
+  variableSymbol: String!
+  constantSymbol: String!
+  specificSymbol: String!
+}
+
+enum SecurityPositionQuoteType {
+  ACTU
+  PERC
+}
+
+enum SecurityPositionQuantityNominalType {
+  UNIT
+  FAMT
+}
+
+type BankInterface {
+  toJson: String!
+  bankingInterface: BankingInterface!
+  tppAuthenticationGroup: BankInterfaceTppAuthenticationGroup!
+  loginCredentials: [BankInterfaceLoginField!]!
+  properties: [BankInterfaceProperty!]!
+  loginHint: String!
+  health: Int!
+  lastCommunicationAttempt: DateTime!
+  lastSuccessfulCommunication: DateTime!
+  isAisSupported: Boolean!
+  isPisSupported: Boolean!
+  paymentCapabilities: BankInterfacePaymentCapabilities!
+  paymentConstraints: BankInterfacePaymentConstraints!
+  aisAccountTypes: [AccountType!]!
+}
+
+type BankBankGroup {
+  toJson: String!
+  id: Long!
+  name: String!
+}
+
+type BankLogo {
+  toJson: String!
+  url: String!
+}
+
+type BankIcon {
+  toJson: String!
+  url: String!
+}
+
+enum MandatorLicense {
+  UNLICENSED
+  AISP
+  PISP
+  FULLYLICENSED
+}
+
+enum PreferredConsentType {
+  ONETIME
+  RECURRING
+}
+
+enum Product {
+  ACCESS
+  DATAINTELLIGENCE
+  WEBFORM
+  GIROIDENT
+  SCHUFAAPI
+  DILABELLING
+  CONTRACTMANAGER
+  GIROCHECK
+  KREDITCHECK
+  KREDITCHECKB2B
+  DEBITFLEX
+  TRANSPARENCYREGISTER
+}
+
+type EnabledProducts {
+  toJson: String!
+  access: Boolean!
+  webForm: Boolean!
+  customerDashboard: Boolean!
+  dataIntelligence: Boolean!
+  giroIdent: Boolean!
+  schufaApi: Boolean!
+  diLabelling: Boolean!
+  contractManager: Boolean!
+  giroCheck: Boolean!
+  kreditCheck: Boolean!
+  kreditCheckB2B: Boolean!
+  debitFlex: Boolean!
+  transparencyRegister: Boolean!
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  CREDIT_CARD
+  SECURITY
+  LOAN
+  MEMBERSHIP
+  BAUSPAREN
+}
+
+type DailyBalance {
+  toJson: String!
+  date: DateTime!
+  balance: Decimal!
+  income: Decimal!
+  spending: Decimal!
+  internalAdjustingEntries: Decimal!
+  transactions: [Long!]!
+}
+
+type DailyBalanceListPaging {
+  toJson: String!
+  page: Int!
+  perPage: Int!
+  pageCount: Int!
+  totalCount: Long!
+}
+
+type Brand {
+  toJson: String!
+  logo: String!
+  favicon: String!
+  icon: Icon!
+  introText: String!
+}
+
+type Functionality {
+  toJson: String!
+  bankBanner: BankBannerEnum
+  progressBar: ProgressBarEnum
+  bankLoginHint: BankLoginHintEnum
+  termsAndConditionsText: TermsAndConditionsTextEnum
+  storeSecrets: StoreSecretsEnum
+  bankDetails: BankDetailsEnum
+  header: HeaderEnum
+  tuvLogo: TuvLogoEnum
+  accountSelection: AccountSelectionEnum
+  language: Language!
+  skipConfirmationView: Boolean
+  renderAccountSelectionView: Boolean
+  hidePaymentSummary: Boolean
+  hidePaymentOverview: Boolean
+}
+
+type Aspect {
+  toJson: String!
+  colorScheme: Color!
+  text: Text!
+  theme: String!
+}
+
+enum WebFormType {
+  BANKCONNECTIONIMPORT
+  BANKCONNECTIONUPDATE
+  PAYMENTWITHACCOUNTID
+  STANDALONEPAYMENT
+  STANDINGORDER
+  DIRECTDEBITWITHACCOUNTID
+}
+
+enum WebFormStatus {
+  NOTYETOPENED
+  INPROGRESS
+  COMPLETED
+  COMPLETEDWITHERROR
+  EXPIRED
+  ABORTED
+  CANCELLED
+}
+
+type Payload {
+  toJson: String!
+  errorCode: ErrorCodeEnumX
+  bankConnectionId: Long
+  paymentId: Long
+  standingOrderId: Long
+  errorMessage: String!
+}
+
+enum TaskTypeX {
+  BANKCONNECTIONUPDATE
+}
+
+enum TaskStatusX {
+  NOTYETSTARTED
+  INPROGRESS
+  WEBFORMREQUIRED
+  COMPLETED
+  COMPLETEDWITHERROR
+}
+
+type TaskPayload {
+  toJson: String!
+  errorCode: ErrorCodeEnum
+  bankConnectionId: Long!
+  webForm: WebFormInfo!
+  errorMessage: String!
+}
+
+type AccountInterface {
+  toJson: String!
+  bankingInterface: BankingInterface!
+  status: AccountStatus!
+  capabilities: [AccountCapability!]!
+  paymentCapabilities: AccountInterfacePaymentCapabilities!
+  lastSuccessfulUpdate: DateTime!
+  lastUpdateAttempt: DateTime!
+}
+
+enum UpdateStatusEnum {
+  INPROGRESS
+  READY
+}
+
+enum CategorizationStatus {
+  PENDING
+  INPROGRESS
+  READY
+}
+
+type BankConnectionInterface {
+  toJson: String!
+  bankingInterface: BankingInterface!
+  loginCredentials: [LoginCredentialResource!]!
+  defaultTwoStepProcedureId: String!
+  twoStepProcedures: [TwoStepProcedure!]!
+  aisConsent: BankConnectionInterfaceAisConsent!
+  lastManualUpdate: BankConnectionInterfaceLastManualUpdate!
+  lastAutoUpdate: BankConnectionInterfaceLastAutoUpdate!
+  userActionRequired: Boolean!
+  maxDaysForDownload: Int!
+}
+
+type BankConnectionOwner {
+  toJson: String!
+  firstName: String!
+  lastName: String!
+  salutation: String!
+  title: String!
+  email: String!
+  dateOfBirth: DateTime!
+  postCode: String!
+  country: String!
+  city: String!
+  street: String!
+  houseNumber: String!
+}
+
+type BankConnectionBank {
+  toJson: String!
+  id: Long!
+  name: String!
+  bic: String!
+  blz: String!
+  location: String!
+  city: String!
+  isTestBank: Boolean!
+  popularity: Int!
+  interfaces: [BankInterface!]!
+  bankGroup: BankBankGroup!
+  isBeta: Boolean!
+  logo: BankLogo!
+  icon: BankIcon!
+}
+
+input RuleConditionInput {
+  categoryId: FinApiCategoryType
+  categoryIdOperator: EnumOperator
+  amount: Decimal
+  amountOperator: NumericOperator
+  purpose: String
+  purposeOperator: StringOperator
+  counterpartName: String
+  counterpartNameOperator: StringOperator
+  counterpartAccountNumber: String
+  counterpartAccountNumberOperator: StringOperator
+  counterpartIban: String
+  counterpartIbanOperator: StringOperator
+  counterpartBankName: String
+  counterpartBankNameOperator: StringOperator
+}
+
+type TariffComparisionPerformance {
+  score: Float!
+  maxScore: Float!
+  percentage: Float!
+}
+
+type MMCoverageQuestionsOverall {
+  tariffTypesLiab: MMTariffTypes
+  abbreviations: [MMCoverageQuestionAbbreviation!]
+  tariffModuleTypes: [MMTariffModuleTypes!]
+  tariffTypes: MMLvTariffTypes
+  explanation: String
+  filterQuestion: Boolean!
+  yesNoQuestion: Boolean!
+  questionId: Int!
+  questionGroupId: Int!
+  abbreviation: String
+  shortDescription: String
+  longDescription: String
+  sortOrder: Int!
+  parameters: [MMCoverageQuestionParameter!]
+  criteria: MMQuestionCriteria!
+  criteriaCombination: MMQuestionCriteriaCombination!
+}
+
+type PACBalance {
+  plan: PACBalanceEntry!
+  actual: PACBalanceEntry!
+}
+
+type PACLifestyle {
+  plan: PACLifestyleEntry!
+  actual: PACLifestyleEntry!
+}
+
+type PACGoals {
+  plan: PACGoalsEntry!
+  actual: PACGoalsEntry!
+}
+
+type PACLiquidities {
+  plan: PACLiquidityEntry!
+  actual: PACLiquidityEntry!
+}
+
+type PACInsurances {
+  plan: PACInsurancesEntry!
+  actual: PACInsurancesEntry!
+}
+
+type PACFixedAssets {
+  plan: PACFixedAssetsEntry!
+  actual: PACFixedAssetsEntry!
+}
+
+type PACLoans {
+  plan: PACLoansEntry!
+  actual: PACLoansEntry!
+}
+
+type KeyValuePairOfStringAndBizDocMemberMetadata {
+  key: String!
+  value: BizDocMemberMetadata!
+}
+
+type Text {
+  toJson: String!
+  fontFamily: String!
+}
+
+type Color {
+  toJson: String!
+  brand: String!
+  secondary: String!
+  text: TextColor!
+}
+
+type Language {
+  toJson: String!
+  selector: SelectorEnum
+  locked: LockedEnum
+}
+
+enum AccountSelectionEnum {
+  NONE
+  SINGLE
+  MULTIPLE
+}
+
+enum TuvLogoEnum {
+  RENDER
+  HIDDEN
+}
+
+enum HeaderEnum {
+  RENDER
+  HIDDEN
+}
+
+enum BankDetailsEnum {
+  LOCKED
+  EDITABLE
+}
+
+enum StoreSecretsEnum {
+  RENDER
+  HIDDEN
+  MANDATORY
+  IMPLICITAPPROVAL
+}
+
+enum TermsAndConditionsTextEnum {
+  BASIC
+  EXPLICIT
+}
+
+enum BankLoginHintEnum {
+  EXPANDED
+  COLLAPSED
+  HIDDEN
+}
+
+enum ProgressBarEnum {
+  RENDER
+  HIDDEN
+}
+
+enum BankBannerEnum {
+  RENDER
+  HIDDEN
+}
+
+type Icon {
+  toJson: String!
+  info: String!
+  loading: String!
+}
+
+type BankInterfacePaymentConstraints {
+  toJson: String!
+  sepaMoneyTransfer: SepaMoneyTransferConstraints!
+  domesticMoneyTransfer: DomesticMoneyTransferConstraints!
+}
+
+type BankInterfacePaymentCapabilities {
+  toJson: String!
+  sepaDirectDebit: Boolean!
+  sepaMoneyTransfer: Boolean!
+  sepaInstantMoneyTransfer: Boolean!
+  sepaCollectiveMoneyTransfer: Boolean!
+  sepaFutureDatedMoneyTransfer: Boolean!
+  sepaStandingOrder: Boolean!
+  domesticMoneyTransfer: Boolean!
+  domesticCollectiveMoneyTransfer: Boolean!
+  domesticFutureDatedMoneyTransfer: Boolean!
+}
+
+enum BankInterfaceProperty {
+  REDIRECTAPPROACH
+  DECOUPLEDAPPROACH
+  DETAILEDCONSENT
+}
+
+type BankInterfaceLoginField {
+  toJson: String!
+  label: String!
+  isSecret: Boolean!
+  isVolatile: Boolean!
+  isMandatory: Boolean!
+}
+
+type BankInterfaceTppAuthenticationGroup {
+  toJson: String!
+  id: Long!
+  name: String!
+}
+
+enum BankingInterface {
+  WEBSCRAPER
+  FINTSSERVER
+  XS2A
+}
+
+enum StringOperator {
+  EQUALS
+  NOT_EQUALS
+  CONTAINS
+}
+
+enum NumericOperator {
+  EQUALS
+  NOT_EQUALS
+  GREATER_THAN
+  LESS_THAN
+  GREATER_THAN_OR_EQUAL
+  LESS_THAN_OR_EQUAL
+}
+
+enum EnumOperator {
+  EQUALS
+}
+
+enum FinApiCategoryType {
+  MOBILITAT
+  MOBILITAT_KFZVERSICHERUNG
+  MOBILITAT_TANKEN
+  EINNAHMEN
+  EINNAHMEN_GEHALT
+  EINNAHMEN_KAPITALEINKOMMEN
+  EINNAHMEN_MIETEINNAHMEN
+  EINNAHMEN_RENTEPENSION
+  EINNAHMEN_STAATLICHELEISTUNGFORDERUNG
+  EINNAHMEN_UNTERHALT
+  BANKKREDIT
+  BANKKREDIT_BANKGEBUHREN
+  BANKKREDIT_BARAUSZAHLUNG
+  BANKKREDIT_KONTENTRANSFER
+  BANKKREDIT_KREDITKARTENABRECHNUNG
+  GESUNDHEITWELLNESS
+  GESUNDHEITWELLNESS_ARZNEIHEILMITTEL
+  GESUNDHEITWELLNESS_WELLNESSBEAUTY
+  GESUNDHEITWELLNESS_ARZTBESUCHKRANKENHAUS
+  FREIZEITHOBBIESSOZIALES
+  FREIZEITHOBBIESSOZIALES_KIRCHESPENDE
+  FREIZEITHOBBIESSOZIALES_RESTAURANTCAFEBAR
+  FREIZEITHOBBIESSOZIALES_SPORTFITNESS
+  KINDER
+  KINDER_SPIELWAREN
+  SHOPPINGUNTERHALTUNG
+  SHOPPINGUNTERHALTUNG_BUCHER_ZEITUNGEN_ZEITSCHRIFTEN
+  LEBENSHALTUNG
+  LEBENSHALTUNG_DROGERIE
+  LEBENSHALTUNG_FESTNETZINTERNET
+  LEBENSHALTUNG_HANDY
+  LEBENSHALTUNG_LEBENSMITTELGETRANKE
+  REISEN
+  REISEN_HOTELUNTERKUNFT
+  VERSICHERUNG
+  VERSICHERUNG_BERUFSUNFAHIGKEITSVERSICHERUNG
+  VERSICHERUNG_HAFTPFLICHTVERSICHERUNG
+  VERSICHERUNG_KRANKENVERSICHERUNG
+  VERSICHERUNG_RISIKOLEBENSVERSICHERUNG
+  VERSICHERUNG_PFLEGEVERSICHERUNG
+  VERSICHERUNG_RECHTSSCHUTZVERSICHERUNG
+  VERSICHERUNG_UNFALLVERSICHERUNG
+  WOHNEN
+  WOHNEN_WOHNNEBENKOSTEN
+  WOHNEN_IMMOBILIENKREDIT
+  WOHNEN_HAUSHALTSDIENSTLEISTUNGEN
+  WOHNEN_MOBELHAUSHALTSGERATE
+  MOBILITAT_KFZKREDIT_LEASINGRATE_KFZKAUF
+  MOBILITAT_KFZSONSTIGE
+  MOBILITAT_TAXI_OPNV_CARBIKESHARING
+  EINNAHMEN_BAREINZAHLUNG
+  BANKKREDIT_KREDITTILGUNGZINSEN
+  SPARENANLEGEN
+  SPARENANLEGEN_BAUSPAREN
+  SPARENANLEGEN_WERTPAPIERANLAGE
+  SPARENANLEGEN_FESTGELD_TAGESGELD_SPARKONTO
+  SPARENANLEGEN_PRIVATE_RENTENVERSICHERUNG
+  SPARENANLEGEN_KAPITALLEBENSVERSICHERUNG
+  SPARENANLEGEN_WERTGEGENSTANDEANDEREANLAGEN
+  FREIZEITHOBBIESSOZIALES_FREIZEITAKTIVITATEN
+  KINDER_TASCHENGELDUNTERHALT
+  KINDER_KINDERBETREUUNGGRUPPEN
+  SHOPPINGUNTERHALTUNG_TV_VIDEO_MUSIK
+  SHOPPINGUNTERHALTUNG_BEKLEIDUNG_SCHUHE_ACCESSOIRES
+  SHOPPINGUNTERHALTUNG_UNTERHALTUNGSELEKTRONIKSOFTWARE
+  SHOPPINGUNTERHALTUNG_BUROMATERIAL
+  LEBENSHALTUNG_HAUSTIERBEDARF
+  LEBENSHALTUNG_HAUSHALTSBEDARF
+  REISEN_PAUSCHALREISE
+  REISEN_TRANSPORT
+  VERSICHERUNG_REISEVERSICHERUNG
+  VERSICHERUNG_KRANKENZUSATZVERSICHERUNG
+  VERSICHERUNG_HAUSRATVERSICHERUNG
+  VERSICHERUNG_WOHNGEBAUDEVERSICHERUNG
+  WOHNEN_MIETEWOHNGELD
+  WOHNEN_HEIMWERKENGARTEN
+  WOHNEN_STROM
+  WOHNEN_GAS
+  VERSICHERUNG_TIERVERSICHERUNG
+}
+
+input EnumFilterOfNullableOfPaymentBillingPeriodInput {
+  and: [EnumFilterOfNullableOfPaymentBillingPeriodInput!]
+  or: [EnumFilterOfNullableOfPaymentBillingPeriodInput!]
+  eq: PaymentBillingPeriod
+  neq: PaymentBillingPeriod
+  in: [PaymentBillingPeriod]
+  nin: [PaymentBillingPeriod]
+}
+
+input EnumFilterOfNullableOfPaymentSubscriptionTierInput {
+  and: [EnumFilterOfNullableOfPaymentSubscriptionTierInput!]
+  or: [EnumFilterOfNullableOfPaymentSubscriptionTierInput!]
+  eq: PaymentSubscriptionTier
+  neq: PaymentSubscriptionTier
+  in: [PaymentSubscriptionTier]
+  nin: [PaymentSubscriptionTier]
+}
+
+input EnumFilterOfNullableOfPaymentStatusInput {
+  and: [EnumFilterOfNullableOfPaymentStatusInput!]
+  or: [EnumFilterOfNullableOfPaymentStatusInput!]
+  eq: PaymentStatus
+  neq: PaymentStatus
+  in: [PaymentStatus]
+  nin: [PaymentStatus]
+}
+
+input EnumFilterOfNullableOfBPoAGrantStatusInput {
+  and: [EnumFilterOfNullableOfBPoAGrantStatusInput!]
+  or: [EnumFilterOfNullableOfBPoAGrantStatusInput!]
+  eq: BPoAGrantStatus
+  neq: BPoAGrantStatus
+  in: [BPoAGrantStatus]
+  nin: [BPoAGrantStatus]
+}
+
+input EnumFilterOfNullableOfInviteStatusInput {
+  and: [EnumFilterOfNullableOfInviteStatusInput!]
+  or: [EnumFilterOfNullableOfInviteStatusInput!]
+  eq: InviteStatus
+  neq: InviteStatus
+  in: [InviteStatus]
+  nin: [InviteStatus]
+}
+
+input EnumFilterOfNullableOfConsentStatusInput {
+  and: [EnumFilterOfNullableOfConsentStatusInput!]
+  or: [EnumFilterOfNullableOfConsentStatusInput!]
+  eq: ConsentStatus
+  neq: ConsentStatus
+  in: [ConsentStatus]
+  nin: [ConsentStatus]
+}
+
+input EnumFilterOfNullableOfUserStatusInput {
+  and: [EnumFilterOfNullableOfUserStatusInput!]
+  or: [EnumFilterOfNullableOfUserStatusInput!]
+  eq: UserStatus
+  neq: UserStatus
+  in: [UserStatus]
+  nin: [UserStatus]
+}
+
+input EnumFilterOfNullableOfDeleteStatusInput {
+  and: [EnumFilterOfNullableOfDeleteStatusInput!]
+  or: [EnumFilterOfNullableOfDeleteStatusInput!]
+  eq: DeleteStatus
+  neq: DeleteStatus
+  in: [DeleteStatus]
+  nin: [DeleteStatus]
+}
+
+input EnumFilterOfNullableOfCreateStatusInput {
+  and: [EnumFilterOfNullableOfCreateStatusInput!]
+  or: [EnumFilterOfNullableOfCreateStatusInput!]
+  eq: CreateStatus
+  neq: CreateStatus
+  in: [CreateStatus]
+  nin: [CreateStatus]
+}
+
+enum OpenBankingUserStatus {
+  NOT_CREATED
+  CREATED
+  DELETED
+}
+
+enum OpenBankingStatus {
+  DISABLED
+  ACTIVATED
+}
+
+enum BPoAGrantStatus {
+  INIT
+  GRANTED
+}
+
+enum UserStatus {
+  INIT
+  ACTIVE
+  BLOCKED
+}
+
+enum AirTheme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+type AssignmentLink {
+  type: Assignment!
+  id: UUID
+  docType: AirBizDocNames!
+  docId: UUID
+}
+
+type IdentifierType {
+  identifier: UUID
+  typeName: String
+}
+
+type KeyValuePairOfStringAndString {
+  key: String!
+  value: String!
+}
+
+input KeyValuePairOfYearMonthAndLifestyleInvValuesInput {
+  key: YearMonthInput!
+  value: LifestyleInvValuesInput!
+}
+
+enum LiquidAssetDistribution {
+  ZERO
+  TWENTY_FIFE
+  FIFTY
+  SEVENTY_FIVE
+  HUNDRED
+}
+
+enum PensionProvisionType {
+  UNKNOWN
+  PRIVATE
+  RIESTER
+  BAV
+  RUERUP
+  BONUS_MAV
+}
+
+enum PrivatePensionProvisionSubType {
+  CLV
+  FLV
+  CPI
+  FPI
+}
+
+enum MemberType {
+  CONTACT
+  PARTNER
+}
+
+enum PassiveHoldingType {
+  REAL_ESTATE
+  PRIVATE_EQUITY
+  VENTURE_CAPTIAL
+  OTHERS
+  WIND_TURBINE
+  SHIP_OWNDERSHIP
+  CONTAINER_OWNERSHIP
+  BIOGAS_PLANT
+  SOLAR_PLANT
+  UNKNOWN
+}
+
+enum FixedAssetType {
+  ACTIVE_HOLDING
+  PASSIVE_HOLDING
+  BUILDING_SAVINGS_CONTRACT
+  OTHER
+}
+
+enum LiquidAssetAssignmentType {
+  HOUSEHOLD
+  CONTACT
+  PARTNER
+}
+
+enum CashAssetType {
+  CHECKING
+  SAVINGS
+}
+
+input OverwritableIntegerInput {
+  value: Int
+  proposedValue: Int
+  isOverwritten: Boolean
+}
+
+input RedemptionInsuranceInput {
+  name: String
+  type: RedemptionInsuranceType
+  amount: Decimal
+  currAmount: Decimal
+  payment: Decimal
+  payIncr: Decimal
+  dueYear: Int
+}
+
+enum GrossIncomeType {
+  UNKNOWN
+  AGRICULTURE_AND_FORESTRY
+  BUSINESS_OPERATIONS
+  SELF_EMPLOYED_WORK
+  EMPLOYED_WORK
+  CAPITAL
+  LETTING_PROPERTY
+  MISC_ACTIVE
+  MISC_PASSIVE
+  TAX_FREE
+}
+
+enum LoanType {
+  ANNUITY
+  MATURITY
+}
+
+enum FamilyStatusInv {
+  INDIVIDUAL
+  COUPLE
+  FAMILY
+  INDIVIDUAL_KID
+}
+
+enum NoClaimsBonusType {
+  _SFM
+  _SF0
+  _SFS
+  _SF05
+  _SF1
+  _SF2
+  _SF3
+  _SF4
+  _SF5
+  _SF6
+  _SF7
+  _SF8
+  _SF9
+  _SF10
+  _SF11
+  _SF12
+  _SF13
+  _SF14
+  _SF15
+  _SF16
+  _SF17
+  _SF18
+  _SF19
+  _SF20
+  _SF21
+  _SF22
+  _SF23
+  _SF24
+  _SF25
+  _SF26
+  _SF27
+  _SF28
+  _SF29
+  _SF30
+  _SF31
+  _SF32
+  _SF33
+  _SF34
+  _SF35
+  _SF36
+  _SF37
+  _SF38
+  _SF39
+  _SF40
+  _SF41
+  _SF42
+  _SF43
+  _SF44
+  _SF45
+  _SF46
+  _SF47
+  _SF48
+  _SF49
+  _SF50
+}
+
+enum CascoType {
+  PARTIALLY
+  FULL
+}
+
+input InsInvSelectionChildrenInput {
+  id: String
+  name: String
+  children: [InsInvSelectionInput!]
+}
+
+input InsInvSelectionInput {
+  id: String
+  name: String
+}
+
+enum RiskOriginator {
+  HOUSEHOLD
+  CONTACT
+  PARTNER
+  CHILD
+  PET
+  VEHICLE
+  REAL_ESTATE
+  OTHER
+  RENTED_HOME
+}
+
+enum InsuranceInvActionCode {
+  ACCEPT
+  CONFIRM
+  CANCEL
+  RESET
+  OPTIMIZE
+}
+
+input InsuranceGroupItemInvMutationInput {
+  insType: InsuranceType
+  riskOrg: RiskOriginator
+  riskOrgID: UUID
+  fee: Decimal
+  feePerc: Decimal
+  amIns: Decimal
+  note: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+enum PaymentTermsType {
+  YEARLY
+  HALFYEARLY
+  QUARTERLY
+  MONTHLY
+}
+
+input FeePayTermMutationInput {
+  fee: Decimal
+  payTerm: PaymentTermsType
+}
+
+enum InsuranceGroupType {
+  LIABILITIES
+  LIFE
+  ADDHEALTH
+}
+
+type KeyValuePairOfYearMonthAndLifestyleInvValues {
+  key: YearMonth!
+  value: LifestyleInvValues!
+}
+
+type PensInvStatus {
+  acceptance: AcceptStatus
+  refusal: RefuseStatus
+  approval: ApproveStatus
+  confirmation: ConfirmStatus
+  decommission: DecomStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type Address {
+  street: String
+  number: String
+  addition: String
+  zipCode: String
+  city: String
+  federalState: FederalState
+  country: Country
+}
+
+enum PropertyUsageType {
+  SELF_USED
+  RENTED
+}
+
+enum PropertyType {
+  UNKOWN
+  FAMILY_HOUSE
+  APARTMENT_HOUSE
+  APARTMENT
+  UNDEVELOPED
+  COMERCIAL
+  RENTED_HOME
+}
+
+type FixedAssetStatus {
+  init: FixedAssetStatus!
+  decommission: DecomStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type OverwritableInteger {
+  value: Int
+  proposedValue: Int
+  isOverwritten: Boolean
+}
+
+type RedemptionInsurance {
+  name: String
+  type: RedemptionInsuranceType
+  amount: Decimal
+  currAmount: Decimal
+  payment: Decimal
+  payIncr: Decimal
+  dueYear: Int
+}
+
+type InsuranceInvStatus {
+  decision: DecStatusInsInv
+  mFee: Decimal
+  amIns: Decimal
+  execution: ExecutionStatusInv
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type InsScore {
+  score: Float
+  maxScore: Float
+  percentage: Float
+}
+
+type InsInvSelectionChildren {
+  itemContained(listToCompare: [InsInvSelectionChildrenInput!]): Boolean!
+  id: String
+  name: String
+  children: [InsInvSelection!]
+}
+
+type InsInvSelection {
+  itemContained(listToCompare: [InsInvSelectionInput!]): Boolean!
+  id: String
+  name: String
+}
+
+enum RiskCategory {
+  PERSON
+  MINLIFE
+  LIABILITY
+  ASSET
+  OTHERS
+}
+
+enum SeverityLevel {
+  ESSENTIAL
+  NEEDED
+  OPTIONAL
+}
+
+type InsuranceGroupItemInv {
+  insType: InsuranceType
+  riskOrg: RiskOriginator
+  riskOrgID: UUID
+  fee: Decimal
+  feePerc: Decimal
+  amIns: Decimal
+  note: String
+  valDate: Date
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type FeePayTerm {
+  fee: Decimal
+  payTerm: PaymentTermsType
+  mFee: Decimal
+}
+
+type Consumption4Life {
+  mAmount: Decimal
+  endYear: Int
+  startYear: Int
+  valYear: Int
+}
+
+type SupplementaryPensionAmount {
+  amount: Decimal
+  netAmount: Decimal
+  propAmount: Decimal
+  isOverwritten: Boolean
+}
+
+type StatutoryPensionAmount {
+  amountSP: Decimal
+  netAmountSP: Decimal
+  propAmountSP: Decimal
+  amountIP: Decimal
+  propAmountIP: Decimal
+  isOverwritten: Boolean
+}
+
+type RiskLifeGap {
+  amount: Decimal
+  proposedAmount: Decimal
+  isOverwritten: Boolean
+  amInsAdult: Decimal
+  amInsChild: Decimal
+}
+
+type SickPayGap {
+  gap: Decimal
+  insCosts: Decimal
+  goal: Decimal
+  grPassIncome: Decimal
+  grAddIncome: Decimal
+  netAddIncome: Decimal
+  grStateCare: Decimal
+  netStateCare: Decimal
+  taxes: Decimal
+}
+
+type WorkInabilityGap {
+  disabGap: Decimal
+  netDisabGap: Decimal
+  insCosts: Decimal
+  goal: Decimal
+  maxSum: Decimal
+  grPassIncome: Decimal
+  grAddIncome: Decimal
+  netAddIncome: Decimal
+  grStateCare: Decimal
+  netStateCare: Decimal
+  taxes: Decimal
+  grPrivCare: Decimal
+  netPrivCare: Decimal
+}
+
+type PensionGap {
+  goal50PercToday: Decimal
+  goal50Perc: Decimal
+  calcPensGap: Decimal
+  netPensionGap: Decimal
+  goalToday: Decimal
+  goal: Decimal
+  grPens: Decimal
+  netPens: Decimal
+  addGrInc: Decimal
+  addNetInc: Decimal
+  phiCosts: Decimal
+  phiContrEmpl: Decimal
+  netIncBefPE: Decimal
+}
+
+enum HealthInsuranceType {
+  UNKNOWN
+  MANDATORY_STATUTORY
+  VOLUNTARY_STATUTORY
+  NON_CONTRIBUTORY_FAMILY
+  PENSIONERS
+  AID
+  PRIVATE
+  FREE_HEALTH_CARE
+}
+
+type MemberStrategy {
+  r_EntryAge: Int
+  r_PensContr: Decimal
+  r_Riester: Boolean
+  r_bAV: Boolean
+  r_Ruerup: RuerupOption
+  r_Private: Boolean
+  r_InvOnly: Boolean
+  r_LLPShare: Decimal
+  r_BAVEmpl: QuantUoMPercCurr
+  m_CovPeriod: MinCoveragePeriod
+  m_SickPayOut: SickPayWeek
+  m_WIType: WorkInabilityType
+  m_SPAmount: OverwritableAmount
+  m_WIAmount: OverwritableAmount
+}
+
+type AddGrossPensions {
+  totalAmount: Decimal
+  totalPension: Decimal
+  totalNetPension: Decimal
+  entries: [AddGrossPension!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type PensionProvisions {
+  totalAmGap: Decimal
+  totalPayGap: Decimal
+  totalNetPayGap: Decimal
+  totalPension: Decimal
+  totalNetPension: Decimal
+  totalAmountInv: Decimal
+  totalPaymentInv: Decimal
+  totalNetPayInv: Decimal
+  totalPensionInv: Decimal
+  totalNetPensionInv: Decimal
+  retDepot: RetirementDepositReference
+  entries: [PensionProvisionReference!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type OtherIncomes {
+  totalTaxInc: Decimal
+  totalNoneTaxInc: Decimal
+  entries: [OtherIncome!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Jobs {
+  totalGrossIncome: Decimal
+  netIncome: Decimal
+  selfEmployed: Boolean
+  publicServant: Boolean
+  civilServant: Boolean
+  hasJob: Boolean
+  physJob: Boolean
+  salMainJob: Decimal
+  privHIns: Boolean
+  grossBonusGoals: Decimal
+  netBonusGoals: Decimal
+  valDate: Date
+  empCatMainJob: EmploymentCategory
+  entries: [Job!]
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type OverwritableAmount {
+  amount: Decimal
+  proposedAmount: Decimal
+  isOverwritten: Boolean
+}
+
+type LifestyleAddSpendings {
+  name: String
+  amount: Decimal
+  year: Int
+  delete: Boolean
+}
+
+type Child {
+  firstName: String
+  lastName: String
+  birthday: Date
+  gender: Gender
+  allowanceBeneficiary: AllowanceBeneficiary
+  hInsType: HealthInsuranceType
+  privHIns: Boolean
+  privateHealthCost: Decimal
+  compCareCost: Decimal
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type RentedHome {
+  name: String
+  mRent: Decimal
+  livingSpace: Decimal
+  notes: String
+  address: Address
+  valDate: Date
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Vehicle {
+  name: String
+  yearlyCosts: Decimal
+  isCompanyCar: Boolean
+  originalPrice: Decimal
+  linkToMember: UUID
+  valDate: Date
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Goal {
+  category: GoalsCategory
+  name: String
+  amount: Decimal
+  amAchInv: Decimal
+  year: Int
+  wealthIncr: Boolean
+  linkToEntity: UUID
+  isParked: Boolean
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type RealEstate {
+  propertyType: PropertyType
+  propertyUsage: PropertyUsageType
+  grossIncomeType: GrossIncomeType
+  appreciation: Decimal
+  rent: Decimal
+  newBuildValue: Decimal
+  livingSpace: Decimal
+  notForPension: Boolean
+  address: Address
+  oilTank: Boolean
+  photolVolt: Boolean
+  renovMeasure: Boolean
+  propInsOA: Boolean
+  landOwnOA: Boolean
+  valDate: Date
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type FixedAsset {
+  actionCode: ActionCodes
+  fixedAssetType: FixedAssetType
+  phType: PassiveHoldingType
+  grossIncomeType: GrossIncomeType
+  appreciation: Decimal
+  savingsRate: Decimal
+  income: Decimal
+  yield: Decimal
+  yieldAm: Decimal
+  reInvesting: Boolean
+  notForPension: Boolean
+  valueAtDueYear: Decimal
+  valDate: Date
+  status: FixedAssetStatus
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type RetirementDepositReference {
+  inventory: [RetirementDeposit!]
+  amountInv: Decimal
+  estAmount: Decimal
+  savRatInv: Decimal
+  netPensInv: Decimal
+  expAmountInv: Decimal
+  expASavRate: Decimal
+  expAAmount: Decimal
+  expNetPensAm: Decimal
+  expNetPensSavRate: Decimal
+  savingsRate: Decimal
+  shareRatio: Decimal
+  expNetPens: Decimal
+  expAmount: Decimal
+  valDate: Date
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Loan {
+  loanType: LoanType
+  grossIncomeType: GrossIncomeType
+  repaymentRate: Decimal
+  interestRate: Decimal
+  interestChangeYear: Int
+  remAmountAtPE: Decimal
+  redIns: RedemptionInsurance
+  linkToAsset: UUID
+  valDate: Date
+  repYear: OverwritableInteger
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type CashAssetReference {
+  amountInv: Decimal
+  estAmount: Decimal
+  remAmount: Decimal
+  savRatInv: Decimal
+  valDate: Date
+  inventory: [CashAssetInventory!]
+  interestRate: Decimal
+  savingsRate: Decimal
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type LiquidAssetReference {
+  amountInv: Decimal
+  estAmount: Decimal
+  remAmount: Decimal
+  savRatInv: Decimal
+  inventory: [LiquidAssetInventory!]
+  savingsRate: Decimal
+  shareRatio: Decimal
+  distribution: LiquidAssetDistribution
+  valDate: Date
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type InsuranceReference {
+  actionCode: ActionCodes
+  misMatchReason: MismatchReason
+  inventory: [InsuranceInventory!]
+  isSelected: Boolean
+  isRelevant: Boolean
+  status: InsRefStatus
+  insType: InsuranceType
+  severity: SeverityLevel
+  riskCategory: RiskCategory
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  riskOrgEntId: UUID
+  description: String
+  fee: OverwritableAmount
+  amountInsured: OverwritableAmount
+  insurer: String
+  note: String
+  score: Decimal
+  deductible: OverwritableAmount
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectable
+  stationary: IrrelevantSelectable
+  ambulant: IrrelevantSelectable
+  dental: IrrelevantSelectable
+  intHealth: IrrelevantSelectable
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectable
+  traffic: IrrelevantSelectable
+  occupation: IrrelevantSelectable
+  tenant: IrrelevantSelectable
+  landlord: IrrelevantSelectable
+  landOwnerLiab: IrrelevantSelectable
+  builderLiab: IrrelevantSelectable
+  waterLiab: IrrelevantSelectable
+  photovoltLiab: IrrelevantSelectable
+  honoraryLiab: IrrelevantSelectable
+  fireDamage: IrrelevantSelectable
+  stormDamage: IrrelevantSelectable
+  waterDamage: IrrelevantSelectable
+  elementaryDamage: IrrelevantSelectable
+  feeDynamics: Decimal
+  untilAge: Int
+  entryAge: Int
+  entAge: OverwritableInteger
+  payoutFrom: SickPayWeek
+  wiType: WorkInabilityType
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type BioInsuranceReference {
+  actionCode: ActionCodes
+  totalAmInsInv: Decimal
+  totalFeeInv: Decimal
+  misMatchReason: MismatchReason
+  inventory: [BioInsuranceInventory!]
+  isSelected: Boolean
+  isRelevant: Boolean
+  status: InsRefStatus
+  insType: InsuranceType
+  severity: SeverityLevel
+  riskCategory: RiskCategory
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  riskOrgEntId: UUID
+  description: String
+  fee: OverwritableAmount
+  amountInsured: OverwritableAmount
+  insurer: String
+  note: String
+  score: Decimal
+  deductible: OverwritableAmount
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectable
+  stationary: IrrelevantSelectable
+  ambulant: IrrelevantSelectable
+  dental: IrrelevantSelectable
+  intHealth: IrrelevantSelectable
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectable
+  traffic: IrrelevantSelectable
+  occupation: IrrelevantSelectable
+  tenant: IrrelevantSelectable
+  landlord: IrrelevantSelectable
+  landOwnerLiab: IrrelevantSelectable
+  builderLiab: IrrelevantSelectable
+  waterLiab: IrrelevantSelectable
+  photovoltLiab: IrrelevantSelectable
+  honoraryLiab: IrrelevantSelectable
+  fireDamage: IrrelevantSelectable
+  stormDamage: IrrelevantSelectable
+  waterDamage: IrrelevantSelectable
+  elementaryDamage: IrrelevantSelectable
+  feeDynamics: Decimal
+  untilAge: Int
+  entryAge: Int
+  entAge: OverwritableInteger
+  payoutFrom: SickPayWeek
+  wiType: WorkInabilityType
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+enum PaymentStatus {
+  NONE
+  ACTIVE
+  CANCELED
+  EXPIRED
+  DISPUTED
+  REFUNDED
+  FAILED
+}
+
+enum CompletenessStatus {
+  INIT
+  INCOMPLETE
+  COMPLETE
+}
+
+enum RetirementGapStatus {
+  INIT
+  GAPOPEN
+  GAPCOVERED
+}
+
+enum ActualizeStatus {
+  UPTODATE
+  OUTDATED
+}
+
+enum ConsistencyStatus {
+  CONSISTENT
+  INCONSISTENT
+}
+
+enum RiskDeductible {
+  NONE
+  LEVEL1
+  LEVEL2
+  LEVEL3
+  LEVEL4
+}
+
+enum InvestmentType {
+  ALL
+  INDIVIDUAL
+  SUST_INV_ONLY
+  SUST_INV_PROV_ONLY
+}
+
+input Consumption4LifeMutationInput {
+  mAmount: Decimal
+  endYear: Int
+  startYear: Int
+}
+
+input SupplementaryPensionAmountMutationInput {
+  amount: Decimal
+  isOverwritten: Boolean
+}
+
+input StatutoryPensionAmountMutationInput {
+  amountSP: Decimal
+  amountIP: Decimal
+  isOverwritten: Boolean
+}
+
+input RiskLifeGapMutationInput {
+  amount: Decimal
+  isOverwritten: Boolean
+}
+
+input MemberStrategyInput {
+  r_EntryAge: Int
+  r_PensContr: Decimal
+  r_Riester: Boolean
+  r_bAV: Boolean
+  r_Ruerup: RuerupOption
+  r_Private: Boolean
+  r_InvOnly: Boolean
+  r_LLPShare: Decimal
+  r_BAVEmpl: QuantUoMPercCurrInput
+  m_CovPeriod: MinCoveragePeriod
+  m_SickPayOut: SickPayWeek
+  m_WIType: WorkInabilityType
+  m_SPAmount: OverwritableAmountInput
+  m_WIAmount: OverwritableAmountInput
+}
+
+enum RetirementType {
+  UNKNOWN
+  PENSIONEER
+  CIVIL_SERVANT_PENSIONEER
+}
+
+enum Gender {
+  UNKNOWN
+  MALE
+  FEMALE
+  OTHER
+}
+
+input AddGrossPensionsMutationInput {
+  entries: [AddGrossPensionMutationInput!]
+}
+
+input PensionProvisionsMutationInput {
+  retDepot: RetirementDepositReferenceMutationInput
+  entries: [PensionProvisionReferenceMutationInput!]
+}
+
+input OtherIncomesMutationInput {
+  entries: [OtherIncomeMutationInput!]
+}
+
+input JobsMutationInput {
+  privHIns: Boolean
+  valDate: Date
+  entries: [JobMutationInput!]
+}
+
+input OverwritableAmountMutationInput {
+  amount: Decimal
+  isOverwritten: Boolean
+}
+
+input LifestyleAddSpendingsInput {
+  name: String
+  amount: Decimal
+  year: Int
+  delete: Boolean
+}
+
+input ChildMutationInput {
+  firstName: String
+  lastName: String
+  birthday: Date
+  gender: Gender
+  allowanceBeneficiary: AllowanceBeneficiary
+  hInsType: HealthInsuranceType
+  privHIns: Boolean
+  privateHealthCost: Decimal
+  compCareCost: Decimal
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input RentedHomeMutationInput {
+  name: String
+  mRent: Decimal
+  livingSpace: Decimal
+  notes: String
+  address: AddressMutationInput
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input VehicleMutationInput {
+  name: String
+  yearlyCosts: Decimal
+  isCompanyCar: Boolean
+  originalPrice: Decimal
+  linkToMember: UUID
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input GoalMutationInput {
+  category: GoalsCategory
+  name: String
+  amount: Decimal
+  year: Int
+  wealthIncr: Boolean
+  isParked: Boolean
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input RealEstateMutationInput {
+  propertyType: PropertyType
+  propertyUsage: PropertyUsageType
+  grossIncomeType: GrossIncomeType
+  appreciation: Decimal
+  rent: Decimal
+  newBuildValue: Decimal
+  livingSpace: Decimal
+  notForPension: Boolean
+  address: AddressMutationInput
+  oilTank: Boolean
+  photolVolt: Boolean
+  renovMeasure: Boolean
+  propInsOA: Boolean
+  landOwnOA: Boolean
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input FixedAssetMutationInput {
+  fixedAssetType: FixedAssetType
+  phType: PassiveHoldingType
+  grossIncomeType: GrossIncomeType
+  appreciation: Decimal
+  savingsRate: Decimal
+  income: Decimal
+  yield: Decimal
+  yieldAm: Decimal
+  reInvesting: Boolean
+  notForPension: Boolean
+  valueAtDueYear: Decimal
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input RetirementDepositReferenceMutationInput {
+  estAmount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input LoanMutationInput {
+  loanType: LoanType
+  repaymentRate: Decimal
+  interestRate: Decimal
+  interestChangeYear: Int
+  redIns: RedemptionInsuranceMutationInput
+  linkToAsset: UUID
+  repYear: OverwritableIntegerMutationInput
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input CashAssetReferenceMutationInput {
+  estAmount: Decimal
+  name: String
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input LiquidAssetReferenceMutationInput {
+  estAmount: Decimal
+  name: String
+  notes: String
+}
+
+input InsuranceReferenceMutationInput {
+  actionCode: ActionCodes
+  misMatchReason: MismatchReason
+  isSelected: Boolean
+  isRelevant: Boolean
+  insType: InsuranceType
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  description: String
+  fee: OverwritableAmountMutationInput
+  amountInsured: OverwritableAmountMutationInput
+  insurer: String
+  note: String
+  deductible: OverwritableAmountMutationInput
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectableMutationInput
+  stationary: IrrelevantSelectableMutationInput
+  ambulant: IrrelevantSelectableMutationInput
+  dental: IrrelevantSelectableMutationInput
+  intHealth: IrrelevantSelectableMutationInput
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectableMutationInput
+  traffic: IrrelevantSelectableMutationInput
+  occupation: IrrelevantSelectableMutationInput
+  tenant: IrrelevantSelectableMutationInput
+  landlord: IrrelevantSelectableMutationInput
+  landOwnerLiab: IrrelevantSelectableMutationInput
+  builderLiab: IrrelevantSelectableMutationInput
+  waterLiab: IrrelevantSelectableMutationInput
+  photovoltLiab: IrrelevantSelectableMutationInput
+  honoraryLiab: IrrelevantSelectableMutationInput
+  fireDamage: IrrelevantSelectableMutationInput
+  stormDamage: IrrelevantSelectableMutationInput
+  waterDamage: IrrelevantSelectableMutationInput
+  elementaryDamage: IrrelevantSelectableMutationInput
+  feeDynamics: Decimal
+  untilAge: Int
+  entAge: OverwritableIntegerMutationInput
+  payoutFrom: SickPayWeek
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input BioInsuranceReferenceMutationInput {
+  actionCode: ActionCodes
+  misMatchReason: MismatchReason
+  isSelected: Boolean
+  isRelevant: Boolean
+  insType: InsuranceType
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  description: String
+  fee: OverwritableAmountMutationInput
+  amountInsured: OverwritableAmountMutationInput
+  note: String
+  deductible: OverwritableAmountMutationInput
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectableMutationInput
+  stationary: IrrelevantSelectableMutationInput
+  ambulant: IrrelevantSelectableMutationInput
+  dental: IrrelevantSelectableMutationInput
+  intHealth: IrrelevantSelectableMutationInput
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectableMutationInput
+  traffic: IrrelevantSelectableMutationInput
+  occupation: IrrelevantSelectableMutationInput
+  tenant: IrrelevantSelectableMutationInput
+  landlord: IrrelevantSelectableMutationInput
+  landOwnerLiab: IrrelevantSelectableMutationInput
+  builderLiab: IrrelevantSelectableMutationInput
+  waterLiab: IrrelevantSelectableMutationInput
+  photovoltLiab: IrrelevantSelectableMutationInput
+  honoraryLiab: IrrelevantSelectableMutationInput
+  fireDamage: IrrelevantSelectableMutationInput
+  stormDamage: IrrelevantSelectableMutationInput
+  waterDamage: IrrelevantSelectableMutationInput
+  elementaryDamage: IrrelevantSelectableMutationInput
+  feeDynamics: Decimal
+  untilAge: Int
+  entryAge: Int
+  entAge: OverwritableIntegerMutationInput
+  payoutFrom: SickPayWeek
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+type LiquidityForecastResultEvent {
+  id: UUID!
+  event: ForecastEventType!
+  identifier: UUID!
+  amount: Decimal!
+}
+
+type LiquidityForecastResultItem {
+  total: Decimal!
+  details: [WealthForecastResultDetail!]
+}
+
+type WealthForecastResultEvent {
+  id: UUID!
+  event: ForecastEventType!
+  identifier: UUID!
+  amount: Decimal!
+}
+
+type WealthForecastResultLiquididyDeviation {
+  positiveDeviation: Decimal!
+  negativeDeviation: Decimal!
+  overallLiquidity: Decimal!
+}
+
+type WealthForecastResultItem {
+  total: Decimal!
+  details: [WealthForecastResultDetail!]
+}
+
+enum CreateStatus {
+  CREATED
+}
+
+enum UploadStatus {
+  INIT
+  CREATED
+  PERSISTED
+}
+
+enum ExecutionStatus {
+  INIT
+  READY
+  INEXECUTION
+  EXECUTED
+}
+
+type Consumption4LifeOutput {
+  mAmount: Decimal
+  endYear: Int
+  startYear: Int
+  valYear: Int
+}
+
+type KeyValuePairOfInt32AndDecimal {
+  key: Int!
+  value: Decimal!
+}
+
+type SupplementaryPensionAmountOutput {
+  amount: Decimal
+  netAmount: Decimal
+  propAmount: Decimal
+  isOverwritten: Boolean
+}
+
+type StatutoryPensionAmountOutput {
+  amountSP: Decimal
+  netAmountSP: Decimal
+  propAmountSP: Decimal
+  amountIP: Decimal
+  propAmountIP: Decimal
+  isOverwritten: Boolean
+}
+
+type RiskLifeGapOutput {
+  amount: Decimal
+  proposedAmount: Decimal
+  isOverwritten: Boolean
+  amInsAdult: Decimal
+  amInsChild: Decimal
+}
+
+type SickPayGapOutput {
+  gap: Decimal
+  insCosts: Decimal
+  goal: Decimal
+  grPassIncome: Decimal
+  grAddIncome: Decimal
+  netAddIncome: Decimal
+  grStateCare: Decimal
+  netStateCare: Decimal
+  taxes: Decimal
+}
+
+type WorkInabilityGapOutput {
+  disabGap: Decimal
+  netDisabGap: Decimal
+  insCosts: Decimal
+  goal: Decimal
+  maxSum: Decimal
+  grPassIncome: Decimal
+  grAddIncome: Decimal
+  netAddIncome: Decimal
+  grStateCare: Decimal
+  netStateCare: Decimal
+  taxes: Decimal
+  grPrivCare: Decimal
+  netPrivCare: Decimal
+}
+
+type PensionGapOutput {
+  goal50PercToday: Decimal
+  goal50Perc: Decimal
+  calcPensGap: Decimal
+  netPensionGap: Decimal
+  goalToday: Decimal
+  goal: Decimal
+  grPens: Decimal
+  netPens: Decimal
+  addGrInc: Decimal
+  addNetInc: Decimal
+  phiCosts: Decimal
+  phiContrEmpl: Decimal
+  netIncBefPE: Decimal
+}
+
+type MemberStrategyOutput {
+  r_EntryAge: Int
+  r_PensContr: Decimal
+  r_Riester: Boolean
+  r_bAV: Boolean
+  r_Ruerup: RuerupOption
+  r_Private: Boolean
+  r_InvOnly: Boolean
+  r_LLPShare: Decimal
+  r_BAVEmpl: QuantUoMPercCurr
+  m_CovPeriod: MinCoveragePeriod
+  m_SickPayOut: SickPayWeek
+  m_WIType: WorkInabilityType
+  m_SPAmount: OverwritableAmountOutput
+  m_WIAmount: OverwritableAmountOutput
+}
+
+type AddGrossPensionsOutput {
+  totalAmount: Decimal
+  totalPension: Decimal
+  totalNetPension: Decimal
+  entries: [AddGrossPensionOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type PensionProvisionsOutput {
+  totalAmGap: Decimal
+  totalPayGap: Decimal
+  totalNetPayGap: Decimal
+  totalPension: Decimal
+  totalNetPension: Decimal
+  totalAmountInv: Decimal
+  totalPaymentInv: Decimal
+  totalNetPayInv: Decimal
+  totalPensionInv: Decimal
+  totalNetPensionInv: Decimal
+  retDepot: RetirementDepositReferenceOutput
+  entries: [PensionProvisionReferenceOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type OtherIncomesOutput {
+  totalTaxInc: Decimal
+  totalNoneTaxInc: Decimal
+  entries: [OtherIncomeOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type JobsOutput {
+  totalGrossIncome: Decimal
+  netIncome: Decimal
+  selfEmployed: Boolean
+  publicServant: Boolean
+  civilServant: Boolean
+  hasJob: Boolean
+  physJob: Boolean
+  salMainJob: Decimal
+  privHIns: Boolean
+  grossBonusGoals: Decimal
+  netBonusGoals: Decimal
+  valDate: Date
+  empCatMainJob: EmploymentCategory
+  entries: [JobOutput!]
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type OverwritableAmountOutput {
+  amount: Decimal
+  proposedAmount: Decimal
+  isOverwritten: Boolean
+}
+
+type LifestyleAddSpendingsOutput {
+  name: String
+  amount: Decimal
+  year: Int
+  delete: Boolean
+}
+
+type ChildOutput {
+  firstName: String
+  lastName: String
+  birthday: Date
+  gender: Gender
+  allowanceBeneficiary: AllowanceBeneficiary
+  hInsType: HealthInsuranceType
+  privHIns: Boolean
+  privateHealthCost: Decimal
+  compCareCost: Decimal
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type RentedHomeOutput {
+  name: String
+  mRent: Decimal
+  livingSpace: Decimal
+  notes: String
+  address: AddressOutput
+  valDate: Date
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type VehicleOutput {
+  name: String
+  yearlyCosts: Decimal
+  isCompanyCar: Boolean
+  originalPrice: Decimal
+  linkToMember: UUID
+  valDate: Date
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type GoalOutput {
+  category: GoalsCategory
+  name: String
+  amount: Decimal
+  amAchInv: Decimal
+  year: Int
+  wealthIncr: Boolean
+  linkToEntity: UUID
+  isParked: Boolean
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type RealEstateOutput {
+  propertyType: PropertyType
+  propertyUsage: PropertyUsageType
+  grossIncomeType: GrossIncomeType
+  appreciation: Decimal
+  rent: Decimal
+  newBuildValue: Decimal
+  livingSpace: Decimal
+  notForPension: Boolean
+  address: AddressOutput
+  oilTank: Boolean
+  photolVolt: Boolean
+  renovMeasure: Boolean
+  propInsOA: Boolean
+  landOwnOA: Boolean
+  valDate: Date
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type FixedAssetOutput {
+  actionCode: ActionCodes
+  fixedAssetType: FixedAssetType
+  phType: PassiveHoldingType
+  grossIncomeType: GrossIncomeType
+  appreciation: Decimal
+  savingsRate: Decimal
+  income: Decimal
+  yield: Decimal
+  yieldAm: Decimal
+  reInvesting: Boolean
+  notForPension: Boolean
+  valueAtDueYear: Decimal
+  valDate: Date
+  status: FixedAssetStatusOutput
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type RetirementDepositReferenceOutput {
+  inventory: [RetirementDepositOutput!]
+  amountInv: Decimal
+  estAmount: Decimal
+  savRatInv: Decimal
+  netPensInv: Decimal
+  expAmountInv: Decimal
+  expASavRate: Decimal
+  expAAmount: Decimal
+  expNetPensAm: Decimal
+  expNetPensSavRate: Decimal
+  savingsRate: Decimal
+  shareRatio: Decimal
+  expNetPens: Decimal
+  expAmount: Decimal
+  valDate: Date
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type LoanOutput {
+  loanType: LoanType
+  grossIncomeType: GrossIncomeType
+  repaymentRate: Decimal
+  interestRate: Decimal
+  interestChangeYear: Int
+  remAmountAtPE: Decimal
+  redIns: RedemptionInsuranceOutput
+  linkToAsset: UUID
+  valDate: Date
+  repYear: OverwritableIntegerOutput
+  dueYear: Int
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type CashAssetReferenceOutput {
+  amountInv: Decimal
+  estAmount: Decimal
+  remAmount: Decimal
+  savRatInv: Decimal
+  valDate: Date
+  inventory: [CashAssetInventoryOutput!]
+  interestRate: Decimal
+  savingsRate: Decimal
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type LiquidAssetReferenceOutput {
+  amountInv: Decimal
+  estAmount: Decimal
+  remAmount: Decimal
+  savRatInv: Decimal
+  inventory: [LiquidAssetInventoryOutput!]
+  savingsRate: Decimal
+  shareRatio: Decimal
+  distribution: LiquidAssetDistribution
+  valDate: Date
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type InsuranceReferenceOutput {
+  actionCode: ActionCodes
+  misMatchReason: MismatchReason
+  inventory: [InsuranceInventoryOutput!]
+  isSelected: Boolean
+  isRelevant: Boolean
+  status: InsRefStatusOutput
+  insType: InsuranceType
+  severity: SeverityLevel
+  riskCategory: RiskCategory
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  riskOrgEntId: UUID
+  description: String
+  fee: OverwritableAmountOutput
+  amountInsured: OverwritableAmountOutput
+  insurer: String
+  note: String
+  score: Decimal
+  deductible: OverwritableAmountOutput
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectableOutput
+  stationary: IrrelevantSelectableOutput
+  ambulant: IrrelevantSelectableOutput
+  dental: IrrelevantSelectableOutput
+  intHealth: IrrelevantSelectableOutput
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectableOutput
+  traffic: IrrelevantSelectableOutput
+  occupation: IrrelevantSelectableOutput
+  tenant: IrrelevantSelectableOutput
+  landlord: IrrelevantSelectableOutput
+  landOwnerLiab: IrrelevantSelectableOutput
+  builderLiab: IrrelevantSelectableOutput
+  waterLiab: IrrelevantSelectableOutput
+  photovoltLiab: IrrelevantSelectableOutput
+  honoraryLiab: IrrelevantSelectableOutput
+  fireDamage: IrrelevantSelectableOutput
+  stormDamage: IrrelevantSelectableOutput
+  waterDamage: IrrelevantSelectableOutput
+  elementaryDamage: IrrelevantSelectableOutput
+  feeDynamics: Decimal
+  untilAge: Int
+  entryAge: Int
+  entAge: OverwritableIntegerOutput
+  payoutFrom: SickPayWeek
+  wiType: WorkInabilityType
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type BioInsuranceReferenceOutput {
+  actionCode: ActionCodes
+  totalAmInsInv: Decimal
+  totalFeeInv: Decimal
+  misMatchReason: MismatchReason
+  inventory: [BioInsuranceInventoryOutput!]
+  isSelected: Boolean
+  isRelevant: Boolean
+  status: InsRefStatusOutput
+  insType: InsuranceType
+  severity: SeverityLevel
+  riskCategory: RiskCategory
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  riskOrgEntId: UUID
+  description: String
+  fee: OverwritableAmountOutput
+  amountInsured: OverwritableAmountOutput
+  insurer: String
+  note: String
+  score: Decimal
+  deductible: OverwritableAmountOutput
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectableOutput
+  stationary: IrrelevantSelectableOutput
+  ambulant: IrrelevantSelectableOutput
+  dental: IrrelevantSelectableOutput
+  intHealth: IrrelevantSelectableOutput
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectableOutput
+  traffic: IrrelevantSelectableOutput
+  occupation: IrrelevantSelectableOutput
+  tenant: IrrelevantSelectableOutput
+  landlord: IrrelevantSelectableOutput
+  landOwnerLiab: IrrelevantSelectableOutput
+  builderLiab: IrrelevantSelectableOutput
+  waterLiab: IrrelevantSelectableOutput
+  photovoltLiab: IrrelevantSelectableOutput
+  honoraryLiab: IrrelevantSelectableOutput
+  fireDamage: IrrelevantSelectableOutput
+  stormDamage: IrrelevantSelectableOutput
+  waterDamage: IrrelevantSelectableOutput
+  elementaryDamage: IrrelevantSelectableOutput
+  feeDynamics: Decimal
+  untilAge: Int
+  entryAge: Int
+  entAge: OverwritableIntegerOutput
+  payoutFrom: SickPayWeek
+  wiType: WorkInabilityType
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+enum ErrorCodeEnumX {
+  ENTITYEXISTS
+  BANKSERVERREJECTION
+  INTERNALERROR
+  INTERRUPTED
+  INVALIDTOKEN
+  MANDATORMISCONFIGURATION
+  NOACCOUNTSFORTYPELIST
+  UNDETERMINEDBANK
+  UNEXPECTEDACCESSRESPONSE
+  UNSUPPORTEDFEATURE
+  UNSUPPORTEDORDER
+}
+
+enum ErrorCodeEnum {
+  BANKSERVERREJECTION
+  INTERNALERROR
+  INVALIDTOKEN
+  UNEXPECTEDACCESSRESPONSE
+  MANDATORMISCONFIGURATION
+}
+
+type WebFormInfo {
+  toJson: String!
+  status: WebFormStatus!
+  id: String!
+  url: String!
+}
+
+enum AccountStatus {
+  UPDATED
+  UPDATEDFIXED
+  DOWNLOADINPROGRESS
+  DOWNLOADFAILED
+  DEPRECATED
+}
+
+enum AccountCapability {
+  DATADOWNLOAD
+  IBANONLYSEPAMONEYTRANSFER
+  IBANONLYSEPADIRECTDEBIT
+  SEPAMONEYTRANSFER
+  SEPACOLLECTIVEMONEYTRANSFER
+  SEPABASICDIRECTDEBIT
+  SEPABASICCOLLECTIVEDIRECTDEBIT
+  SEPAB2BDIRECTDEBIT
+  SEPAB2BCOLLECTIVEDIRECTDEBIT
+}
+
+type AccountInterfacePaymentCapabilities {
+  toJson: String!
+  sepaInstantMoneyTransfer: Boolean!
+  sepaFutureMoneyTransfer: Boolean!
+  sepaFutureCollectiveMoneyTransfer: Boolean!
+  domesticMoneyTransfer: Boolean!
+  domesticCollectiveMoneyTransfer: Boolean!
+  domesticFutureMoneyTransfer: Boolean!
+  domesticFutureCollectiveMoneyTransfer: Boolean!
+}
+
+type LoginCredentialResource {
+  toJson: String!
+  label: String!
+  value: String!
+}
+
+type TwoStepProcedure {
+  toJson: String!
+  procedureId: String!
+  procedureName: String!
+  procedureChallengeType: String!
+  implicitExecute: Boolean!
+}
+
+type BankConnectionInterfaceAisConsent {
+  toJson: String!
+  status: BankConsentStatus!
+  expiresAt: DateTime!
+  supportsImportNewAccounts: Boolean!
+}
+
+type BankConnectionInterfaceLastManualUpdate {
+  toJson: String!
+  result: UpdateResultStatus!
+  errorType: ErrorType
+  errorMessage: String!
+  timestamp: DateTime!
+}
+
+type BankConnectionInterfaceLastAutoUpdate {
+  toJson: String!
+  result: UpdateResultStatus!
+  errorType: ErrorType
+  errorMessage: String!
+  timestamp: DateTime!
+}
+
+enum MMTariffTypes {
+  _0
+  _1
+  _2
+}
+
+type MMCoverageQuestionAbbreviation {
+  analysis: MMConditionsAnalysis!
+  abbreviation: String!
+}
+
+enum MMTariffModuleTypes {
+  _0
+  _1
+  _2
+  _3
+  _4
+  _5
+  _6
+  _7
+  _8
+  _9
+  _10
+  _11
+  _12
+  _13
+  _14
+}
+
+enum MMLvTariffTypes {
+  _0
+  _1
+  _2
+  _4
+  _8
+  _16
+  _32
+  _64
+  _128
+  _256
+  _512
+  _1024
+  _2048
+  _4096
+  _8192
+  _16384
+  _32768
+  _65536
+  _131072
+  _262144
+  _524288
+  _1048576
+  _2097152
+  _4194304
+  _8388608
+  _16777216
+  _16842752
+  _25493504
+  _33554432
+  _67108864
+  _134217728
+  _135266304
+  _135790592
+  _268435456
+  _335544320
+  _536870912
+  _1073741824
+  _4294967296
+  _4294967424
+  _4299194496
+  _8589934592
+  _8589935616
+  _8589937664
+  _8725728256
+  _17179869184
+  _17179869440
+  _34359738368
+  _68719476736
+  _137438953472
+  _240551723008
+  _274877906944
+  _549755813888
+  _1099511627776
+  _2199023255552
+}
+
+type MMCoverageQuestionParameter {
+  label: String!
+  parameterId: Int!
+  unit: String!
+  sortOrder: Int!
+  valueMax: Float!
+  valueMin: Float!
+  multipleUsage: Boolean!
+  isRequired: Boolean!
+}
+
+enum MMQuestionCriteria {
+  _1
+  _2
+  _4
+  _8
+  _16
+  _32
+  _64
+  _128
+  _256
+  _512
+}
+
+enum MMQuestionCriteriaCombination {
+  _0
+  _1
+  _2
+}
+
+type PACBalanceEntry {
+  amount: Decimal!
+  impact: Decimal!
+}
+
+type PACLifestyleEntry {
+  spendings: Decimal!
+  amount: Decimal!
+  impact: Decimal!
+}
+
+type PACGoalsEntry {
+  overall: PACDecDecImp!
+  entries: [PACStringDecImp!]!
+}
+
+type PACLiquidityEntry {
+  riskTolerance: RiskTolerance!
+  cashAsset: PACDecImp!
+  investmentAsset: PACDecImp!
+  total: PACLiquidityTotal!
+}
+
+type PACInsurancesEntry {
+  personal: PACInsuranceEntry!
+  liability: PACInsuranceEntry!
+  wealth: PACInsuranceEntry!
+  others: PACInsuranceEntry!
+  total: PACInsuranceEntry!
+}
+
+type PACFixedAssetsEntry {
+  pensions: PACDecImp!
+  realEstates: PACDecImp!
+  ownCompanies: PACDecImp!
+  passiveHoldings: PACDecImp!
+  fixTerms: PACDecImp!
+  other: PACDecImp!
+  total: PACDecImp!
+}
+
+type PACLoansEntry {
+  annuity: PACDecDecImp!
+  maturity: PACDecDecImp!
+  total: PACDecDecImp!
+}
+
+type BizDocMemberMetadata {
+  memberName: String!
+  relation: BizDocRelationMetadata
+}
+
+type PACInsuranceEntry {
+  count: Int!
+  score: Decimal!
+  spendings: Decimal!
+  impact: Decimal!
+}
+
+type PACLiquidityTotal {
+  yearlyYieldPotential: Decimal!
+  yearlyLossPotential: Decimal!
+  amount: Decimal!
+  impact: Decimal!
+}
+
+type PACDecImp {
+  amount: Decimal!
+  impact: Decimal!
+}
+
+type PACStringDecImp {
+  name: String!
+  amount: Decimal!
+  impact: Decimal!
+}
+
+type PACDecDecImp {
+  spendings: Decimal!
+  amount: Decimal!
+  impact: Decimal!
+}
+
+enum MMConditionsAnalysis {
+  _0
+  _1
+  _2
+  _3
+  _4
+  _5
+  _6
+  _7
+  _8
+  _9
+  _10
+  _11
+  _12
+  _13
+  _14
+  _15
+  _16
+  _17
+  _18
+  _19
+  _20
+  _21
+}
+
+enum ErrorType {
+  BUSINESS
+  TECHNICAL
+}
+
+enum UpdateResultStatus {
+  OK
+  BANKSERVERREJECTION
+  INTERNALSERVERERROR
+}
+
+enum BankConsentStatus {
+  PRESENT
+  NOTPRESENT
+}
+
+type BioInsuranceInventoryOutput {
+  actionCode: ActionCodes
+  tariffName: String
+  extID: String
+  status: InsInvStatusOutput
+  insType: InsuranceType
+  severity: SeverityLevel
+  riskCategory: RiskCategory
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  riskOrgEntId: UUID
+  description: String
+  fee: OverwritableAmountOutput
+  amountInsured: OverwritableAmountOutput
+  insurer: String
+  note: String
+  score: Decimal
+  deductible: OverwritableAmountOutput
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectableOutput
+  stationary: IrrelevantSelectableOutput
+  ambulant: IrrelevantSelectableOutput
+  dental: IrrelevantSelectableOutput
+  intHealth: IrrelevantSelectableOutput
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectableOutput
+  traffic: IrrelevantSelectableOutput
+  occupation: IrrelevantSelectableOutput
+  tenant: IrrelevantSelectableOutput
+  landlord: IrrelevantSelectableOutput
+  landOwnerLiab: IrrelevantSelectableOutput
+  builderLiab: IrrelevantSelectableOutput
+  waterLiab: IrrelevantSelectableOutput
+  photovoltLiab: IrrelevantSelectableOutput
+  honoraryLiab: IrrelevantSelectableOutput
+  fireDamage: IrrelevantSelectableOutput
+  stormDamage: IrrelevantSelectableOutput
+  waterDamage: IrrelevantSelectableOutput
+  elementaryDamage: IrrelevantSelectableOutput
+  feeDynamics: Decimal
+  untilAge: Int
+  entryAge: Int
+  entAge: OverwritableIntegerOutput
+  payoutFrom: SickPayWeek
+  wiType: WorkInabilityType
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type IrrelevantSelectableOutput {
+  selected: Boolean
+  irrelevant: Boolean
+}
+
+type InsRefStatusOutput {
+  decision: DecideStatus!
+  approval: ApproveStatus!
+  confirmation: ConfirmStatus!
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type InsuranceInventoryOutput {
+  actionCode: ActionCodes
+  tariffName: String
+  extID: String
+  status: InsInvStatusOutput
+  insType: InsuranceType
+  severity: SeverityLevel
+  riskCategory: RiskCategory
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  riskOrgEntId: UUID
+  description: String
+  fee: OverwritableAmountOutput
+  amountInsured: OverwritableAmountOutput
+  insurer: String
+  note: String
+  score: Decimal
+  deductible: OverwritableAmountOutput
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectableOutput
+  stationary: IrrelevantSelectableOutput
+  ambulant: IrrelevantSelectableOutput
+  dental: IrrelevantSelectableOutput
+  intHealth: IrrelevantSelectableOutput
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectableOutput
+  traffic: IrrelevantSelectableOutput
+  occupation: IrrelevantSelectableOutput
+  tenant: IrrelevantSelectableOutput
+  landlord: IrrelevantSelectableOutput
+  landOwnerLiab: IrrelevantSelectableOutput
+  builderLiab: IrrelevantSelectableOutput
+  waterLiab: IrrelevantSelectableOutput
+  photovoltLiab: IrrelevantSelectableOutput
+  honoraryLiab: IrrelevantSelectableOutput
+  fireDamage: IrrelevantSelectableOutput
+  stormDamage: IrrelevantSelectableOutput
+  waterDamage: IrrelevantSelectableOutput
+  elementaryDamage: IrrelevantSelectableOutput
+  feeDynamics: Decimal
+  untilAge: Int
+  entryAge: Int
+  entAge: OverwritableIntegerOutput
+  payoutFrom: SickPayWeek
+  wiType: WorkInabilityType
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type LiquidAssetInventoryOutput {
+  savingsRate: Decimal
+  shareRatio: Decimal
+  distribution: LiquidAssetDistribution
+  valDate: Date
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type CashAssetInventoryOutput {
+  valDate: Date
+  interestRate: Decimal
+  savingsRate: Decimal
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type OverwritableIntegerOutput {
+  value: Int
+  proposedValue: Int
+  isOverwritten: Boolean
+}
+
+type RedemptionInsuranceOutput {
+  name: String
+  type: RedemptionInsuranceType
+  amount: Decimal
+  currAmount: Decimal
+  payment: Decimal
+  payIncr: Decimal
+  dueYear: Int
+}
+
+type RetirementDepositOutput {
+  savingsRate: Decimal
+  shareRatio: Decimal
+  expNetPens: Decimal
+  expAmount: Decimal
+  valDate: Date
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type FixedAssetStatusOutput {
+  decommission: DecomStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type AddressOutput {
+  street: String
+  number: String
+  addition: String
+  zipCode: String
+  city: String
+  federalState: FederalState
+  country: Country
+}
+
+type JobOutput {
+  name: String
+  employmentCategory: EmploymentCategoryExt
+  grossIncomeType: GrossIncomeType
+  mainJob: Boolean
+  amount: Decimal
+  yearlyBonus: Decimal
+  yBonGoals: Decimal
+  isPhysicalWork: Boolean
+  privHIns: Boolean
+  privHInsCost: Decimal
+  compCareCost: Decimal
+  phCostPE: Decimal
+  pensInsObliged: Boolean
+  contrExempt: Boolean
+  entDailySick: Boolean
+  startDate: Date
+  endDate: Date
+  federalState: FederalState
+  valDate: Date
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type OtherIncomeOutput {
+  name: String
+  amount: Decimal
+  grossIncomeType: GrossIncomeType
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type PensionProvisionReferenceOutput {
+  isSelected: Boolean
+  isRelevant: Boolean
+  amountInv: Decimal
+  payInv: Decimal
+  netPayInv: Decimal
+  payEmpInv: Decimal
+  grossPensInv: Decimal
+  netPensInv: Decimal
+  valDate: Date
+  proposal: PensionProvisionProposalOutput
+  inventory: [PensionProvisionInventoryOutput!]
+  status: PensRefStatusOutput
+  ppType: PensionProvisionType
+  withGuarantee: Boolean
+  name: String
+  amount: Decimal
+  payment: Decimal
+  netPayment: Decimal
+  payEmp: Decimal
+  payEmpPerc: Decimal
+  grossPension: Decimal
+  netPension: Decimal
+  payIncr: Decimal
+  before2005: Boolean
+  startYear: Int
+  irr: Decimal
+  distribution: LiquidAssetDistribution
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type AddGrossPensionOutput {
+  grossPensionType: GrossPensionType
+  name: String
+  amount: Decimal
+  grossPension: Decimal
+  netPension: Decimal
+  valDate: Date
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type WealthForecastResultDetail {
+  identifier: UUID!
+  name: String
+  amount: Decimal!
+}
+
+enum ForecastEventType {
+  GOAL_ACHIEVED
+  GOAL_ACHIEVED_TO_REPAY_LOAN
+  LAST_GOAL_ACHIEVED
+  FIXED_ASSET_DUEYEAR_REACHED
+  FIXED_ASSET_CONVERTED_TO_INCOME_IN_PENSION
+  FIXED_ASSET_NOT_USED_FOR_RETIREMENT
+  LOAN_DUEYEAR_REACHED
+  LOAN_RESOLVED_WITH_ASSIGNED_ASSET
+  LOAN_REPAYMENT_BY_REDEMPTION_INSURANCE
+  LOAN_RESOLVED_BY_ASSIGNED_GOAL
+  MEMBER_FREE_LIQUIDITY_USED_FOR_PENSIONGAP
+  MEMBER_SAVINGSPLAN_FOR_RETIREMENT
+  PENSIONBUFFER_ACHIEVED
+  FREE_LIQUIDITY_USED_FOR_RETBUFFER_INFLATIONGAP
+  RET_DEP_USED_FOR_RETBUFFER_INFLATIONGAP
+  MEMBER_IN_RETIREMENT
+  MEMBER_SICKPAY_PAYMENT_END
+  MEMBER_RISKLIFE_PAYMENT_END
+  MEMBER_WORKINAB_PAYMENT_END
+  MEMBER_PENSIONPROVISION_PAYMENT_END
+  MEMBER_LIFESTYLE_RETIREMENT_REACHED
+  MEMBER_INCOME_RETIREMENT_REACHED
+  COMMOM_SAVINGS_FOR_RETIREMENT_END
+  COMMON_SAVINGS_FOR_INFLATIONGAP_END
+  CHILD_GROWN_UP
+  CHILD_BENEFITS_DROPPED
+  CHILD_INSURANCE_COSTS_DROPPED
+  REALESTATE_NOT_USED_FOR_RETIREMENT
+  REALESTATE_DUEYEAR_REACHED
+  REALESTATE_CONVERTED_TO_INCOME_IN_PENSION
+  REALESTATE_INSURANCE_COSTS_DROPPED
+  CONSUMPTION_FROM_DEPOT_STARTED
+  CONSUMPTION_FROM_DEPOT_ENDED
+  END_OF_LIQUIDITY
+  END_OF_WEALTH
+  CAPITAL_CONVERTED_TO_PENSION_MEMBERRETDEPOSIT
+  CAPITAL_CONVERTED_TO_PENSION_HHRETDEPOSIT
+  ASSET_CONVERTED_TO_FREE_LIQUIDITY
+  CAPITAL_CONVERTED_TO_PENSION_PARTNERRETDEPOSIT
+}
+
+enum FamilyStatus {
+  INDIVIDUAL
+  COUPLE
+  FAMILY
+}
+
+input IrrelevantSelectableMutationInput {
+  selected: Boolean
+}
+
+enum CareLevel {
+  UNKNOWN
+  LEVEL_1
+  LEVEL_2
+  LEVEL_3
+  LEVEL_4
+  LEVEL_5
+}
+
+enum AccomodationType {
+  UNKNOWN
+  SINGLE_ROOM
+  TWIN_ROOM
+}
+
+enum MismatchReason {
+  NONE
+  DEMAND_NOT_COVERED
+  DEMAND_NOT_EXIST
+  OVER_INSURED
+  COVERAGE_MISMATCH
+  OVERPRICED
+}
+
+input OverwritableIntegerMutationInput {
+  value: Int
+  isOverwritten: Boolean
+}
+
+input RedemptionInsuranceMutationInput {
+  name: String
+  type: RedemptionInsuranceType
+  amount: Decimal
+  payment: Decimal
+  payIncr: Decimal
+}
+
+enum GoalsCategory {
+  REAL_ESTATE
+  VEHICLE
+  LEISURE
+  OTHER
+  EDUCATION
+}
+
+input AddressMutationInput {
+  street: String
+  number: String
+  addition: String
+  zipCode: String
+  city: String
+  federalState: FederalState
+  country: Country
+}
+
+enum AllowanceBeneficiary {
+  UNKNOWN
+  CONTACT
+  CONTACT50
+  PARTNER
+  PARTNER50
+  COUPLE
+  NONE
+}
+
+input JobMutationInput {
+  name: String
+  employmentCategory: EmploymentCategoryExt
+  mainJob: Boolean
+  amount: Decimal
+  yearlyBonus: Decimal
+  yBonGoals: Decimal
+  isPhysicalWork: Boolean
+  privHIns: Boolean
+  privHInsCost: Decimal
+  compCareCost: Decimal
+  phCostPE: Decimal
+  pensInsObliged: Boolean
+  contrExempt: Boolean
+  entDailySick: Boolean
+  startDate: Date
+  endDate: Date
+  federalState: FederalState
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input OtherIncomeMutationInput {
+  name: String
+  amount: Decimal
+  grossIncomeType: GrossIncomeType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input PensionProvisionReferenceMutationInput {
+  inventory: [PensionProvisionInventoryMutationInput!]
+  ppType: PensionProvisionType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input AddGrossPensionMutationInput {
+  grossPensionType: GrossPensionType
+  name: String
+  amount: Decimal
+  grossPension: Decimal
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+input OverwritableAmountInput {
+  amount: Decimal
+  proposedAmount: Decimal
+  isOverwritten: Boolean
+}
+
+enum SickPayWeek {
+  SECOND
+  FORTH
+  SEVENTH
+}
+
+enum MinCoveragePeriod {
+  UNKOWN
+  SIXTY
+  SIXTY3
+  SIXTY5
+  SIXTY7
+  LIFELONG
+}
+
+input QuantUoMPercCurrInput {
+  amount: Decimal
+  uoM: UoMPerCurr
+}
+
+enum RuerupOption {
+  YES
+  YES_GUARENTEE
+  NO
+}
+
+type BioInsuranceInventory {
+  actionCode: ActionCodes
+  tariffName: String
+  extID: String
+  status: InsInvStatus
+  insType: InsuranceType
+  severity: SeverityLevel
+  riskCategory: RiskCategory
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  riskOrgEntId: UUID
+  description: String
+  fee: OverwritableAmount
+  amountInsured: OverwritableAmount
+  insurer: String
+  note: String
+  score: Decimal
+  deductible: OverwritableAmount
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectable
+  stationary: IrrelevantSelectable
+  ambulant: IrrelevantSelectable
+  dental: IrrelevantSelectable
+  intHealth: IrrelevantSelectable
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectable
+  traffic: IrrelevantSelectable
+  occupation: IrrelevantSelectable
+  tenant: IrrelevantSelectable
+  landlord: IrrelevantSelectable
+  landOwnerLiab: IrrelevantSelectable
+  builderLiab: IrrelevantSelectable
+  waterLiab: IrrelevantSelectable
+  photovoltLiab: IrrelevantSelectable
+  honoraryLiab: IrrelevantSelectable
+  fireDamage: IrrelevantSelectable
+  stormDamage: IrrelevantSelectable
+  waterDamage: IrrelevantSelectable
+  elementaryDamage: IrrelevantSelectable
+  feeDynamics: Decimal
+  untilAge: Int
+  entryAge: Int
+  entAge: OverwritableInteger
+  payoutFrom: SickPayWeek
+  wiType: WorkInabilityType
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type IrrelevantSelectable {
+  selected: Boolean
+  irrelevant: Boolean
+}
+
+type InsRefStatus {
+  decision: DecideStatus!
+  approval: ApproveStatus!
+  confirmation: ConfirmStatus!
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type InsuranceInventory {
+  actionCode: ActionCodes
+  tariffName: String
+  extID: String
+  status: InsInvStatus
+  insType: InsuranceType
+  severity: SeverityLevel
+  riskCategory: RiskCategory
+  riskOriginator: RiskOriginator
+  riskOriginatorID: UUID
+  riskOrgEntId: UUID
+  description: String
+  fee: OverwritableAmount
+  amountInsured: OverwritableAmount
+  insurer: String
+  note: String
+  score: Decimal
+  deductible: OverwritableAmount
+  progression: Decimal
+  accomType: AccomodationType
+  chiefPhysician: Boolean
+  fromLevel: CareLevel
+  hiType: HealthInsuranceType
+  privHIns: Boolean
+  dailySickness: IrrelevantSelectable
+  stationary: IrrelevantSelectable
+  ambulant: IrrelevantSelectable
+  dental: IrrelevantSelectable
+  intHealth: IrrelevantSelectable
+  underInsWaiver: Boolean
+  tariffType: FamilyStatus
+  private: IrrelevantSelectable
+  traffic: IrrelevantSelectable
+  occupation: IrrelevantSelectable
+  tenant: IrrelevantSelectable
+  landlord: IrrelevantSelectable
+  landOwnerLiab: IrrelevantSelectable
+  builderLiab: IrrelevantSelectable
+  waterLiab: IrrelevantSelectable
+  photovoltLiab: IrrelevantSelectable
+  honoraryLiab: IrrelevantSelectable
+  fireDamage: IrrelevantSelectable
+  stormDamage: IrrelevantSelectable
+  waterDamage: IrrelevantSelectable
+  elementaryDamage: IrrelevantSelectable
+  feeDynamics: Decimal
+  untilAge: Int
+  entryAge: Int
+  entAge: OverwritableInteger
+  payoutFrom: SickPayWeek
+  wiType: WorkInabilityType
+  pensionIncrease: Decimal
+  payTerm: PaymentTermsType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type LiquidAssetInventory {
+  savingsRate: Decimal
+  shareRatio: Decimal
+  distribution: LiquidAssetDistribution
+  valDate: Date
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type CashAssetInventory {
+  valDate: Date
+  interestRate: Decimal
+  savingsRate: Decimal
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type RetirementDeposit {
+  savingsRate: Decimal
+  shareRatio: Decimal
+  expNetPens: Decimal
+  expAmount: Decimal
+  valDate: Date
+  name: String
+  amount: Decimal
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type Job {
+  name: String
+  employmentCategory: EmploymentCategory
+  grossIncomeType: GrossIncomeType
+  mainJob: Boolean
+  amount: Decimal
+  yearlyBonus: Decimal
+  yBonGoals: Decimal
+  isPhysicalWork: Boolean
+  privHIns: Boolean
+  privHInsCost: Decimal
+  compCareCost: Decimal
+  phCostPE: Decimal
+  pensInsObliged: Boolean
+  contrExempt: Boolean
+  entDailySick: Boolean
+  startDate: Date
+  endDate: Date
+  federalState: FederalState
+  valDate: Date
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+enum EmploymentCategory {
+  UNEMPLOYED
+  EMPLOYEE
+  PUBLIC_SERVANT
+  CIVIL_SERVANT
+  SOLDIER_POLICE
+  SELF_EMPLOYED
+  MINIJOB_EMPLOYED
+  APPRENTICE
+  STUDENT
+  EXECUTIVE
+  RETIREE
+  RETIREEINCAP
+  PENSIONEER
+  PENSIONEERINAB
+  HOUSEWIFE
+  JUDGE
+}
+
+type OtherIncome {
+  name: String
+  amount: Decimal
+  grossIncomeType: GrossIncomeType
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type PensionProvisionReference {
+  actionCode: ActionCodes
+  isSelected: Boolean
+  isRelevant: Boolean
+  amountInv: Decimal
+  payInv: Decimal
+  netPayInv: Decimal
+  payEmpInv: Decimal
+  grossPensInv: Decimal
+  netPensInv: Decimal
+  valDate: Date
+  proposal: PensionProvisionProposal
+  inventory: [PensionProvisionInventory!]
+  status: PensRefStatus
+  ppType: PensionProvisionType
+  withGuarantee: Boolean
+  name: String
+  amount: Decimal
+  payment: Decimal
+  netPayment: Decimal
+  payEmp: Decimal
+  payEmpPerc: Decimal
+  grossPension: Decimal
+  netPension: Decimal
+  payIncr: Decimal
+  before2005: Boolean
+  startYear: Int
+  irr: Decimal
+  distribution: LiquidAssetDistribution
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type AddGrossPension {
+  grossPensionType: GrossPensionType
+  name: String
+  amount: Decimal
+  grossPension: Decimal
+  netPension: Decimal
+  valDate: Date
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type QuantUoMPercCurr {
+  amount: Decimal
+  uoM: UoMPerCurr
+}
+
+enum ExecutionStatusInv {
+  INIT
+  HANDEDOVER
+  INPROCESS
+}
+
+enum DecStatusInsInv {
+  INIT
+  RETAINED
+  TOBECANCELED
+  TOBECHECKED
+  CHECKED
+  TOBEOPTIMIZED
+}
+
+enum RedemptionInsuranceType {
+  CLV
+  FLV
+}
+
+enum Country {
+  UNKNOWN
+  GERMANY
+}
+
+enum FederalState {
+  UNKNOWN
+  BADEN_WUERTTEMBERG
+  BAVARIA
+  BERLIN
+  BRANDENBURG
+  BREMEN
+  HAMBURG
+  HESSE
+  LOWER_SAXONY
+  MECKLENBURG_WEST_POMERANIA
+  NORTH_RHINE_WESTPHALIA
+  RHINELAND_PALATINATE
+  SAARLAND
+  SAXONY
+  SAXONY_ANHALT
+  SCHLESWIG_HOLSTEIN
+  THURINGIA
+}
+
+enum DecomStatus {
+  INIT
+  TO_BE_DECOMISSIONED
+  DECOMISSIONED
+  DECOMISSIONCONFIRMED
+}
+
+enum ConfirmStatus {
+  INIT
+  CONFIRMED
+  CANCELED
+}
+
+enum ApproveStatus {
+  INIT
+  APPROVED
+  REJECTED
+}
+
+enum RefuseStatus {
+  INIT
+  REFUSED
+}
+
+enum AcceptStatus {
+  INIT
+  ACCEPTED
+}
+
+type LifestyleInvValues {
+  food: Decimal
+  utility: Decimal
+  rent: Decimal
+  clothing: Decimal
+  education: Decimal
+  media: Decimal
+  vacation: Decimal
+  mobility: Decimal
+  miscellaneous: Decimal
+  buffer: Decimal
+}
+
+type YearMonth {
+  year: Int!
+  month: Int!
+}
+
+input LifestyleInvValuesInput {
+  food: Decimal
+  utility: Decimal
+  rent: Decimal
+  clothing: Decimal
+  education: Decimal
+  media: Decimal
+  vacation: Decimal
+  mobility: Decimal
+  miscellaneous: Decimal
+  buffer: Decimal
+}
+
+input YearMonthInput {
+  year: Int!
+  month: Int!
+}
+
+enum AirBizDocNames {
+  REFERENCE_PORTFOLIO
+  CUSTOMER
+  EMPLOYEE
+  TEAM
+  TARIFF
+  INVENTORY
+  OPEN_BANKING_MAPPING_RULE
+}
+
+enum Assignment {
+  HOUSEHOLD
+  CONTACT
+  PARTNER
+  CHILD
+  PET
+  VEHICLE
+  REAL_ESTATE
+  OTHER
+  RENTED_HOME
+}
+
+type DomesticMoneyTransferConstraints {
+  toJson: String!
+  mandatoryFields: DomesticMoneyTransferMandatoryFields!
+}
+
+type SepaMoneyTransferConstraints {
+  toJson: String!
+  mandatoryFields: SepaMoneyTransferMandatoryFields!
+  purposeOrEndToEndId: Boolean!
+  maxCollectiveOrders: Int!
+  maxPurposeLength: Int!
+}
+
+enum LockedEnum {
+  CS
+  DE
+  EN
+  ES
+  FR
+  IT
+  NL
+  PL
+  RO
+  SK
+  TR
+}
+
+enum SelectorEnum {
+  RENDER
+  HIDDEN
+}
+
+type TextColor {
+  toJson: String!
+  primary: String!
+  secondary: String!
+}
+
+type SepaMoneyTransferMandatoryFields {
+  toJson: String!
+  purpose: Boolean!
+  counterpartName: Boolean!
+  counterpartBic: Boolean!
+  counterpartBankName: Boolean!
+  endToEndId: Boolean!
+  counterpartAddress: SepaMoneyTransferCounterpartAddressMandatoryFields!
+}
+
+type DomesticMoneyTransferMandatoryFields {
+  toJson: String!
+  endToEndId: Boolean!
+}
+
+enum UoMPerCurr {
+  CURRRENCY
+  PERCENTAGE
+}
+
+type PensRefStatus {
+  decision: DecideStatus!
+  approval: ApproveStatus!
+  confirmation: ConfirmStatus!
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type PensionProvisionInventory {
+  actionCode: ActionCodes
+  pppSubType: PrivatePensionProvisionSubType
+  expAmount: Decimal
+  expGrPension: Decimal
+  dueYear: Int
+  assToLoan: Boolean
+  valDate: Date
+  status: PensInvStatus
+  ppType: PensionProvisionType
+  withGuarantee: Boolean
+  name: String
+  amount: Decimal
+  payment: Decimal
+  netPayment: Decimal
+  payEmp: Decimal
+  payEmpPerc: Decimal
+  grossPension: Decimal
+  netPension: Decimal
+  payIncr: Decimal
+  before2005: Boolean
+  startYear: Int
+  irr: Decimal
+  distribution: LiquidAssetDistribution
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type PensionProvisionProposal {
+  actionCode: ActionCodes
+  insurer: String
+  extID: String
+  execAct: PensPropExecAction
+  status: PensPropStatus
+  ppType: PensionProvisionType
+  withGuarantee: Boolean
+  name: String
+  amount: Decimal
+  payment: Decimal
+  netPayment: Decimal
+  payEmp: Decimal
+  payEmpPerc: Decimal
+  grossPension: Decimal
+  netPension: Decimal
+  payIncr: Decimal
+  before2005: Boolean
+  startYear: Int
+  irr: Decimal
+  distribution: LiquidAssetDistribution
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+  isConsistent: Boolean
+  isComplete: Boolean
+  entityId: UUID
+  attachmentCount: Int
+}
+
+type InsInvStatus {
+  acceptance: AcceptStatus
+  refusal: RefuseStatus
+  approval: ApproveStatus
+  confirmation: ConfirmStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+enum GrossPensionType {
+  UNKNOWN
+  SUPPLEMENTARY_FUND
+  CIVIL_SERVANT_PENSION
+  STATUTORY_PENSION
+}
+
+input PensionProvisionInventoryMutationInput {
+  pppSubType: PrivatePensionProvisionSubType
+  expAmount: Decimal
+  dueYear: Int
+  withGuarantee: Boolean
+  name: String
+  amount: Decimal
+  payment: Decimal
+  netPayment: Decimal
+  payEmp: Decimal
+  payEmpPerc: Decimal
+  grossPension: Decimal
+  payIncr: Decimal
+  before2005: Boolean
+  startYear: Int
+  irr: Decimal
+  distribution: LiquidAssetDistribution
+  notes: String
+  identifier: UUID!
+  actionIndicator: ActionIndicator!
+}
+
+enum EmploymentCategoryExt {
+  UNEMPLOYED
+  EMPLOYEE
+  PUBLIC_SERVANT
+  CIVIL_SERVANT
+  SOLDIER_POLICE
+  SELF_EMPLOYED
+  MINIJOB_EMPLOYED
+  APPRENTICE
+  EXECUTIVE
+  HOUSEWIFE
+  JUDGE
+}
+
+type PensRefStatusOutput {
+  decision: DecideStatus!
+  approval: ApproveStatus!
+  confirmation: ConfirmStatus!
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type PensionProvisionInventoryOutput {
+  pppSubType: PrivatePensionProvisionSubType
+  expAmount: Decimal
+  expGrPension: Decimal
+  dueYear: Int
+  assToLoan: Boolean
+  valDate: Date
+  status: PensInvStatusOutput
+  ppType: PensionProvisionType
+  withGuarantee: Boolean
+  name: String
+  amount: Decimal
+  payment: Decimal
+  netPayment: Decimal
+  payEmp: Decimal
+  payEmpPerc: Decimal
+  grossPension: Decimal
+  netPension: Decimal
+  payIncr: Decimal
+  before2005: Boolean
+  startYear: Int
+  irr: Decimal
+  distribution: LiquidAssetDistribution
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+type PensionProvisionProposalOutput {
+  insurer: String
+  extID: String
+  execAct: PensPropExecAction
+  status: PensPropStatusOutput
+  ppType: PensionProvisionType
+  withGuarantee: Boolean
+  name: String
+  amount: Decimal
+  payment: Decimal
+  netPayment: Decimal
+  payEmp: Decimal
+  payEmpPerc: Decimal
+  grossPension: Decimal
+  netPension: Decimal
+  payIncr: Decimal
+  before2005: Boolean
+  startYear: Int
+  irr: Decimal
+  distribution: LiquidAssetDistribution
+  notes: String
+  identifier: UUID!
+  isConsistent: Boolean
+  isComplete: Boolean
+  attachmentCount: Int
+}
+
+enum DecideStatus {
+  INIT
+  PART_DECIDED
+  DECIDED
+}
+
+type InsInvStatusOutput {
+  acceptance: AcceptStatus
+  refusal: RefuseStatus
+  approval: ApproveStatus
+  confirmation: ConfirmStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type PensPropStatusOutput {
+  acceptance: AcceptStatus!
+  refusal: RefuseStatus!
+  approval: ApproveStatus!
+  confirmation: ConfirmStatus!
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type PensInvStatusOutput {
+  acceptance: AcceptStatus
+  refusal: RefuseStatus
+  approval: ApproveStatus
+  confirmation: ConfirmStatus
+  decommission: DecomStatus
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+type PensPropStatus {
+  acceptance: AcceptStatus!
+  refusal: RefuseStatus!
+  approval: ApproveStatus!
+  confirmation: ConfirmStatus!
+  creation: CreateStatus
+  deletion: DeleteStatus
+}
+
+enum PensPropExecAction {
+  NONE
+  CONTRACT_CREATE
+}
+
+type SepaMoneyTransferCounterpartAddressMandatoryFields {
+  toJson: String!
+  street: Boolean!
+  houseNumber: Boolean!
+  postCode: Boolean!
+  city: Boolean!
+  country: Boolean!
+}
