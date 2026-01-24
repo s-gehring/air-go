@@ -15,9 +15,10 @@ type RetryState struct {
 	TotalDuration time.Duration // Cumulative retry time
 }
 
-// calculateDelay calculates the retry delay with exponential backoff and jitter
+// CalculateDelay calculates the retry delay with exponential backoff and jitter
 // Retry schedule: 1s, 2s, 10s (with ±20% jitter)
-func calculateDelay(attempt int, baseDelay, maxDelay time.Duration) time.Duration {
+// Exported for testing (T092)
+func CalculateDelay(attempt int, baseDelay, maxDelay time.Duration) time.Duration {
 	var delay time.Duration
 
 	switch attempt {
@@ -50,13 +51,15 @@ func calculateDelay(attempt int, baseDelay, maxDelay time.Duration) time.Duratio
 	return jittered
 }
 
-// shouldRetry determines if another retry attempt should be made
-func shouldRetry(attempt int, maxAttempts int) bool {
+// ShouldRetry determines if another retry attempt should be made
+// Exported for testing (T092)
+func ShouldRetry(attempt int, maxAttempts int) bool {
 	return attempt < maxAttempts
 }
 
-// logRetryAttempt logs a retry attempt with structured fields
-func logRetryAttempt(logger zerolog.Logger, state *RetryState, delay time.Duration) {
+// LogRetryAttempt logs a retry attempt with structured fields
+// Exported for testing (T092)
+func LogRetryAttempt(logger zerolog.Logger, state *RetryState, delay time.Duration) {
 	logger.Warn().
 		Int("attempt", state.Attempt).
 		Err(state.LastError).

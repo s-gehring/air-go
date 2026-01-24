@@ -119,7 +119,7 @@ func (c *Client) Connect(ctx context.Context) error {
 			retryState.TotalDuration = time.Since(startTime)
 
 			// If this is the last attempt or context is cancelled, fail
-			if !shouldRetry(attempt, c.config.MaxRetryAttempts) || ctx.Err() != nil {
+			if !ShouldRetry(attempt, c.config.MaxRetryAttempts) || ctx.Err() != nil {
 				c.logger.Error().
 					Str("event_type", "mongodb_connection_error").
 					Str("host", c.config.URI).
@@ -130,8 +130,8 @@ func (c *Client) Connect(ctx context.Context) error {
 			}
 
 			// Calculate delay and wait before retry
-			delay := calculateDelay(attempt, c.config.RetryBaseDelay, c.config.RetryMaxDelay)
-			logRetryAttempt(c.logger, retryState, delay)
+			delay := CalculateDelay(attempt, c.config.RetryBaseDelay, c.config.RetryMaxDelay)
+			LogRetryAttempt(c.logger, retryState, delay)
 
 			select {
 			case <-time.After(delay):
@@ -151,7 +151,7 @@ func (c *Client) Connect(ctx context.Context) error {
 			retryState.LastError = err
 			retryState.TotalDuration = time.Since(startTime)
 
-			if !shouldRetry(attempt, c.config.MaxRetryAttempts) || ctx.Err() != nil {
+			if !ShouldRetry(attempt, c.config.MaxRetryAttempts) || ctx.Err() != nil {
 				c.logger.Error().
 					Str("event_type", "mongodb_connection_error").
 					Str("host", c.config.URI).
@@ -160,8 +160,8 @@ func (c *Client) Connect(ctx context.Context) error {
 				return ErrConnectionTimeout
 			}
 
-			delay := calculateDelay(attempt, c.config.RetryBaseDelay, c.config.RetryMaxDelay)
-			logRetryAttempt(c.logger, retryState, delay)
+			delay := CalculateDelay(attempt, c.config.RetryBaseDelay, c.config.RetryMaxDelay)
+			LogRetryAttempt(c.logger, retryState, delay)
 
 			select {
 			case <-time.After(delay):
