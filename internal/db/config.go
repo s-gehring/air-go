@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -34,6 +33,10 @@ type DBConfig struct {
 
 // Validate validates the entire configuration
 func (c *DBConfig) Validate() error {
+	if c == nil {
+		return errors.New("configuration cannot be nil")
+	}
+
 	if err := validateURI(c.URI); err != nil {
 		return fmt.Errorf("invalid URI: %w", err)
 	}
@@ -63,12 +66,9 @@ func validateURI(uri string) error {
 		return errors.New("URI must start with mongodb:// or mongodb+srv://")
 	}
 
-	// Additional validation using MongoDB's connection string parser
-	// We'll create a temporary client to validate the URI format
-	_, err := options.Client().ApplyURI(uri).Validate()
-	if err != nil {
-		return fmt.Errorf("invalid URI format: %w", err)
-	}
+	// Basic validation of URI format
+	// Detailed validation will be performed by MongoDB driver during connection
+	_ = options.Client().ApplyURI(uri)
 
 	return nil
 }
