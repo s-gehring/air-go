@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/spf13/viper"
 	"github.com/yourusername/air-go/internal/db"
