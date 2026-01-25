@@ -208,15 +208,15 @@ func TestConnectionPoolExhaustion(t *testing.T) {
 	require.NoError(t, err)
 	defer cleanup()
 
-	// Create client with small pool size for testing
+	// Create client with minimum allowed pool size for testing
 	logger := zerolog.Nop()
 	config := &db.DBConfig{
 		URI:              uri,
 		Database:         "pool_test_db",
 		ConnectTimeout:   30 * time.Second,
 		OperationTimeout: 10 * time.Second,
-		MinPoolSize:      2,
-		MaxPoolSize:      5, // Small pool for testing exhaustion
+		MinPoolSize:      5,
+		MaxPoolSize:      10, // Minimum allowed per FR-006, test with more concurrent ops
 		MaxConnIdleTime:  5 * time.Minute,
 		MaxRetryAttempts: 3,
 		RetryBaseDelay:   1 * time.Second,
@@ -245,7 +245,7 @@ func TestConnectionPoolExhaustion(t *testing.T) {
 	var successCount atomic.Int64
 	var timeoutCount atomic.Int64
 
-	concurrency := 10 // More than MaxPoolSize (5)
+	concurrency := 25 // More than MaxPoolSize (10) to create pressure
 
 	for i := 0; i < concurrency; i++ {
 		wg.Add(1)
@@ -272,9 +272,9 @@ func TestConnectionPoolExhaustion(t *testing.T) {
 
 	wg.Wait()
 
-	// With pool size 5, operations should eventually complete
+	// With pool size 10 and 25 concurrent operations, the pool will be under pressure
 	// Some might timeout if they wait too long, but most should succeed
-	t.Logf("Pool exhaustion test: %d success, %d timeouts (pool size: 5)",
+	t.Logf("Pool exhaustion test: %d success, %d timeouts (pool size: 10, concurrent: 25)",
 		successCount.Load(), timeoutCount.Load())
 
 	// Verify that at least some operations succeeded
