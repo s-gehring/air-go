@@ -2,19 +2,13 @@ package e2e
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/yourusername/air-go/internal/config"
-	"github.com/yourusername/air-go/internal/server"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 // GraphQL response structures
