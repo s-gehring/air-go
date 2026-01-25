@@ -533,7 +533,8 @@ func (r *queryResolver) OtherUserSigninActivitiesGet(ctx context.Context, identi
 
 // CustomerGet is the resolver for the customerGet field.
 func (r *queryResolver) CustomerGet(ctx context.Context, identifier string) (*generated.Customer, error) {
-	return nil, nil
+	// Implementation moved to customer.go for better organization
+	return customerGet(r, ctx, identifier)
 }
 
 // CustomerByKeysGet is the resolver for the customerByKeysGet field.

@@ -94,10 +94,8 @@ func logQueryError(ctx context.Context, queryName string, err error, duration ti
 	}
 
 	// Extract error code if it's a QueryError
-	var queryErr *QueryError
 	if err != nil {
 		if qe, ok := err.(*QueryError); ok {
-			queryErr = qe
 			logEvent = logEvent.Str("error_code", qe.Code)
 		}
 	}

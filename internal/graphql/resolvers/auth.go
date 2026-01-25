@@ -2,7 +2,6 @@ package resolvers
 
 import (
 	"context"
-	"errors"
 )
 
 // contextKey is a type for context keys to avoid collisions

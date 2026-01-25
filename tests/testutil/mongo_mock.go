@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 // MockCollection is a mock implementation of *mongo.Collection
@@ -78,7 +79,7 @@ func NewMockDatabase() *MockDatabase {
 // Collection returns a mock collection
 func (m *MockDatabase) Collection(name string, opts ...*options.CollectionOptions) *mongo.Collection {
 	args := m.Called(name, opts)
-	if mockColl, exists := m.collections[name]; exists {
+	if _, exists := m.collections[name]; exists {
 		return nil // Return nil but track the mock
 	}
 	return args.Get(0).(*mongo.Collection)
@@ -104,7 +105,7 @@ func (m *MockClient) Database(name string, opts ...*options.DatabaseOptions) *mo
 }
 
 // Ping mocks the Ping method
-func (m *MockClient) Ping(ctx context.Context, rp *mongo.ReadPref) error {
+func (m *MockClient) Ping(ctx context.Context, rp *readpref.ReadPref) error {
 	args := m.Called(ctx, rp)
 	return args.Error(0)
 }

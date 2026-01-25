@@ -16,6 +16,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/yourusername/air-go/internal/config"
+	"github.com/yourusername/air-go/internal/db"
 	"github.com/yourusername/air-go/internal/graphql/generated"
 	"github.com/yourusername/air-go/internal/graphql/resolvers"
 	"github.com/yourusername/air-go/internal/health"
@@ -102,9 +103,16 @@ func (s *Server) setupRoutes() {
 
 // graphQLHandler handles GraphQL requests
 func (s *Server) graphQLHandler(w http.ResponseWriter, r *http.Request) {
-	// Create resolver with database client for health monitoring (T088)
+	// Create resolver with database client for health monitoring and data access (T088)
+	// Type assert to *db.Client to access Collection method for customerGet resolver
+	dbClient, ok := s.dbClient.(*db.Client)
+	if !ok {
+		http.Error(w, "Database client not available", http.StatusInternalServerError)
+		return
+	}
+
 	resolver := &resolvers.Resolver{
-		DBClient: s.dbClient,
+		DBClient: dbClient,
 	}
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 	srv.ServeHTTP(w, r)
