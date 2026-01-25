@@ -33,7 +33,7 @@ func CalculateDelay(attempt int, baseDelay, maxDelay time.Duration) time.Duratio
 	}
 
 	// Add ±20% jitter to prevent thundering herd
-	jitter := time.Duration(rand.Int63n(int64(delay * 40 / 100)))  // 40% range
+	jitter := time.Duration(rand.Int63n(int64(delay * 40 / 100))) // 40% range
 	jitter = jitter - (delay * 20 / 100)                          // Center at ±20%
 
 	jittered := delay + jitter

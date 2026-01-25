@@ -16,39 +16,39 @@ func TestCalculateDelay_RetrySchedule(t *testing.T) {
 	maxDelay := 10 * time.Second
 
 	tests := []struct {
-		name         string
-		attempt      int
-		expectedMin  time.Duration
-		expectedMax  time.Duration
-		description  string
+		name        string
+		attempt     int
+		expectedMin time.Duration
+		expectedMax time.Duration
+		description string
 	}{
 		{
-			name:         "first_attempt",
-			attempt:      1,
-			expectedMin:  800 * time.Millisecond,  // 1s - 20% jitter
-			expectedMax:  1200 * time.Millisecond, // 1s + 20% jitter
-			description:  "First attempt should use 1s delay with ±20% jitter",
+			name:        "first_attempt",
+			attempt:     1,
+			expectedMin: 800 * time.Millisecond,  // 1s - 20% jitter
+			expectedMax: 1200 * time.Millisecond, // 1s + 20% jitter
+			description: "First attempt should use 1s delay with ±20% jitter",
 		},
 		{
-			name:         "second_attempt",
-			attempt:      2,
-			expectedMin:  1600 * time.Millisecond, // 2s - 20% jitter
-			expectedMax:  2400 * time.Millisecond, // 2s + 20% jitter
-			description:  "Second attempt should use 2s delay with ±20% jitter",
+			name:        "second_attempt",
+			attempt:     2,
+			expectedMin: 1600 * time.Millisecond, // 2s - 20% jitter
+			expectedMax: 2400 * time.Millisecond, // 2s + 20% jitter
+			description: "Second attempt should use 2s delay with ±20% jitter",
 		},
 		{
-			name:         "third_attempt",
-			attempt:      3,
-			expectedMin:  8 * time.Second,  // 10s - 20% jitter
-			expectedMax:  10 * time.Second, // 10s (capped at maxDelay)
-			description:  "Third attempt should use 10s delay with ±20% jitter",
+			name:        "third_attempt",
+			attempt:     3,
+			expectedMin: 8 * time.Second,  // 10s - 20% jitter
+			expectedMax: 10 * time.Second, // 10s (capped at maxDelay)
+			description: "Third attempt should use 10s delay with ±20% jitter",
 		},
 		{
-			name:         "exceeds_max_attempts",
-			attempt:      10,
-			expectedMin:  8 * time.Second,  // maxDelay - 20% jitter
-			expectedMax:  10 * time.Second, // maxDelay (capped)
-			description:  "Delay should be capped at maxDelay for attempts > 3",
+			name:        "exceeds_max_attempts",
+			attempt:     10,
+			expectedMin: 8 * time.Second,  // maxDelay - 20% jitter
+			expectedMax: 10 * time.Second, // maxDelay (capped)
+			description: "Delay should be capped at maxDelay for attempts > 3",
 		},
 	}
 

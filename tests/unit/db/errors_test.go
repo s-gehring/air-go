@@ -71,10 +71,10 @@ func TestErrorUnwrapping(t *testing.T) {
 // TestErrorComparison verifies error equality checks (T093)
 func TestErrorComparison(t *testing.T) {
 	tests := []struct {
-		name      string
-		err1      error
-		err2      error
-		shouldBe  bool
+		name     string
+		err1     error
+		err2     error
+		shouldBe bool
 	}{
 		{
 			name:     "same_error_constants",
@@ -104,10 +104,10 @@ func TestErrorComparison(t *testing.T) {
 // TestErrorMessages verifies error messages are descriptive (T093)
 func TestErrorMessages(t *testing.T) {
 	tests := []struct {
-		name         string
-		err          error
-		mustContain  []string
-		description  string
+		name        string
+		err         error
+		mustContain []string
+		description string
 	}{
 		{
 			name:        "invalid_configuration_descriptive",

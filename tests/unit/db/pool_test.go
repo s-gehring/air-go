@@ -226,14 +226,14 @@ func TestPoolConfiguration_DefaultValues(t *testing.T) {
 	config := &db.DBConfig{
 		URI:              "mongodb://localhost:27017",
 		Database:         "testdb",
-		ConnectTimeout:   30 * time.Second,  // Default connect timeout
-		OperationTimeout: 10 * time.Second,  // Default operation timeout
-		MinPoolSize:      5,                 // Default min pool size
-		MaxPoolSize:      10,                // Default max pool size
-		MaxConnIdleTime:  5 * time.Minute,   // Default idle timeout
-		MaxRetryAttempts: 3,                 // Default max retry attempts
-		RetryBaseDelay:   1 * time.Second,   // Default base delay
-		RetryMaxDelay:    10 * time.Second,  // Default max delay
+		ConnectTimeout:   30 * time.Second, // Default connect timeout
+		OperationTimeout: 10 * time.Second, // Default operation timeout
+		MinPoolSize:      5,                // Default min pool size
+		MaxPoolSize:      10,               // Default max pool size
+		MaxConnIdleTime:  5 * time.Minute,  // Default idle timeout
+		MaxRetryAttempts: 3,                // Default max retry attempts
+		RetryBaseDelay:   1 * time.Second,  // Default base delay
+		RetryMaxDelay:    10 * time.Second, // Default max delay
 	}
 
 	err := config.Validate()
@@ -265,8 +265,8 @@ func TestPoolConfiguration_RecommendedProduction(t *testing.T) {
 		Database:         "production",
 		ConnectTimeout:   30 * time.Second,
 		OperationTimeout: 10 * time.Second,
-		MinPoolSize:      10,                // Higher min for production
-		MaxPoolSize:      20,                // Max allowed
+		MinPoolSize:      10, // Higher min for production
+		MaxPoolSize:      20, // Max allowed
 		MaxConnIdleTime:  5 * time.Minute,
 		MaxRetryAttempts: 3,
 		RetryBaseDelay:   1 * time.Second,
