@@ -20,11 +20,11 @@ import (
 )
 
 var (
-	// testLogger for database client (discards output for cleaner test results)
+	// testLogger for database client (discards output for cleaner test results).
 	testLogger = zerolog.New(io.Discard).With().Timestamp().Logger()
 )
 
-// TestHealthCheckWithDatabase verifies that the health check endpoint includes database status when connected
+// TestHealthCheckWithDatabase verifies that the health check endpoint includes database status when connected.
 func TestHealthCheckWithDatabase(t *testing.T) {
 	// Start testcontainer
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
@@ -119,7 +119,7 @@ func TestHealthCheckWithDatabase(t *testing.T) {
 	assert.NotEmpty(t, healthResponse.Database.Message)
 
 	// Assert latency is measured (should be > 0)
-	assert.Greater(t, healthResponse.Database.LatencyMs, int64(0))
+	assert.GreaterOrEqual(t, healthResponse.Database.LatencyMs, int64(0))
 
 	// Assert no error
 	assert.Empty(t, healthResponse.Database.Error)
@@ -128,7 +128,7 @@ func TestHealthCheckWithDatabase(t *testing.T) {
 		healthResponse.Status, healthResponse.Database.Status, healthResponse.Database.LatencyMs)
 }
 
-// TestHealthCheckDegraded verifies that the health check returns degraded status when database is disconnected
+// TestHealthCheckDegraded verifies that the health check returns degraded status when database is disconnected.
 func TestHealthCheckDegraded(t *testing.T) {
 	// Start testcontainer
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)

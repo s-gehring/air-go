@@ -86,7 +86,7 @@ func TestDatabaseCleanup(t *testing.T) {
 	}
 }
 
-// TestTestIsolation tests that no data contamination occurs across test runs (T038)
+// TestTestIsolation tests that no data contamination occurs across test runs (T038).
 func TestTestIsolation(t *testing.T) {
 	ctx := context.Background()
 
@@ -160,7 +160,7 @@ func TestTestIsolation(t *testing.T) {
 	})
 }
 
-// TestContainerLifecycle tests container cleanup on test completion (T039)
+// TestContainerLifecycle tests container cleanup on test completion (T039).
 func TestContainerLifecycle(t *testing.T) {
 	ctx := context.Background()
 
@@ -203,7 +203,7 @@ func TestContainerLifecycle(t *testing.T) {
 	_ = containerID // Prevent unused variable error
 }
 
-// TestCleanupPerformance tests that cleanup completes in <2s (T045 validation)
+// TestCleanupPerformance tests that cleanup completes in <2s (T045 validation).
 func TestCleanupPerformance(t *testing.T) {
 	ctx := context.Background()
 

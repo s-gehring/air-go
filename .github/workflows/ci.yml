@@ -10,7 +10,7 @@ on:
 
 env:
   GO_VERSION: '1.25.6'
-  GOLANGCI_LINT_VERSION: '2.8.0'
+  GOLANGCI_LINT_VERSION: 'latest'
 
 jobs:
   format:
@@ -28,7 +28,7 @@ jobs:
       - name: Run gofmt
         run: |
           # Check if any Go files are not properly formatted
-          unformatted=$(gofmt -l ./...)
+          unformatted=$(gofmt -l .)
           if [ -n "$unformatted" ]; then
             echo "The following files are not properly formatted:"
             echo "$unformatted"
@@ -50,7 +50,7 @@ jobs:
           cache: true
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v9
         with:
           version: ${{ env.GOLANGCI_LINT_VERSION }}
           # Optional: golangci-lint command line arguments
