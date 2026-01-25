@@ -358,7 +358,7 @@ func (r *mutationResolver) OpenBankingMappingRuleDelete(ctx context.Context, ide
 
 // Alive is the resolver for the alive field.
 func (r *queryResolver) Alive(ctx context.Context) (bool, error) {
-	return false, nil
+	return true, nil
 }
 
 // Health is the resolver for the health field.
@@ -368,17 +368,38 @@ func (r *queryResolver) Health(ctx context.Context) (*generated.Health, error) {
 
 // ErrorCodeMetadataGet is the resolver for the errorCodeMetadataGet field.
 func (r *queryResolver) ErrorCodeMetadataGet(ctx context.Context) ([]*generated.ErrorCodeMetadata, error) {
-	return nil, nil
+	// Require authentication (T016)
+	if _, err := requireAuth(ctx); err != nil {
+		return nil, err
+	}
+
+	// TODO: Load error code metadata from database/configuration
+	// For now, return empty slice
+	return []*generated.ErrorCodeMetadata{}, nil
 }
 
 // InconsistencyMetadataGet is the resolver for the inconsistencyMetadataGet field.
 func (r *queryResolver) InconsistencyMetadataGet(ctx context.Context) ([]*generated.InconsistencyMetadata, error) {
-	return nil, nil
+	// Require authentication (T017)
+	if _, err := requireAuth(ctx); err != nil {
+		return nil, err
+	}
+
+	// TODO: Load inconsistency metadata from database/configuration
+	// For now, return empty slice
+	return []*generated.InconsistencyMetadata{}, nil
 }
 
 // DocumentMetadataGet is the resolver for the documentMetadataGet field.
 func (r *queryResolver) DocumentMetadataGet(ctx context.Context) ([]*generated.BizDocMetadata, error) {
-	return nil, nil
+	// Require authentication (T018)
+	if _, err := requireAuth(ctx); err != nil {
+		return nil, err
+	}
+
+	// TODO: Load business document metadata from database/configuration
+	// For now, return empty slice
+	return []*generated.BizDocMetadata{}, nil
 }
 
 // ReferencePortfolioGet is the resolver for the referencePortfolioGet field.

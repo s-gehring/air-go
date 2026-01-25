@@ -59,3 +59,9 @@ func getUserClaims(ctx context.Context) *UserClaims {
 	claims, _ := ctx.Value(userClaimsKey).(*UserClaims)
 	return claims
 }
+
+// WithUserClaims returns a new context with the given user claims
+// This is exported for use in testing
+func WithUserClaims(ctx context.Context, claims *UserClaims) context.Context {
+	return context.WithValue(ctx, userClaimsKey, claims)
+}

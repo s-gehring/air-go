@@ -2,6 +2,8 @@ package testutil
 
 import (
 	"context"
+
+	"github.com/yourusername/air-go/internal/graphql/resolvers"
 )
 
 // MockUserClaims represents test user claims
@@ -20,8 +22,16 @@ const (
 )
 
 // WithAuthContext returns a context with user claims for testing
+// Converts MockUserClaims to resolvers.UserClaims and stores in context using the resolver's helper
 func WithAuthContext(ctx context.Context, claims *MockUserClaims) context.Context {
-	return context.WithValue(ctx, userClaimsKey, claims)
+	// Convert to resolvers.UserClaims type
+	resolverClaims := &resolvers.UserClaims{
+		UserID:      claims.UserID,
+		Email:       claims.Email,
+		Roles:       claims.Roles,
+		Permissions: claims.Permissions,
+	}
+	return resolvers.WithUserClaims(ctx, resolverClaims)
 }
 
 // WithAdminContext returns a context with admin user claims for testing

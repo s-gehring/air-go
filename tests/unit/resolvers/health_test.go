@@ -3,24 +3,38 @@ package resolvers_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/yourusername/air-go/internal/db"
 	"github.com/yourusername/air-go/internal/graphql/resolvers"
-	"github.com/yourusername/air-go/internal/health"
 )
 
-// MockDBHealthChecker is a mock implementation of health.DBHealthChecker
-type MockDBHealthChecker struct {
+// MockDBClient is a mock implementation of resolvers.DBClient
+type MockDBClient struct {
 	mock.Mock
 }
 
-func (m *MockDBHealthChecker) HealthStatus(ctx context.Context) (*health.DBHealthStatus, error) {
+func (m *MockDBClient) HealthStatus(ctx context.Context) (*db.HealthStatus, error) {
 	args := m.Called(ctx)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*health.DBHealthStatus), args.Error(1)
+	return args.Get(0).(*db.HealthStatus), args.Error(1)
+}
+
+func (m *MockDBClient) Collection(name string) db.Collection {
+	args := m.Called(name)
+	if args.Get(0) == nil {
+		return nil
+	}
+	return args.Get(0).(db.Collection)
+}
+
+func (m *MockDBClient) IsConnected() bool {
+	args := m.Called()
+	return args.Bool(0)
 }
 
 // TestAlive tests the alive query (T014)
@@ -57,11 +71,12 @@ func TestHealth(t *testing.T) {
 	t.Run("should return ok status when database is connected", func(t *testing.T) {
 		// Arrange
 		ctx := context.Background()
-		mockDB := new(MockDBHealthChecker)
-		mockDB.On("HealthStatus", mock.Anything).Return(&health.DBHealthStatus{
+		mockDB := new(MockDBClient)
+		mockDB.On("HealthStatus", mock.Anything).Return(&db.HealthStatus{
 			Status:    "connected",
 			Message:   "MongoDB connected",
 			LatencyMs: 2,
+			Timestamp: time.Now(),
 			Error:     "",
 		}, nil)
 
@@ -86,11 +101,12 @@ func TestHealth(t *testing.T) {
 	t.Run("should return degraded status when database is not connected", func(t *testing.T) {
 		// Arrange
 		ctx := context.Background()
-		mockDB := new(MockDBHealthChecker)
-		mockDB.On("HealthStatus", mock.Anything).Return(&health.DBHealthStatus{
+		mockDB := new(MockDBClient)
+		mockDB.On("HealthStatus", mock.Anything).Return(&db.HealthStatus{
 			Status:    "disconnected",
 			Message:   "MongoDB connection failed",
 			LatencyMs: 0,
+			Timestamp: time.Now(),
 			Error:     "connection timeout",
 		}, nil)
 
@@ -113,11 +129,12 @@ func TestHealth(t *testing.T) {
 	t.Run("should not require authentication", func(t *testing.T) {
 		// Arrange - unauthenticated context
 		ctx := context.Background()
-		mockDB := new(MockDBHealthChecker)
-		mockDB.On("HealthStatus", mock.Anything).Return(&health.DBHealthStatus{
+		mockDB := new(MockDBClient)
+		mockDB.On("HealthStatus", mock.Anything).Return(&db.HealthStatus{
 			Status:    "connected",
 			Message:   "MongoDB connected",
 			LatencyMs: 1,
+			Timestamp: time.Now(),
 			Error:     "",
 		}, nil)
 
@@ -137,11 +154,12 @@ func TestHealth(t *testing.T) {
 	t.Run("should complete within 100ms threshold", func(t *testing.T) {
 		// Arrange
 		ctx := context.Background()
-		mockDB := new(MockDBHealthChecker)
-		mockDB.On("HealthStatus", mock.Anything).Return(&health.DBHealthStatus{
+		mockDB := new(MockDBClient)
+		mockDB.On("HealthStatus", mock.Anything).Return(&db.HealthStatus{
 			Status:    "connected",
 			Message:   "MongoDB connected",
 			LatencyMs: 5,
+			Timestamp: time.Now(),
 			Error:     "",
 		}, nil)
 
