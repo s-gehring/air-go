@@ -71,7 +71,7 @@ func TestConnectionPoolLoad(t *testing.T) {
 	})
 }
 
-// testConcurrentOperations tests N concurrent database operations
+// testConcurrentOperations tests N concurrent database operations.
 func testConcurrentOperations(t *testing.T, collection db.Collection, concurrency int) {
 	ctx := context.Background()
 
