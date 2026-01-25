@@ -185,8 +185,8 @@ func TestClient_Database_NotConnected(t *testing.T) {
 	}
 }
 
-// TestClient_Collection_PanicsWhenNotConnected tests Collection() panic behavior
-func TestClient_Collection_PanicsWhenNotConnected(t *testing.T) {
+// TestClient_Collection_ReturnsNilWhenNotConnected tests Collection() returns nil when not connected
+func TestClient_Collection_ReturnsNilWhenNotConnected(t *testing.T) {
 	logger := zerolog.Nop()
 
 	config := &db.DBConfig{
@@ -208,14 +208,11 @@ func TestClient_Collection_PanicsWhenNotConnected(t *testing.T) {
 	}
 	defer client.Close()
 
-	// Collection() should panic when database is nil
-	defer func() {
-		if r := recover(); r == nil {
-			t.Error("Collection() did not panic when database is nil")
-		}
-	}()
-
-	client.Collection("test_collection")
+	// Collection() should return nil when database is not initialized
+	collection := client.Collection("test_collection")
+	if collection != nil {
+		t.Error("Collection() should return nil when database is not initialized")
+	}
 }
 
 // TestClient_HealthStatus_NotConnected tests health status when not connected

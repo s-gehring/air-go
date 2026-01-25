@@ -19,7 +19,7 @@ const (
 // responseWriter wraps http.ResponseWriter to capture status code and response size
 type responseWriter struct {
 	http.ResponseWriter
-	statusCode int
+	statusCode   int
 	bytesWritten int
 }
 

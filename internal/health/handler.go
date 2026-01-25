@@ -11,17 +11,17 @@ import (
 
 // DatabaseHealth represents database connectivity status (T091)
 type DatabaseHealth struct {
-	Status    string `json:"status"`              // connected, disconnected, error
-	Message   string `json:"message"`             // Human-readable status message
-	LatencyMs int64  `json:"latency_ms"`          // Ping latency in milliseconds
-	Error     string `json:"error,omitempty"`     // Error details if status is error
+	Status    string `json:"status"`          // connected, disconnected, error
+	Message   string `json:"message"`         // Human-readable status message
+	LatencyMs int64  `json:"latency_ms"`      // Ping latency in milliseconds
+	Error     string `json:"error,omitempty"` // Error details if status is error
 }
 
 // Response represents the health check response structure (T091)
 type Response struct {
-	Status    string          `json:"status"`              // Overall status: ok, degraded
-	Timestamp string          `json:"timestamp"`           // RFC3339 timestamp
-	Database  *DatabaseHealth `json:"database,omitempty"`  // Database health (optional)
+	Status    string          `json:"status"`             // Overall status: ok, degraded
+	Timestamp string          `json:"timestamp"`          // RFC3339 timestamp
+	Database  *DatabaseHealth `json:"database,omitempty"` // Database health (optional)
 }
 
 // DBHealthChecker interface for checking database health

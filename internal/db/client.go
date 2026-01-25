@@ -303,9 +303,14 @@ func (c *Client) HealthStatus(ctx context.Context) (*HealthStatus, error) {
 
 // Collection returns a collection accessor for database operations (T059)
 // Returns a Collection interface with timeout enforcement and structured logging
+// Returns nil if database is not initialized (call Connect() first)
 func (c *Client) Collection(name string) Collection {
 	if c.database == nil {
-		panic("database not initialized: call Connect() first")
+		c.logger.Error().
+			Str("event_type", "collection_access_error").
+			Str("collection", name).
+			Msg("Cannot access collection: database not initialized")
+		return nil
 	}
 
 	mongoCollection := c.database.Collection(name)

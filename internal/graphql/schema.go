@@ -12,10 +12,10 @@ import (
 
 // Schema represents a loaded and validated GraphQL schema
 type Schema struct {
-	Schema      *ast.Schema
-	RawContent  string
-	LoadedAt    time.Time
-	SchemaPath  string
+	Schema     *ast.Schema
+	RawContent string
+	LoadedAt   time.Time
+	SchemaPath string
 }
 
 // LoadSchema loads and validates the GraphQL schema from the specified file
