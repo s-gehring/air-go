@@ -19,6 +19,8 @@ coverage.*
 *.coverprofile
 profile.cov
 
+gql-specs
+
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
@@ -37,7 +39,6 @@ go.work.sum
 bin/
 dist/
 build/
-
 # Logs
 *.log
 
@@ -46,3 +47,7 @@ build/
 Thumbs.db
 *.tmp
 *.swp
+
+*.py
+
+.gemini

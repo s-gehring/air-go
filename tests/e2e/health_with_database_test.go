@@ -118,7 +118,7 @@ func TestHealthCheckWithDatabase(t *testing.T) {
 	// Assert database message is present
 	assert.NotEmpty(t, healthResponse.Database.Message)
 
-	// Assert latency is measured (should be > 0)
+	// Assert latency is measured (should be at least 0)
 	assert.GreaterOrEqual(t, healthResponse.Database.LatencyMs, int64(0))
 
 	// Assert no error

@@ -216,7 +216,7 @@ func TestConnectionPooling(t *testing.T) {
 	})
 }
 
-// TestDatabaseOperationTimeouts verifies operation timeout configuration (T046 extended)
+// TestDatabaseOperationTimeouts verifies operation timeout configuration (T046 extended).
 func TestDatabaseOperationTimeouts(t *testing.T) {
 	ctx := context.Background()
 
