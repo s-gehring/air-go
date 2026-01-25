@@ -17,9 +17,9 @@ Enterprise GraphQL API backend built with Go, gqlgen, and MongoDB.
 
 ### Prerequisites
 
-- Go 1.21 or later
+- Go 1.25.6 or later
 - Docker and Docker Compose (for local development)
-- MongoDB 7.0+ (or use Docker Compose)
+- MongoDB 8.2+ (or use Docker Compose)
 
 ### Installation
 
@@ -53,7 +53,7 @@ docker run -d \
   --name air-mongodb \
   -p 27017:27017 \
   -e MONGO_INITDB_DATABASE=air \
-  mongo:7.0
+  mongo:8.2.3
 
 # Or use an existing MongoDB instance
 ```
@@ -82,7 +82,7 @@ The included `docker-compose.yml` file sets up MongoDB automatically:
 ```yaml
 services:
   mongodb:
-    image: mongo:7.0
+    image: mongo:8.2.3
     ports:
       - "27017:27017"
     environment:
@@ -99,7 +99,7 @@ volumes:
 If you prefer to run MongoDB manually:
 
 ```bash
-# Install MongoDB 7.0+
+# Install MongoDB 8.2+
 # https://www.mongodb.com/docs/manual/installation/
 
 # Start MongoDB

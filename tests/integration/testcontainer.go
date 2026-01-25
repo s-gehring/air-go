@@ -13,7 +13,7 @@ import (
 
 // TestContainerConfig holds configuration for test MongoDB container (T040)
 type TestContainerConfig struct {
-	Image        string        // MongoDB Docker image (default: mongo:7.0)
+	Image        string        // MongoDB Docker image (default: mongo:8.2.3)
 	Port         string        // Exposed port (default: 27017)
 	Database     string        // Test database name (default: test_db)
 	CleanupMode  string        // cleanup mode: "drop" (default) or "terminate"
@@ -23,7 +23,7 @@ type TestContainerConfig struct {
 // DefaultTestContainerConfig returns default configuration for test containers
 func DefaultTestContainerConfig() *TestContainerConfig {
 	return &TestContainerConfig{
-		Image:        "mongo:7.0",
+		Image:        "mongo:8.2.3",
 		Port:         "27017/tcp",
 		Database:     "test_db",
 		CleanupMode:  "drop",
