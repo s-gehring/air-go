@@ -39,6 +39,9 @@ type Collection interface {
 	// CountDocuments counts documents matching the filter
 	CountDocuments(ctx context.Context, filter interface{}) (int64, error)
 
+	// Aggregate executes an aggregation pipeline
+	Aggregate(ctx context.Context, pipeline interface{}, opts ...*options.AggregateOptions) (*mongo.Cursor, error)
+
 	// Name returns the collection name
 	Name() string
 }
@@ -370,4 +373,35 @@ func (c *collectionWrapper) CountDocuments(ctx context.Context, filter interface
 		Msg("Documents counted")
 
 	return count, nil
+}
+
+// Aggregate executes an aggregation pipeline
+func (c *collectionWrapper) Aggregate(ctx context.Context, pipeline interface{}, opts ...*options.AggregateOptions) (*mongo.Cursor, error) {
+	ctx, cancel := c.withTimeout(ctx)
+	defer cancel()
+
+	startTime := time.Now()
+
+	cursor, err := c.collection.Aggregate(ctx, pipeline, opts...)
+
+	duration := time.Since(startTime)
+
+	// Structured logging
+	if err != nil {
+		c.logger.Error().
+			Str("operation", "aggregate").
+			Str("collection", c.name).
+			Dur("duration_ms", duration).
+			Err(err).
+			Msg("Aggregate operation failed")
+		return nil, err
+	}
+
+	c.logger.Debug().
+		Str("operation", "aggregate").
+		Str("collection", c.name).
+		Dur("duration_ms", duration).
+		Msg("Aggregate operation completed")
+
+	return cursor, nil
 }

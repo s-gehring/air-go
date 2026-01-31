@@ -487,10 +487,7 @@ func (r *queryResolver) InventoryDownloadAttachment(ctx context.Context, attachm
 	return "", nil
 }
 
-// ByKeysGet is the resolver for the byKeysGet field.
-func (r *queryResolver) ByKeysGet(ctx context.Context, identifiers []string, order []*generated.InventoryQuerySorterInput) ([]*generated.Inventory, error) {
-	return nil, nil
-}
+// ByKeysGet is implemented in inventory.go
 
 // Search is the resolver for the search field.
 func (r *queryResolver) Search(ctx context.Context, where *generated.InventoryQueryFilterInput, order []*generated.InventoryQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfInventory, error) {
