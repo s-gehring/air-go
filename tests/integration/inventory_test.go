@@ -332,10 +332,9 @@ func TestInventoryNullCustomerIdASC(t *testing.T) {
 		{
 			"$addFields": map[string]interface{}{
 				"_sortKey": map[string]interface{}{
-					"$cond": map[string]interface{}{
-						"if":   map[string]interface{}{"$eq": []interface{}{"$customerId", nil}},
-						"then": "zzzzzzz-null-placeholder", // Sorts after all UUIDs
-						"else": "$customerId",
+					"$ifNull": []interface{}{
+						"$customerId",
+						"zzzzzzz-null-placeholder", // Sorts after all UUIDs
 					},
 				},
 			},
@@ -414,10 +413,9 @@ func TestInventoryNullCustomerIdDESC(t *testing.T) {
 		{
 			"$addFields": map[string]interface{}{
 				"_sortKey": map[string]interface{}{
-					"$cond": map[string]interface{}{
-						"if":   map[string]interface{}{"$eq": []interface{}{"$customerId", nil}},
-						"then": "0000000-null-placeholder", // Sorts before all UUIDs
-						"else": "$customerId",
+					"$ifNull": []interface{}{
+						"$customerId",
+						"zzzzzzz-null-placeholder", // Sorts first when descending
 					},
 				},
 			},

@@ -91,10 +91,9 @@ func appendCustomerIDSorting(pipeline []bson.M, sortDirection generated.SortEnum
 		pipeline = append(pipeline, bson.M{
 			"$addFields": bson.M{
 				"_sortKey": bson.M{
-					"$cond": bson.M{
-						"if":   bson.M{"$eq": []interface{}{"$customerId", nil}},
-						"then": "zzzzzzz-null-placeholder", // Sorts after all valid UUIDs
-						"else": "$customerId",
+					"$ifNull": []interface{}{
+						"$customerId",
+						"zzzzzzz-null-placeholder", // Sorts after all valid UUIDs
 					},
 				},
 			},
@@ -106,10 +105,9 @@ func appendCustomerIDSorting(pipeline []bson.M, sortDirection generated.SortEnum
 		pipeline = append(pipeline, bson.M{
 			"$addFields": bson.M{
 				"_sortKey": bson.M{
-					"$cond": bson.M{
-						"if":   bson.M{"$eq": []interface{}{"$customerId", nil}},
-						"then": "0000000-null-placeholder", // Sorts before all valid UUIDs
-						"else": "$customerId",
+					"$ifNull": []interface{}{
+						"$customerId",
+						"zzzzzzz-null-placeholder", // Sorts first when descending
 					},
 				},
 			},

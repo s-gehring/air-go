@@ -32,4 +32,5 @@ Go 1.21+: Follow standard conventions
 - My github username is "s-gehring".
 - Commit often, but never to master branch.
 - Only write comment if really necessary.
+- Use docker to start required infrastructure, like a MongoDB database
 <!-- MANUAL ADDITIONS END -->
