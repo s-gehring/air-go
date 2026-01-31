@@ -139,3 +139,57 @@ func executeGraphQLRequest(t *testing.T, query string, variables map[string]inte
 
 	return resp
 }
+
+// T037: E2E test for ordering by customerId ASC
+func TestE2E_ByKeysGet_OrderingASC(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping E2E test")
+	}
+
+	t.Skip("E2E tests require GraphQL HTTP server setup")
+
+	// TODO: Implement when GraphQL HTTP server is ready
+	// Expected: Inventories ordered by customerId in ascending order
+	// Non-null customerIds should come first (in ascending order)
+	// Null customerIds should come last
+}
+
+// T038: E2E test for ordering by customerId DESC
+func TestE2E_ByKeysGet_OrderingDESC(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping E2E test")
+	}
+
+	t.Skip("E2E tests require GraphQL HTTP server setup")
+
+	// TODO: Implement when GraphQL HTTP server is ready
+	// Expected: Inventories ordered by customerId in descending order
+	// Null customerIds should come first
+	// Non-null customerIds should come last (in descending order)
+}
+
+// T039: E2E test for default ordering (identifier ASC) when no order parameter
+func TestE2E_ByKeysGet_DefaultOrdering(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping E2E test")
+	}
+
+	t.Skip("E2E tests require GraphQL HTTP server setup")
+
+	// TODO: Implement when GraphQL HTTP server is ready
+	// Expected: When no order parameter provided, results ordered by identifier ASC
+}
+
+// T040: E2E test for null customerId ordering (both ASC and DESC)
+func TestE2E_ByKeysGet_NullCustomerIdOrdering(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping E2E test")
+	}
+
+	t.Skip("E2E tests require GraphQL HTTP server setup")
+
+	// TODO: Implement when GraphQL HTTP server is ready
+	// Expected ASC: Non-null customerIds first (ascending), nulls last
+	// Expected DESC: Nulls first, non-null customerIds last (descending)
+	// This verifies SQL-standard null handling behavior
+}

@@ -68,6 +68,9 @@ func buildInventoryPipeline(identifiers []string, order []*generated.InventoryQu
 		sortSpec := order[0]
 		if sortSpec.CustomerID != nil {
 			pipeline = appendCustomerIDSorting(pipeline, *sortSpec.CustomerID)
+		} else {
+			// Default ordering: identifier ascending (when order param provided but customerID is nil)
+			pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}})
 		}
 	} else {
 		// Default ordering: identifier ascending
