@@ -7,6 +7,7 @@ package resolvers
 
 import (
 	"context"
+	"time"
 
 	"github.com/yourusername/air-go/internal/graphql/generated"
 )
@@ -402,9 +403,27 @@ func (r *queryResolver) DocumentMetadataGet(ctx context.Context) ([]*generated.B
 	return []*generated.BizDocMetadata{}, nil
 }
 
-// ReferencePortfolioGet is the resolver for the referencePortfolioGet field.
+// T035: ReferencePortfolioGet resolver using generic getEntity function
 func (r *queryResolver) ReferencePortfolioGet(ctx context.Context, identifier string) (*generated.ReferencePortfolioOutput, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+	defer func() {
+		duration := time.Since(startTime)
+		logQueryExecution(ctx, "referencePortfolioGet", duration, err == nil)
+	}()
+
+	config := entityConfigs["referencePortfolio"]
+	var portfolio generated.ReferencePortfolioOutput
+
+	if err = getEntity(ctx, r.DBClient, config, identifier, &portfolio); err != nil {
+		return nil, err
+	}
+
+	if portfolio.Identifier == "" {
+		return nil, nil
+	}
+
+	return &portfolio, nil
 }
 
 // ReferencePortfolioByKeysGet is the resolver for the referencePortfolioByKeysGet field.
@@ -467,9 +486,27 @@ func (r *queryResolver) ReferencePortfolioIncompleteNodesGet(ctx context.Context
 	return nil, nil
 }
 
-// InventoryGet is the resolver for the inventoryGet field.
+// T033: InventoryGet resolver using generic getEntity function
 func (r *queryResolver) InventoryGet(ctx context.Context, identifier string) (*generated.Inventory, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+	defer func() {
+		duration := time.Since(startTime)
+		logQueryExecution(ctx, "inventoryGet", duration, err == nil)
+	}()
+
+	config := entityConfigs["inventory"]
+	var inventory generated.Inventory
+
+	if err = getEntity(ctx, r.DBClient, config, identifier, &inventory); err != nil {
+		return nil, err
+	}
+
+	if inventory.Identifier == "" {
+		return nil, nil
+	}
+
+	return &inventory, nil
 }
 
 // InventoryForCustomerGet is the resolver for the inventoryForCustomerGet field.
@@ -494,9 +531,27 @@ func (r *queryResolver) Search(ctx context.Context, where *generated.InventoryQu
 	return nil, nil
 }
 
-// ExecutionPlanGet is the resolver for the executionPlanGet field.
+// T034: ExecutionPlanGet resolver using generic getEntity function
 func (r *queryResolver) ExecutionPlanGet(ctx context.Context, identifier string) (*generated.ExecutionPlan, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+	defer func() {
+		duration := time.Since(startTime)
+		logQueryExecution(ctx, "executionPlanGet", duration, err == nil)
+	}()
+
+	config := entityConfigs["executionPlan"]
+	var executionPlan generated.ExecutionPlan
+
+	if err = getEntity(ctx, r.DBClient, config, identifier, &executionPlan); err != nil {
+		return nil, err
+	}
+
+	if executionPlan.Identifier == "" {
+		return nil, nil
+	}
+
+	return &executionPlan, nil
 }
 
 // ExecutionPlanByKeysGet is the resolver for the executionPlanByKeysGet field.
@@ -549,10 +604,28 @@ func (r *queryResolver) OtherUserSigninActivitiesGet(ctx context.Context, identi
 	return nil, nil
 }
 
-// CustomerGet is the resolver for the customerGet field.
+// T030: CustomerGet resolver using generic getEntity function
 func (r *queryResolver) CustomerGet(ctx context.Context, identifier string) (*generated.Customer, error) {
-	// Implementation moved to customer.go for better organization
-	return customerGet(r, ctx, identifier)
+	startTime := time.Now()
+	var err error
+	defer func() {
+		duration := time.Since(startTime)
+		logQueryExecution(ctx, "customerGet", duration, err == nil)
+	}()
+
+	config := entityConfigs["customer"]
+	var customer generated.Customer
+
+	if err = getEntity(ctx, r.DBClient, config, identifier, &customer); err != nil {
+		return nil, err
+	}
+
+	// Check if entity was found (getEntity returns empty struct for not found)
+	if customer.Identifier == "" {
+		return nil, nil
+	}
+
+	return &customer, nil
 }
 
 // CustomerByKeysGet is the resolver for the customerByKeysGet field.
@@ -570,9 +643,27 @@ func (r *queryResolver) CustomerGetCrispIdentity(ctx context.Context) (*generate
 	return nil, nil
 }
 
-// EmployeeGet is the resolver for the employeeGet field.
+// T031: EmployeeGet resolver using generic getEntity function
 func (r *queryResolver) EmployeeGet(ctx context.Context, identifier string) (*generated.Employee, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+	defer func() {
+		duration := time.Since(startTime)
+		logQueryExecution(ctx, "employeeGet", duration, err == nil)
+	}()
+
+	config := entityConfigs["employee"]
+	var employee generated.Employee
+
+	if err = getEntity(ctx, r.DBClient, config, identifier, &employee); err != nil {
+		return nil, err
+	}
+
+	if employee.Identifier == "" {
+		return nil, nil
+	}
+
+	return &employee, nil
 }
 
 // EmployeeByKeysGet is the resolver for the employeeByKeysGet field.
@@ -610,9 +701,27 @@ func (r *queryResolver) EmployeeTeamMembersForTeamGet(ctx context.Context, teamI
 	return nil, nil
 }
 
-// TeamGet is the resolver for the teamGet field.
+// T032: TeamGet resolver using generic getEntity function
 func (r *queryResolver) TeamGet(ctx context.Context, identifier string) (*generated.TeamQueryOutput, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+	defer func() {
+		duration := time.Since(startTime)
+		logQueryExecution(ctx, "teamGet", duration, err == nil)
+	}()
+
+	config := entityConfigs["team"]
+	var team generated.TeamQueryOutput
+
+	if err = getEntity(ctx, r.DBClient, config, identifier, &team); err != nil {
+		return nil, err
+	}
+
+	if team.Identifier == "" {
+		return nil, nil
+	}
+
+	return &team, nil
 }
 
 // TeamByKeysGet is the resolver for the teamByKeysGet field.

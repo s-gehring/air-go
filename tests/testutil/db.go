@@ -63,21 +63,86 @@ func CreateIndexes(t *testing.T, db *mongo.Database) {
 	t.Helper()
 	ctx := context.Background()
 
-	collection := db.Collection("inventories")
+	// T001-T004: Create indexes for all entity collections
 
-	// Create identifier index (unique)
-	_, err := collection.Indexes().CreateOne(ctx, mongo.IndexModel{
+	// Inventories collection (existing)
+	inventoriesCol := db.Collection("inventories")
+	_, err := inventoriesCol.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys:    map[string]interface{}{"identifier": 1},
 		Options: options.Index().SetUnique(true),
 	})
-	require.NoError(t, err, "Failed to create identifier index")
+	require.NoError(t, err, "Failed to create inventories identifier index")
 
-	// Create customerId index (sparse for ordering)
-	_, err = collection.Indexes().CreateOne(ctx, mongo.IndexModel{
+	_, err = inventoriesCol.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys:    map[string]interface{}{"customerId": 1},
 		Options: options.Index().SetSparse(true),
 	})
-	require.NoError(t, err, "Failed to create customerId index")
+	require.NoError(t, err, "Failed to create inventories customerId index")
 
-	t.Log("Created required indexes")
+	// Customers collection (existing unique index, add compound for sorting)
+	customersCol := db.Collection("customers")
+	_, err = customersCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    map[string]interface{}{"identifier": 1},
+		Options: options.Index().SetUnique(true),
+	})
+	require.NoError(t, err, "Failed to create customers identifier index")
+
+	_, err = customersCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: map[string]interface{}{"lastName": 1, "identifier": 1},
+	})
+	require.NoError(t, err, "Failed to create customers lastName+identifier index")
+
+	// T001: Employees collection indexes
+	employeesCol := db.Collection("employees")
+	_, err = employeesCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    map[string]interface{}{"identifier": 1},
+		Options: options.Index().SetUnique(true),
+	})
+	require.NoError(t, err, "Failed to create employees identifier index")
+
+	_, err = employeesCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: map[string]interface{}{"lastName": 1, "identifier": 1},
+	})
+	require.NoError(t, err, "Failed to create employees lastName+identifier index")
+
+	// T002: Teams collection indexes
+	teamsCol := db.Collection("teams")
+	_, err = teamsCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    map[string]interface{}{"identifier": 1},
+		Options: options.Index().SetUnique(true),
+	})
+	require.NoError(t, err, "Failed to create teams identifier index")
+
+	_, err = teamsCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: map[string]interface{}{"name": 1, "identifier": 1},
+	})
+	require.NoError(t, err, "Failed to create teams name+identifier index")
+
+	// T003: ExecutionPlans collection indexes
+	executionPlansCol := db.Collection("executionPlans")
+	_, err = executionPlansCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    map[string]interface{}{"identifier": 1},
+		Options: options.Index().SetUnique(true),
+	})
+	require.NoError(t, err, "Failed to create executionPlans identifier index")
+
+	_, err = executionPlansCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: map[string]interface{}{"customerId": 1, "identifier": 1},
+	})
+	require.NoError(t, err, "Failed to create executionPlans customerId+identifier index")
+
+	// T004: ReferencePortfolios collection indexes
+	referencePortfoliosCol := db.Collection("referencePortfolios")
+	_, err = referencePortfoliosCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    map[string]interface{}{"identifier": 1},
+		Options: options.Index().SetUnique(true),
+	})
+	require.NoError(t, err, "Failed to create referencePortfolios identifier index")
+
+	_, err = referencePortfoliosCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: map[string]interface{}{"customerId": 1, "identifier": 1},
+	})
+	require.NoError(t, err, "Failed to create referencePortfolios customerId+identifier index")
+
+	t.Log("Created required indexes for all entity collections")
 }
