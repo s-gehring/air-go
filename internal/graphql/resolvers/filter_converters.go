@@ -17,6 +17,26 @@ func convertStringFilter(field string, filter *generated.StringFilterInput) bson
 
 	conditions := []bson.M{}
 
+	// T092: Handle null value filters
+	// Check if this is an explicit null check: filter object exists but Eq is nil and no other operators are set
+	isExplicitNullCheck := filter.Eq == nil &&
+		filter.Neq == nil &&
+		filter.Contains == nil &&
+		filter.Ncontains == nil &&
+		filter.StartsWith == nil &&
+		filter.NstartsWith == nil &&
+		filter.EndsWith == nil &&
+		filter.NendsWith == nil &&
+		(filter.In == nil || len(filter.In) == 0) &&
+		(filter.Nin == nil || len(filter.Nin) == 0) &&
+		(filter.And == nil || len(filter.And) == 0) &&
+		(filter.Or == nil || len(filter.Or) == 0)
+
+	if isExplicitNullCheck {
+		// User provided { eq: null } or empty filter object - interpret as "field should be null"
+		return bson.M{field: nil}
+	}
+
 	// Equality operators
 	if filter.Eq != nil {
 		conditions = append(conditions, bson.M{field: *filter.Eq})
