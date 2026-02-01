@@ -9,6 +9,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/yourusername/air-go/internal/graphql/generated"
 )
 
@@ -426,9 +427,36 @@ func (r *queryResolver) ReferencePortfolioGet(ctx context.Context, identifier st
 	return &portfolio, nil
 }
 
-// ReferencePortfolioByKeysGet is the resolver for the referencePortfolioByKeysGet field.
+// T065: ReferencePortfolioByKeysGet resolver (no sorter - default to identifier ordering)
 func (r *queryResolver) ReferencePortfolioByKeysGet(ctx context.Context, identifiers []string, order []*generated.ReferencePortfolioQuerySorterInput) ([]*generated.ReferencePortfolioOutput, error) {
-	return nil, nil
+	startTime := time.Now()
+	identifierCount := len(identifiers)
+	var resultCount int
+	var err error
+
+	defer func() {
+		duration := time.Since(startTime).Milliseconds()
+		if err != nil {
+			log.Error().Err(err).Int("identifierCount", identifierCount).
+				Int64("duration", duration).Str("query", "referencePortfolioByKeysGet").
+				Msg("referencePortfolioByKeysGet query failed")
+		} else {
+			log.Info().Int("identifierCount", identifierCount).Int("resultCount", resultCount).
+				Int64("duration", duration).Str("query", "referencePortfolioByKeysGet").
+				Msg("referencePortfolioByKeysGet query completed")
+		}
+	}()
+
+	config := entityConfigs["referencePortfolio"]
+	var portfolios []*generated.ReferencePortfolioOutput
+
+	// Note: ReferencePortfolio has no sorter converter (nil), will use default identifier ordering
+	if err = getEntitiesByKeys(ctx, r.DBClient, config, identifiers, order, &portfolios); err != nil {
+		return nil, err
+	}
+
+	resultCount = len(portfolios)
+	return portfolios, nil
 }
 
 // ReferencePortfolioSearch is the resolver for the referencePortfolioSearch field.
@@ -524,7 +552,38 @@ func (r *queryResolver) InventoryDownloadAttachment(ctx context.Context, attachm
 	return "", nil
 }
 
-// ByKeysGet is implemented in inventory.go
+// T063: InventoryByKeysGet resolver using generic getEntitiesByKeys function
+func (r *queryResolver) ByKeysGet(ctx context.Context, identifiers []string, order []*generated.InventoryQuerySorterInput) ([]*generated.Inventory, error) {
+	startTime := time.Now()
+	identifierCount := len(identifiers)
+	var resultCount int
+	var err error
+
+	defer func() {
+		duration := time.Since(startTime).Milliseconds()
+		if err != nil {
+			log.Error().Err(err).Int("identifierCount", identifierCount).
+				Int64("duration", duration).Str("query", "byKeysGet").
+				Msg("byKeysGet query failed")
+		} else {
+			log.Info().Int("identifierCount", identifierCount).Int("resultCount", resultCount).
+				Int64("duration", duration).Str("query", "byKeysGet").
+				Msg("byKeysGet query completed")
+		}
+	}()
+
+	config := entityConfigs["inventory"]
+	var inventories []*generated.Inventory
+
+	if err = getEntitiesByKeys(ctx, r.DBClient, config, identifiers, order, &inventories); err != nil {
+		return nil, err
+	}
+
+	resultCount = len(inventories)
+	return inventories, nil
+}
+
+// Note: ByKeysGet was previously implemented in inventory.go
 
 // Search is the resolver for the search field.
 func (r *queryResolver) Search(ctx context.Context, where *generated.InventoryQueryFilterInput, order []*generated.InventoryQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfInventory, error) {
@@ -554,9 +613,36 @@ func (r *queryResolver) ExecutionPlanGet(ctx context.Context, identifier string)
 	return &executionPlan, nil
 }
 
-// ExecutionPlanByKeysGet is the resolver for the executionPlanByKeysGet field.
+// T064: ExecutionPlanByKeysGet resolver (no sorter - default to identifier ordering)
 func (r *queryResolver) ExecutionPlanByKeysGet(ctx context.Context, identifiers []string, order []*generated.ExecutionPlanQuerySorterInput) ([]*generated.ExecutionPlan, error) {
-	return nil, nil
+	startTime := time.Now()
+	identifierCount := len(identifiers)
+	var resultCount int
+	var err error
+
+	defer func() {
+		duration := time.Since(startTime).Milliseconds()
+		if err != nil {
+			log.Error().Err(err).Int("identifierCount", identifierCount).
+				Int64("duration", duration).Str("query", "executionPlanByKeysGet").
+				Msg("executionPlanByKeysGet query failed")
+		} else {
+			log.Info().Int("identifierCount", identifierCount).Int("resultCount", resultCount).
+				Int64("duration", duration).Str("query", "executionPlanByKeysGet").
+				Msg("executionPlanByKeysGet query completed")
+		}
+	}()
+
+	config := entityConfigs["executionPlan"]
+	var executionPlans []*generated.ExecutionPlan
+
+	// Note: ExecutionPlan has no sorter converter (nil), will use default identifier ordering
+	if err = getEntitiesByKeys(ctx, r.DBClient, config, identifiers, order, &executionPlans); err != nil {
+		return nil, err
+	}
+
+	resultCount = len(executionPlans)
+	return executionPlans, nil
 }
 
 // ExecutionPlanSearch is the resolver for the executionPlanSearch field.
@@ -628,9 +714,35 @@ func (r *queryResolver) CustomerGet(ctx context.Context, identifier string) (*ge
 	return &customer, nil
 }
 
-// CustomerByKeysGet is the resolver for the customerByKeysGet field.
+// T060: CustomerByKeysGet resolver using generic getEntitiesByKeys function
 func (r *queryResolver) CustomerByKeysGet(ctx context.Context, identifiers []string, order []*generated.CustomerQuerySorterInput) ([]*generated.Customer, error) {
-	return nil, nil
+	startTime := time.Now()
+	identifierCount := len(identifiers)
+	var resultCount int
+	var err error
+
+	defer func() {
+		duration := time.Since(startTime).Milliseconds()
+		if err != nil {
+			log.Error().Err(err).Int("identifierCount", identifierCount).
+				Int64("duration", duration).Str("query", "customerByKeysGet").
+				Msg("customerByKeysGet query failed")
+		} else {
+			log.Info().Int("identifierCount", identifierCount).Int("resultCount", resultCount).
+				Int64("duration", duration).Str("query", "customerByKeysGet").
+				Msg("customerByKeysGet query completed")
+		}
+	}()
+
+	config := entityConfigs["customer"]
+	var customers []*generated.Customer
+
+	if err = getEntitiesByKeys(ctx, r.DBClient, config, identifiers, order, &customers); err != nil {
+		return nil, err
+	}
+
+	resultCount = len(customers)
+	return customers, nil
 }
 
 // CustomerSearch is the resolver for the customerSearch field.
@@ -666,9 +778,35 @@ func (r *queryResolver) EmployeeGet(ctx context.Context, identifier string) (*ge
 	return &employee, nil
 }
 
-// EmployeeByKeysGet is the resolver for the employeeByKeysGet field.
+// T061: EmployeeByKeysGet resolver using generic getEntitiesByKeys function
 func (r *queryResolver) EmployeeByKeysGet(ctx context.Context, identifiers []string, order []*generated.EmployeeQuerySorterInput) ([]*generated.Employee, error) {
-	return nil, nil
+	startTime := time.Now()
+	identifierCount := len(identifiers)
+	var resultCount int
+	var err error
+
+	defer func() {
+		duration := time.Since(startTime).Milliseconds()
+		if err != nil {
+			log.Error().Err(err).Int("identifierCount", identifierCount).
+				Int64("duration", duration).Str("query", "employeeByKeysGet").
+				Msg("employeeByKeysGet query failed")
+		} else {
+			log.Info().Int("identifierCount", identifierCount).Int("resultCount", resultCount).
+				Int64("duration", duration).Str("query", "employeeByKeysGet").
+				Msg("employeeByKeysGet query completed")
+		}
+	}()
+
+	config := entityConfigs["employee"]
+	var employees []*generated.Employee
+
+	if err = getEntitiesByKeys(ctx, r.DBClient, config, identifiers, order, &employees); err != nil {
+		return nil, err
+	}
+
+	resultCount = len(employees)
+	return employees, nil
 }
 
 // EmployeeSearch is the resolver for the employeeSearch field.
@@ -724,9 +862,36 @@ func (r *queryResolver) TeamGet(ctx context.Context, identifier string) (*genera
 	return &team, nil
 }
 
-// TeamByKeysGet is the resolver for the teamByKeysGet field.
+// T062: TeamByKeysGet resolver (no sorter - default to identifier ordering)
 func (r *queryResolver) TeamByKeysGet(ctx context.Context, identifiers []string, order []*generated.TeamQuerySorterInput) ([]*generated.TeamQueryOutput, error) {
-	return nil, nil
+	startTime := time.Now()
+	identifierCount := len(identifiers)
+	var resultCount int
+	var err error
+
+	defer func() {
+		duration := time.Since(startTime).Milliseconds()
+		if err != nil {
+			log.Error().Err(err).Int("identifierCount", identifierCount).
+				Int64("duration", duration).Str("query", "teamByKeysGet").
+				Msg("teamByKeysGet query failed")
+		} else {
+			log.Info().Int("identifierCount", identifierCount).Int("resultCount", resultCount).
+				Int64("duration", duration).Str("query", "teamByKeysGet").
+				Msg("teamByKeysGet query completed")
+		}
+	}()
+
+	config := entityConfigs["team"]
+	var teams []*generated.TeamQueryOutput
+
+	// Note: Team has no sorter converter (nil), will use default identifier ordering
+	if err = getEntitiesByKeys(ctx, r.DBClient, config, identifiers, order, &teams); err != nil {
+		return nil, err
+	}
+
+	resultCount = len(teams)
+	return teams, nil
 }
 
 // TeamSearch is the resolver for the teamSearch field.
