@@ -51,8 +51,8 @@ func TestTeamSearch_BasicFiltering_NameStartsWith(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return 2 teams starting with "Sales"
-	assert.Equal(t, 2, result.Count)
-	assert.Equal(t, 2, result.TotalCount)
+	assert.Equal(t, int64(2), result.Count)
+	assert.Equal(t, int64(2), result.TotalCount)
 	assert.Len(t, result.Data, 2)
 
 	// Verify both results start with "Sales"
@@ -100,7 +100,7 @@ func TestTeamSearch_MultiFieldSorting(t *testing.T) {
 	// Assertions
 	require.NoError(t, err)
 	require.NotNil(t, result)
-	assert.Equal(t, 4, result.Count)
+	assert.Equal(t, int64(4), result.Count)
 	assert.Len(t, result.Data, 4)
 
 	// Verify sorting: Alpha teams first (Z before A in DESC), then Beta teams (Y before B in DESC)
@@ -161,8 +161,8 @@ func TestTeamSearch_NestedORFilters(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return 2 teams (Alpha and Gamma)
-	assert.Equal(t, 2, result.Count)
-	assert.Equal(t, 2, result.TotalCount)
+	assert.Equal(t, int64(2), result.Count)
+	assert.Equal(t, int64(2), result.TotalCount)
 	assert.Len(t, result.Data, 2)
 
 	// Verify results contain Alpha or Gamma

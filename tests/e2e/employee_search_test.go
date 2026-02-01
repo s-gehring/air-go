@@ -50,8 +50,8 @@ func TestEmployeeSearch_BasicFiltering_UserEmail(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return 2 employees with "john" in userEmail
-	assert.Equal(t, 2, result.Count)
-	assert.Equal(t, 2, result.TotalCount)
+	assert.Equal(t, int64(2), result.Count)
+	assert.Equal(t, int64(2), result.TotalCount)
 	assert.Len(t, result.Data, 2)
 
 	// Verify both results contain "john" in email
@@ -95,7 +95,7 @@ func TestEmployeeSearch_SingleFieldSorting_LastNameASC(t *testing.T) {
 	// Assertions
 	require.NoError(t, err)
 	require.NotNil(t, result)
-	assert.Equal(t, 4, result.Count)
+	assert.Equal(t, int64(4), result.Count)
 	assert.Len(t, result.Data, 4)
 
 	// Verify results are sorted by lastName ascending
@@ -135,8 +135,8 @@ func TestEmployeeSearch_BackwardPagination(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return last 10 employees
-	assert.Equal(t, 10, result.Count)
-	assert.Equal(t, 25, result.TotalCount)
+	assert.Equal(t, int64(10), result.Count)
+	assert.Equal(t, int64(25), result.TotalCount)
 	assert.Len(t, result.Data, 10)
 
 	// Should have previous page available
@@ -176,8 +176,8 @@ func TestEmployeeSearch_CountWithPartialPage(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return only 5 employees
-	assert.Equal(t, 5, result.Count)       // Current page count
-	assert.Equal(t, 5, result.TotalCount)  // Total matching entities
+	assert.Equal(t, int64(5), result.Count)       // Current page count
+	assert.Equal(t, int64(5), result.TotalCount)  // Total matching entities
 	assert.Len(t, result.Data, 5)
 	assert.False(t, result.Paging.HasNextPage)
 	assert.False(t, result.Paging.HasPreviousPage)
@@ -219,7 +219,7 @@ func TestEmployeeSearch_ComplexFilter_AndCombination(t *testing.T) {
 	// Assertions
 	require.NoError(t, err)
 	require.NotNil(t, result)
-	assert.Equal(t, 1, result.Count) // Only John Smith
+	assert.Equal(t, int64(1), result.Count) // Only John Smith
 	assert.Equal(t, "John", *result.Data[0].FirstName)
 	assert.Equal(t, "Smith", *result.Data[0].LastName)
 }

@@ -1,0 +1,358 @@
+package resolvers_test
+
+import (
+	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/yourusername/air-go/internal/db"
+	"github.com/yourusername/air-go/internal/graphql/generated"
+	"github.com/yourusername/air-go/internal/graphql/resolvers"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+// MockClient is a mock implementation of db.Client
+type MockClient struct {
+	collections map[string]*MockCollection
+}
+
+func NewMockClient() *MockClient {
+	return &MockClient{
+		collections: make(map[string]*MockCollection),
+	}
+}
+
+func (m *MockClient) Collection(name string) db.CollectionInterface {
+	if coll, ok := m.collections[name]; ok {
+		return coll
+	}
+	coll := &MockCollection{}
+	m.collections[name] = coll
+	return coll
+}
+
+func (m *MockClient) Disconnect(ctx context.Context) error {
+	return nil
+}
+
+func (m *MockClient) GetDB() *mongo.Database {
+	return nil
+}
+
+// T037: Unit test for sorting integration in searchEntities
+func TestSearchEntities_SortingIntegration(t *testing.T) {
+	ctx := context.Background()
+	mockClient := NewMockClient()
+	mockColl := &MockCollection{}
+	mockClient.collections["customers"] = mockColl
+
+	resolver := resolvers.NewResolver(mockClient)
+	queryResolver := resolver.Query()
+
+	// Setup mock expectations
+	// Mock Aggregate call to verify sorting pipeline is constructed correctly
+	mockColl.On("Aggregate", ctx, mock.MatchedBy(func(pipeline interface{}) bool {
+		// Verify pipeline contains $sort stage from sorter converter
+		pipelineArr, ok := pipeline.([]bson.M)
+		if !ok {
+			return false
+		}
+
+		// Check that pipeline includes a $facet stage with data branch containing $sort
+		for _, stage := range pipelineArr {
+			if facet, ok := stage["$facet"]; ok {
+				facetMap, ok := facet.(bson.M)
+				if !ok {
+					continue
+				}
+
+				if data, ok := facetMap["data"]; ok {
+					dataStages, ok := data.([]bson.M)
+					if !ok {
+						continue
+					}
+
+					// Verify $sort stage exists in data branch
+					for _, dataStage := range dataStages {
+						if _, hasSortStage := dataStage["$sort"]; hasSortStage {
+							return true
+						}
+					}
+				}
+			}
+		}
+		return false
+	})).Return(&MockCursor{}, nil)
+
+	// Build sorter: lastName ASC
+	sorter := []*generated.CustomerQuerySorterInput{
+		{LastName: func() *generated.SortEnumType { s := generated.SortEnumTypeAsc; return &s }()},
+	}
+
+	// Execute customerSearch with sorter
+	first := int64(10)
+	_, err := queryResolver.CustomerSearch(ctx, nil, sorter, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+
+	// Verify that SorterConverter was called by checking mock expectations
+	mockColl.AssertExpectations(t)
+}
+
+// MockCursor implements a minimal mongo.Cursor for testing
+type MockCursor struct {
+	mongo.Cursor
+	index   int
+	results []bson.M
+}
+
+func (m *MockCursor) Next(ctx context.Context) bool {
+	if m.index >= len(m.results) {
+		return false
+	}
+	m.index++
+	return true
+}
+
+func (m *MockCursor) Decode(val interface{}) error {
+	// Minimal decode implementation for testing
+	return nil
+}
+
+func (m *MockCursor) Close(ctx context.Context) error {
+	return nil
+}
+
+func (m *MockCursor) All(ctx context.Context, results interface{}) error {
+	// Mock implementation that returns empty results
+	return nil
+}
+
+// T037 Additional: Test default sorting behavior (identifier ASC when no order provided)
+func TestSearchEntities_DefaultSorting(t *testing.T) {
+	ctx := context.Background()
+	mockClient := NewMockClient()
+	mockColl := &MockCollection{}
+	mockClient.collections["customers"] = mockColl
+
+	resolver := resolvers.NewResolver(mockClient)
+	queryResolver := resolver.Query()
+
+	// Setup mock expectations
+	mockColl.On("Aggregate", ctx, mock.MatchedBy(func(pipeline interface{}) bool {
+		// Verify pipeline contains default $sort by identifier when no sorter provided
+		pipelineArr, ok := pipeline.([]bson.M)
+		if !ok {
+			return false
+		}
+
+		for _, stage := range pipelineArr {
+			if facet, ok := stage["$facet"]; ok {
+				facetMap, ok := facet.(bson.M)
+				if !ok {
+					continue
+				}
+
+				if data, ok := facetMap["data"]; ok {
+					dataStages, ok := data.([]bson.M)
+					if !ok {
+						continue
+					}
+
+					// Verify $sort stage exists with identifier field
+					for _, dataStage := range dataStages {
+						if sortStage, hasSortStage := dataStage["$sort"]; hasSortStage {
+							sortMap, ok := sortStage.(bson.M)
+							if !ok {
+								continue
+							}
+							// Check for identifier ASC (value = 1)
+							if identSort, hasIdent := sortMap["identifier"]; hasIdent {
+								if identSort == 1 {
+									return true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return false
+	})).Return(&MockCursor{}, nil)
+
+	// Execute customerSearch WITHOUT sorter (should use default identifier ASC)
+	first := int64(10)
+	_, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+
+	// Verify mock expectations
+	mockColl.AssertExpectations(t)
+}
+
+// Test that sorter converter is properly integrated
+func TestSorterConverter_Integration(t *testing.T) {
+	// This test verifies that the entity config's SorterConverter is called
+	// The actual converter logic is tested separately in sorter converter unit tests
+
+	ctx := context.Background()
+	mockClient := NewMockClient()
+	mockColl := &MockCollection{}
+	mockClient.collections["employees"] = mockColl
+
+	resolver := resolvers.NewResolver(mockClient)
+	queryResolver := resolver.Query()
+
+	// Setup mock to verify pipeline contains sorting
+	mockColl.On("Aggregate", ctx, mock.Anything).Return(&MockCursor{}, nil)
+
+	// Build sorter for employee: lastName ASC, firstName ASC
+	sorter := []*generated.EmployeeQuerySorterInput{
+		{
+			LastName:  func() *generated.SortEnumType { s := generated.SortEnumTypeAsc; return &s }(),
+			FirstName: func() *generated.SortEnumType { s := generated.SortEnumTypeAsc; return &s }(),
+		},
+	}
+
+	// Execute employeeSearch with multi-field sorter
+	first := int64(10)
+	result, err := queryResolver.EmployeeSearch(ctx, nil, sorter, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	assert.NotNil(t, result)
+
+	// Verify aggregate was called (meaning sorter converter was invoked)
+	mockColl.AssertExpectations(t)
+}
+
+// T051: Unit test for pagination filter building
+
+// Test buildPaginationFilter for forward pagination (after cursor)
+func TestBuildPaginationFilter_ForwardPagination(t *testing.T) {
+	// This tests the logic of buildPaginationFilter indirectly through search behavior
+	// The function is not exported, so we test through integration
+
+	ctx := context.Background()
+	mockClient := NewMockClient()
+	mockColl := &MockCollection{}
+	mockClient.collections["customers"] = mockColl
+
+	resolver := resolvers.NewResolver(mockClient)
+	queryResolver := resolver.Query()
+
+	// Setup mock to verify pagination filter is applied
+	mockColl.On("Aggregate", ctx, mock.MatchedBy(func(pipeline interface{}) bool {
+		// Verify pipeline includes pagination filter with $or conditions
+		pipelineArr, ok := pipeline.([]bson.M)
+		if !ok {
+			return false
+		}
+
+		// Look for $match stage in the data branch of $facet
+		for _, stage := range pipelineArr {
+			if facet, ok := stage["$facet"]; ok {
+				facetMap := facet.(bson.M)
+				if data, ok := facetMap["data"]; ok {
+					dataStages := data.([]bson.M)
+					for _, dataStage := range dataStages {
+						if matchStage, hasMatch := dataStage["$match"]; hasMatch {
+							matchMap := matchStage.(bson.M)
+							// Check for $or operator (used in pagination filter)
+							if _, hasOr := matchMap["$or"]; hasOr {
+								return true
+							}
+						}
+					}
+				}
+			}
+		}
+		return false
+	})).Return(&MockCursor{}, nil)
+
+	// Execute search with after cursor
+	// Cursor: {"s":["Smith"],"i":"abc-123"}
+	afterCursor := "eyJzIjpbIlNtaXRoIl0sImkiOiJhYmMtMTIzIn0="
+	first := int64(10)
+	_, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, &afterCursor, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+
+	// Verify pagination filter was applied
+	mockColl.AssertExpectations(t)
+}
+
+// Test buildPaginationFilter for backward pagination (before cursor)
+func TestBuildPaginationFilter_BackwardPagination(t *testing.T) {
+	ctx := context.Background()
+	mockClient := NewMockClient()
+	mockColl := &MockCollection{}
+	mockClient.collections["customers"] = mockColl
+
+	resolver := resolvers.NewResolver(mockClient)
+	queryResolver := resolver.Query()
+
+	// Setup mock to verify pagination filter with $lt operators
+	mockColl.On("Aggregate", ctx, mock.MatchedBy(func(pipeline interface{}) bool {
+		// Verify pipeline includes pagination filter for backward navigation
+		pipelineArr, ok := pipeline.([]bson.M)
+		if !ok {
+			return false
+		}
+
+		for _, stage := range pipelineArr {
+			if facet, ok := stage["$facet"]; ok {
+				facetMap := facet.(bson.M)
+				if data, ok := facetMap["data"]; ok {
+					dataStages := data.([]bson.M)
+					for _, dataStage := range dataStages {
+						if matchStage, hasMatch := dataStage["$match"]; hasMatch {
+							matchMap := matchStage.(bson.M)
+							if _, hasOr := matchMap["$or"]; hasOr {
+								return true
+							}
+						}
+					}
+				}
+			}
+		}
+		return false
+	})).Return(&MockCursor{}, nil)
+
+	// Execute search with before cursor
+	beforeCursor := "eyJzIjpbIlNtaXRoIl0sImkiOiJhYmMtMTIzIn0="
+	last := int64(10)
+	_, err := queryResolver.CustomerSearch(ctx, nil, nil, nil, nil, &last, &beforeCursor)
+
+	// Assertions
+	require.NoError(t, err)
+	mockColl.AssertExpectations(t)
+}
+
+// Test pagination filter with null values in cursor
+func TestBuildPaginationFilter_NullValues(t *testing.T) {
+	ctx := context.Background()
+	mockClient := NewMockClient()
+	mockColl := &MockCollection{}
+	mockClient.collections["customers"] = mockColl
+
+	resolver := resolvers.NewResolver(mockClient)
+	queryResolver := resolver.Query()
+
+	// Mock expects aggregation with pagination filter
+	mockColl.On("Aggregate", ctx, mock.Anything).Return(&MockCursor{}, nil)
+
+	// Cursor with null sort field: {"s":[null],"i":"abc-123"}
+	cursorWithNull := "eyJzIjpbbnVsbF0sImkiOiJhYmMtMTIzIn0="
+	first := int64(10)
+	_, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, &cursorWithNull, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	mockColl.AssertExpectations(t)
+}

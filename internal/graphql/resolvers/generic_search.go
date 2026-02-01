@@ -3,6 +3,7 @@ package resolvers
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -280,13 +281,8 @@ func searchEntities(
 	}
 
 	// Decode trimmed data into result
-	dataBytes := make([]byte, 0)
-	for _, raw := range facetResult.Data {
-		dataBytes = append(dataBytes, raw...)
-	}
-
-	// Use bson.Unmarshal to decode into the result slice
-	// Create a temporary array to decode all items
+	// We need to decode each bson.Raw into a bson.M for cursor generation
+	// AND populate the result slice
 	tempArray := make([]bson.M, len(facetResult.Data))
 	for i, raw := range facetResult.Data {
 		if err := bson.Unmarshal(raw, &tempArray[i]); err != nil {
@@ -298,27 +294,41 @@ func searchEntities(
 		}
 	}
 
-	// Marshal temp array and unmarshal into result type
-	tempBytes, err := bson.Marshal(bson.M{"items": tempArray})
-	if err != nil {
+	// Now decode the bson.Raw array into the result slice using reflection
+	// The result parameter is a pointer to a slice (e.g., *[]*Customer)
+	resultValue := reflect.ValueOf(result)
+	if resultValue.Kind() != reflect.Ptr {
 		return 0, 0, false, false, nil, nil, &QueryError{
-			Message: "Failed to encode entity data",
-			Code:    ErrCodeDatabaseError,
-			Cause:   err,
+			Message: "Result must be a pointer to a slice",
+			Code:    ErrCodeInvalidInput,
 		}
 	}
 
-	var wrapper struct {
-		Items interface{} `bson:"items"`
-	}
-	wrapper.Items = result
-
-	if err := bson.Unmarshal(tempBytes, &wrapper); err != nil {
+	sliceValue := resultValue.Elem()
+	if sliceValue.Kind() != reflect.Slice {
 		return 0, 0, false, false, nil, nil, &QueryError{
-			Message: "Failed to decode entities into result type",
-			Code:    ErrCodeDatabaseError,
-			Cause:   err,
+			Message: "Result must be a pointer to a slice",
+			Code:    ErrCodeInvalidInput,
 		}
+	}
+
+	// Decode each raw item into the slice
+	for _, raw := range facetResult.Data {
+		// Create a new element of the slice's element type
+		elemType := sliceValue.Type().Elem()
+		newElem := reflect.New(elemType.Elem()) // elemType is *Customer, elemType.Elem() is Customer
+
+		// Unmarshal into the new element
+		if err := bson.Unmarshal(raw, newElem.Interface()); err != nil {
+			return 0, 0, false, false, nil, nil, &QueryError{
+				Message: "Failed to decode entity into result type",
+				Code:    ErrCodeDatabaseError,
+				Cause:   err,
+			}
+		}
+
+		// Append to the slice
+		sliceValue.Set(reflect.Append(sliceValue, newElem))
 	}
 
 	count = dataCount

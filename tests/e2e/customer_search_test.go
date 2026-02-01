@@ -51,8 +51,8 @@ func TestCustomerSearch_BasicFiltering_FirstName(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return exactly 2 customers with "John" in firstName
-	assert.Equal(t, 2, result.Count)
-	assert.Equal(t, 2, result.TotalCount)
+	assert.Equal(t, int64(2), result.Count)
+	assert.Equal(t, int64(2), result.TotalCount)
 	assert.Len(t, result.Data, 2)
 
 	// Verify both results contain "John"
@@ -100,13 +100,13 @@ func TestCustomerSearch_StatusFiltering_Activation(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return exactly 2 customers with ACTIVE status
-	assert.Equal(t, 2, result.Count)
-	assert.Equal(t, 2, result.TotalCount)
+	assert.Equal(t, int64(2), result.Count)
+	assert.Equal(t, int64(2), result.TotalCount)
 	assert.Len(t, result.Data, 2)
 
 	// Verify all results have ACTIVE status
 	for _, customer := range result.Data {
-		assert.Equal(t, generated.UserStatusActive, customer.Status.Activation)
+		assert.Equal(t, generated.UserStatusActive, *customer.Status.Activation)
 	}
 }
 
@@ -145,8 +145,8 @@ func TestCustomerSearch_EmptyResultSet(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return empty results
-	assert.Equal(t, 0, result.Count)
-	assert.Equal(t, 0, result.TotalCount)
+	assert.Equal(t, int64(0), result.Count)
+	assert.Equal(t, int64(0), result.TotalCount)
 	assert.Empty(t, result.Data)
 	assert.False(t, result.Paging.HasNextPage)
 	assert.False(t, result.Paging.HasPreviousPage)
@@ -183,8 +183,8 @@ func TestCustomerSearch_EmptyFilter(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return 3 non-deleted customers (excludes customer-032)
-	assert.Equal(t, 3, result.Count)
-	assert.Equal(t, 3, result.TotalCount)
+	assert.Equal(t, int64(3), result.Count)
+	assert.Equal(t, int64(3), result.TotalCount)
 	assert.Len(t, result.Data, 3)
 
 	// Verify no deleted customers in results
@@ -286,8 +286,8 @@ func TestCustomerSearch_NullValueFilter(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return 2 customers with null employeeEmail
-	assert.Equal(t, 2, result.Count)
-	assert.Equal(t, 2, result.TotalCount)
+	assert.Equal(t, int64(2), result.Count)
+	assert.Equal(t, int64(2), result.TotalCount)
 	assert.Len(t, result.Data, 2)
 
 	// Verify all results have null employeeEmail
@@ -324,8 +324,8 @@ func TestCustomerSearch_DefaultLimitApplied(t *testing.T) {
 	require.NotNil(t, result)
 
 	// Should return maximum of 200 customers (default limit)
-	assert.Equal(t, 200, result.Count)
-	assert.Equal(t, 250, result.TotalCount)
+	assert.Equal(t, int64(200), result.Count)
+	assert.Equal(t, int64(250), result.TotalCount)
 	assert.Len(t, result.Data, 200)
 	assert.True(t, result.Paging.HasNextPage) // More results available
 }
@@ -412,7 +412,7 @@ func TestCustomerSearch_ComplexAndOrFilter(t *testing.T) {
 	// Assertions
 	require.NoError(t, err)
 	require.NotNil(t, result)
-	assert.Equal(t, 2, result.Count) // Should match Sarah+ACTIVE and Sarah+BLOCKED only
+	assert.Equal(t, int64(2), result.Count) // Should match Sarah+ACTIVE and Sarah+BLOCKED only
 	assert.Len(t, result.Data, 2)
 
 	// Verify all results match the filter criteria
@@ -472,7 +472,7 @@ func TestCustomerSearch_DeeplyNestedFilters(t *testing.T) {
 	// Assertions
 	require.NoError(t, err)
 	require.NotNil(t, result)
-	assert.Equal(t, 2, result.Count) // Should match Alice+ACTIVE and Bob+BLOCKED
+	assert.Equal(t, int64(2), result.Count) // Should match Alice+ACTIVE and Bob+BLOCKED
 	assert.Len(t, result.Data, 2)
 
 	// Verify results
@@ -562,7 +562,7 @@ func TestCustomerSearch_Sorting_CreateDateDesc(t *testing.T) {
 	// Assertions
 	require.NoError(t, err)
 	require.NotNil(t, result)
-	assert.Equal(t, 3, result.Count)
+	assert.Equal(t, int64(3), result.Count)
 	assert.Len(t, result.Data, 3)
 
 	// Verify results are sorted by createDate DESC (newest first)
@@ -604,7 +604,7 @@ func TestCustomerSearch_Sorting_NullHandling(t *testing.T) {
 	// Assertions
 	require.NoError(t, err)
 	require.NotNil(t, result)
-	assert.Equal(t, 4, result.Count)
+	assert.Equal(t, int64(4), result.Count)
 	assert.Len(t, result.Data, 4)
 
 	// Verify ASC sorting: non-nulls first, nulls last
@@ -643,8 +643,8 @@ func TestCustomerSearch_Pagination_ForwardFirstPage(t *testing.T) {
 	// Assertions
 	require.NoError(t, err)
 	require.NotNil(t, result)
-	assert.Equal(t, 20, result.Count)
-	assert.Equal(t, 25, result.TotalCount)
+	assert.Equal(t, int64(20), result.Count)
+	assert.Equal(t, int64(25), result.TotalCount)
 	assert.True(t, result.Paging.HasNextPage) // Should have more results
 	assert.NotNil(t, result.Paging.EndCursor) // Should have cursor for next page
 	assert.NotNil(t, result.Paging.StartCursor)

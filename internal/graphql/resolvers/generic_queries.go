@@ -394,31 +394,34 @@ func teamSorterConverter(sorter interface{}) []bson.M {
 		return []bson.M{{"$sort": bson.M{"identifier": 1}}}
 	}
 
-	sortSpec := s[0]
-	pipeline := []bson.M{}
+	// Build a single $sort document with all fields
+	sortDoc := bson.M{}
 
-	if sortSpec.Name != nil {
-		pipeline = appendNullSafeSorting(pipeline, "name", *sortSpec.Name)
-	}
+	// Process all sorter inputs in order
+	for _, sortSpec := range s {
+		if sortSpec.Name != nil {
+			sortDoc["name"] = sortEnumToInt(*sortSpec.Name)
+		}
 
-	if sortSpec.Description != nil {
-		pipeline = appendNullSafeSorting(pipeline, "description", *sortSpec.Description)
-	}
+		if sortSpec.Description != nil {
+			sortDoc["description"] = sortEnumToInt(*sortSpec.Description)
+		}
 
-	if sortSpec.IsShared != nil {
-		pipeline = appendNullSafeSorting(pipeline, "isShared", *sortSpec.IsShared)
-	}
+		if sortSpec.IsShared != nil {
+			sortDoc["isShared"] = sortEnumToInt(*sortSpec.IsShared)
+		}
 
-	if sortSpec.EmployeeID != nil {
-		pipeline = appendNullSafeSorting(pipeline, "employeeId", *sortSpec.EmployeeID)
+		if sortSpec.EmployeeID != nil {
+			sortDoc["employeeId"] = sortEnumToInt(*sortSpec.EmployeeID)
+		}
 	}
 
 	// Default to identifier if no fields specified
-	if len(pipeline) == 0 {
-		pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}})
+	if len(sortDoc) == 0 {
+		sortDoc["identifier"] = 1
 	}
 
-	return pipeline
+	return []bson.M{{"$sort": sortDoc}}
 }
 
 // T042: ExecutionPlan sorter converter
@@ -428,11 +431,13 @@ func executionPlanSorterConverter(sorter interface{}) []bson.M {
 		return []bson.M{{"$sort": bson.M{"identifier": 1}}}
 	}
 
-	sortSpec := s[0]
 	pipeline := []bson.M{}
 
-	if sortSpec.CustomerID != nil {
-		pipeline = appendNullSafeSorting(pipeline, "customerId", *sortSpec.CustomerID)
+	// Process all sorter inputs in order
+	for _, sortSpec := range s {
+		if sortSpec.CustomerID != nil {
+			pipeline = appendNullSafeSorting(pipeline, "customerId", *sortSpec.CustomerID)
+		}
 	}
 
 	// Default to identifier if no fields specified
@@ -450,11 +455,13 @@ func referencePortfolioSorterConverter(sorter interface{}) []bson.M {
 		return []bson.M{{"$sort": bson.M{"identifier": 1}}}
 	}
 
-	sortSpec := s[0]
 	pipeline := []bson.M{}
 
-	if sortSpec.CustomerID != nil {
-		pipeline = appendNullSafeSorting(pipeline, "customerId", *sortSpec.CustomerID)
+	// Process all sorter inputs in order
+	for _, sortSpec := range s {
+		if sortSpec.CustomerID != nil {
+			pipeline = appendNullSafeSorting(pipeline, "customerId", *sortSpec.CustomerID)
+		}
 	}
 
 	// Default to identifier if no fields specified
