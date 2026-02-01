@@ -11,11 +11,13 @@ import (
 
 // EntityConfig defines configuration for generic entity queries
 // T005: EntityConfig struct for parameterized entity queries
+// T007: Added FilterConverter for search functionality
 type EntityConfig struct {
 	CollectionName  string                              // MongoDB collection name
 	DeletionField   string                              // Field indicating deletion status (e.g., "status.deletion" or "actionIndicator")
 	DeletionValue   string                              // Value indicating deleted entity (e.g., "DELETED" or "DELETE")
 	SorterConverter func(interface{}) []bson.M          // Converts GraphQL sorter input to MongoDB aggregation pipeline stages
+	FilterConverter func(interface{}) bson.M            // Converts GraphQL filter input to MongoDB filter (T007)
 }
 
 // T013: Entity configuration map with all 6 entities
@@ -25,36 +27,67 @@ var entityConfigs = map[string]EntityConfig{
 		DeletionField:   "status.deletion",
 		DeletionValue:   "DELETED",
 		SorterConverter: customerSorterConverter,
+		FilterConverter: func(filter interface{}) bson.M {
+			if f, ok := filter.(*generated.CustomerQueryFilterInput); ok {
+				return convertCustomerFilter(f)
+			}
+			return bson.M{}
+		},
 	},
 	"employee": {
 		CollectionName:  "employees",
 		DeletionField:   "status.deletion",
 		DeletionValue:   "DELETED",
 		SorterConverter: employeeSorterConverter,
+		FilterConverter: func(filter interface{}) bson.M {
+			if f, ok := filter.(*generated.EmployeeQueryFilterInput); ok {
+				return convertEmployeeFilter(f)
+			}
+			return bson.M{}
+		},
 	},
 	"team": {
 		CollectionName:  "teams",
 		DeletionField:   "status.deletion",
 		DeletionValue:   "DELETED",
 		SorterConverter: nil, // No QuerySorterInput defined for teams
+		FilterConverter: func(filter interface{}) bson.M {
+			if f, ok := filter.(*generated.TeamQueryFilterInput); ok {
+				return convertTeamFilter(f)
+			}
+			return bson.M{}
+		},
 	},
 	"inventory": {
 		CollectionName:  "inventories",
 		DeletionField:   "actionIndicator",
 		DeletionValue:   "DELETE",
 		SorterConverter: inventorySorterConverter,
+		FilterConverter: nil, // No search functionality for inventory in this feature
 	},
 	"executionPlan": {
 		CollectionName:  "executionPlans",
 		DeletionField:   "actionIndicator",
 		DeletionValue:   "DELETE",
 		SorterConverter: nil, // No QuerySorterInput defined for execution plans
+		FilterConverter: func(filter interface{}) bson.M {
+			if f, ok := filter.(*generated.ExecutionPlanQueryFilterInput); ok {
+				return convertExecutionPlanFilter(f)
+			}
+			return bson.M{}
+		},
 	},
 	"referencePortfolio": {
 		CollectionName:  "referencePortfolios",
 		DeletionField:   "actionIndicator",
 		DeletionValue:   "DELETE",
 		SorterConverter: nil, // No QuerySorterInput defined for reference portfolios
+		FilterConverter: func(filter interface{}) bson.M {
+			if f, ok := filter.(*generated.ReferencePortfolioQueryFilterInput); ok {
+				return convertReferencePortfolioFilter(f)
+			}
+			return bson.M{}
+		},
 	},
 }
 

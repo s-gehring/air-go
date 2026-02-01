@@ -460,8 +460,71 @@ func (r *queryResolver) ReferencePortfolioByKeysGet(ctx context.Context, identif
 }
 
 // ReferencePortfolioSearch is the resolver for the referencePortfolioSearch field.
+// T031: ReferencePortfolioSearch resolver using generic searchEntities function
 func (r *queryResolver) ReferencePortfolioSearch(ctx context.Context, where *generated.ReferencePortfolioQueryFilterInput, order []*generated.ReferencePortfolioQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfReferencePortfolioOutput, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+
+	// Convert int64 pointers to int pointers
+	var firstInt, lastInt *int
+	if first != nil {
+		temp := int(*first)
+		firstInt = &temp
+	}
+	if last != nil {
+		temp := int(*last)
+		lastInt = &temp
+	}
+
+	// Log search start
+	hasFilter := where != nil
+	hasAfter := after != nil && *after != ""
+	hasBefore := before != nil && *before != ""
+	logSearchStart(ctx, "referencePortfolio", hasFilter, firstInt, lastInt, hasAfter, hasBefore)
+
+	defer func() {
+		duration := time.Since(startTime)
+		if err != nil {
+			logQueryError(ctx, "referencePortfolioSearch", err, duration)
+		}
+	}()
+
+	config := entityConfigs["referencePortfolio"]
+	var portfolios []*generated.ReferencePortfolioOutput
+
+	count, totalCount, hasNextPage, hasPreviousPage, startCursor, endCursor, searchErr := searchEntities(
+		ctx,
+		r.DBClient,
+		config,
+		where,
+		order,
+		firstInt, after, lastInt, before,
+		&portfolios,
+	)
+
+	if searchErr != nil {
+		err = searchErr
+		return nil, err
+	}
+
+	duration := time.Since(startTime)
+	logSearchResult(ctx, "referencePortfolio", count, totalCount, duration)
+
+	pageInfo := &generated.PageInfo{
+		HasNextPage:     hasNextPage,
+		HasPreviousPage: hasPreviousPage,
+		StartCursor:     startCursor,
+		EndCursor:       endCursor,
+	}
+
+	result := &generated.QueryOutputOfReferencePortfolioOutput{
+		Count:      int64(count),
+		Data:       portfolios,
+		Paging:     pageInfo,
+		TotalCount: int64(totalCount),
+	}
+
+	return result, nil
 }
 
 // ReferencePortfolioDownloadAttachment is the resolver for the referencePortfolioDownloadAttachment field.
@@ -646,8 +709,71 @@ func (r *queryResolver) ExecutionPlanByKeysGet(ctx context.Context, identifiers 
 }
 
 // ExecutionPlanSearch is the resolver for the executionPlanSearch field.
+// T030: ExecutionPlanSearch resolver using generic searchEntities function
 func (r *queryResolver) ExecutionPlanSearch(ctx context.Context, where *generated.ExecutionPlanQueryFilterInput, order []*generated.ExecutionPlanQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfExecutionPlan, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+
+	// Convert int64 pointers to int pointers
+	var firstInt, lastInt *int
+	if first != nil {
+		temp := int(*first)
+		firstInt = &temp
+	}
+	if last != nil {
+		temp := int(*last)
+		lastInt = &temp
+	}
+
+	// Log search start
+	hasFilter := where != nil
+	hasAfter := after != nil && *after != ""
+	hasBefore := before != nil && *before != ""
+	logSearchStart(ctx, "executionPlan", hasFilter, firstInt, lastInt, hasAfter, hasBefore)
+
+	defer func() {
+		duration := time.Since(startTime)
+		if err != nil {
+			logQueryError(ctx, "executionPlanSearch", err, duration)
+		}
+	}()
+
+	config := entityConfigs["executionPlan"]
+	var executionPlans []*generated.ExecutionPlan
+
+	count, totalCount, hasNextPage, hasPreviousPage, startCursor, endCursor, searchErr := searchEntities(
+		ctx,
+		r.DBClient,
+		config,
+		where,
+		order,
+		firstInt, after, lastInt, before,
+		&executionPlans,
+	)
+
+	if searchErr != nil {
+		err = searchErr
+		return nil, err
+	}
+
+	duration := time.Since(startTime)
+	logSearchResult(ctx, "executionPlan", count, totalCount, duration)
+
+	pageInfo := &generated.PageInfo{
+		HasNextPage:     hasNextPage,
+		HasPreviousPage: hasPreviousPage,
+		StartCursor:     startCursor,
+		EndCursor:       endCursor,
+	}
+
+	result := &generated.QueryOutputOfExecutionPlan{
+		Count:      int64(count),
+		Data:       executionPlans,
+		Paging:     pageInfo,
+		TotalCount: int64(totalCount),
+	}
+
+	return result, nil
 }
 
 // ExecutionPlanForCustomerGet is the resolver for the executionPlanForCustomerGet field.
@@ -746,8 +872,78 @@ func (r *queryResolver) CustomerByKeysGet(ctx context.Context, identifiers []str
 }
 
 // CustomerSearch is the resolver for the customerSearch field.
+// T027: Implement CustomerSearch resolver using generic searchEntities function
 func (r *queryResolver) CustomerSearch(ctx context.Context, where *generated.CustomerQueryFilterInput, order []*generated.CustomerQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfCustomer, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+
+	// Convert int64 pointers to int pointers for searchEntities
+	var firstInt, lastInt *int
+	if first != nil {
+		temp := int(*first)
+		firstInt = &temp
+	}
+	if last != nil {
+		temp := int(*last)
+		lastInt = &temp
+	}
+
+	// Log search start
+	hasFilter := where != nil
+	hasAfter := after != nil && *after != ""
+	hasBefore := before != nil && *before != ""
+	logSearchStart(ctx, "customer", hasFilter, firstInt, lastInt, hasAfter, hasBefore)
+
+	defer func() {
+		duration := time.Since(startTime)
+		if err != nil {
+			logQueryError(ctx, "customerSearch", err, duration)
+		}
+	}()
+
+	// Get entity configuration
+	config := entityConfigs["customer"]
+
+	// Prepare result slice
+	var customers []*generated.Customer
+
+	// Call generic search function
+	count, totalCount, hasNextPage, hasPreviousPage, startCursor, endCursor, searchErr := searchEntities(
+		ctx,
+		r.DBClient,
+		config,
+		where,
+		order,
+		firstInt, after, lastInt, before,
+		&customers,
+	)
+
+	if searchErr != nil {
+		err = searchErr
+		return nil, err
+	}
+
+	// Log search result
+	duration := time.Since(startTime)
+	logSearchResult(ctx, "customer", count, totalCount, duration)
+
+	// Build PageInfo
+	pageInfo := &generated.PageInfo{
+		HasNextPage:     hasNextPage,
+		HasPreviousPage: hasPreviousPage,
+		StartCursor:     startCursor,
+		EndCursor:       endCursor,
+	}
+
+	// Build and return QueryOutputOfCustomer
+	result := &generated.QueryOutputOfCustomer{
+		Count:      int64(count),
+		Data:       customers,
+		Paging:     pageInfo,
+		TotalCount: int64(totalCount),
+	}
+
+	return result, nil
 }
 
 // CustomerGetCrispIdentity is the resolver for the customerGetCrispIdentity field.
@@ -810,8 +1006,71 @@ func (r *queryResolver) EmployeeByKeysGet(ctx context.Context, identifiers []str
 }
 
 // EmployeeSearch is the resolver for the employeeSearch field.
+// T028: EmployeeSearch resolver using generic searchEntities function
 func (r *queryResolver) EmployeeSearch(ctx context.Context, where *generated.EmployeeQueryFilterInput, order []*generated.EmployeeQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfEmployee, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+
+	// Convert int64 pointers to int pointers
+	var firstInt, lastInt *int
+	if first != nil {
+		temp := int(*first)
+		firstInt = &temp
+	}
+	if last != nil {
+		temp := int(*last)
+		lastInt = &temp
+	}
+
+	// Log search start
+	hasFilter := where != nil
+	hasAfter := after != nil && *after != ""
+	hasBefore := before != nil && *before != ""
+	logSearchStart(ctx, "employee", hasFilter, firstInt, lastInt, hasAfter, hasBefore)
+
+	defer func() {
+		duration := time.Since(startTime)
+		if err != nil {
+			logQueryError(ctx, "employeeSearch", err, duration)
+		}
+	}()
+
+	config := entityConfigs["employee"]
+	var employees []*generated.Employee
+
+	count, totalCount, hasNextPage, hasPreviousPage, startCursor, endCursor, searchErr := searchEntities(
+		ctx,
+		r.DBClient,
+		config,
+		where,
+		order,
+		firstInt, after, lastInt, before,
+		&employees,
+	)
+
+	if searchErr != nil {
+		err = searchErr
+		return nil, err
+	}
+
+	duration := time.Since(startTime)
+	logSearchResult(ctx, "employee", count, totalCount, duration)
+
+	pageInfo := &generated.PageInfo{
+		HasNextPage:     hasNextPage,
+		HasPreviousPage: hasPreviousPage,
+		StartCursor:     startCursor,
+		EndCursor:       endCursor,
+	}
+
+	result := &generated.QueryOutputOfEmployee{
+		Count:      int64(count),
+		Data:       employees,
+		Paging:     pageInfo,
+		TotalCount: int64(totalCount),
+	}
+
+	return result, nil
 }
 
 // EmployeeAllWithRoleGet is the resolver for the employeeAllWithRoleGet field.
@@ -895,8 +1154,71 @@ func (r *queryResolver) TeamByKeysGet(ctx context.Context, identifiers []string,
 }
 
 // TeamSearch is the resolver for the teamSearch field.
+// T029: TeamSearch resolver using generic searchEntities function
 func (r *queryResolver) TeamSearch(ctx context.Context, where *generated.TeamQueryFilterInput, order []*generated.TeamQuerySorterInput, first *int64, after *string, last *int64, before *string) (*generated.QueryOutputOfTeamQueryOutput, error) {
-	return nil, nil
+	startTime := time.Now()
+	var err error
+
+	// Convert int64 pointers to int pointers
+	var firstInt, lastInt *int
+	if first != nil {
+		temp := int(*first)
+		firstInt = &temp
+	}
+	if last != nil {
+		temp := int(*last)
+		lastInt = &temp
+	}
+
+	// Log search start
+	hasFilter := where != nil
+	hasAfter := after != nil && *after != ""
+	hasBefore := before != nil && *before != ""
+	logSearchStart(ctx, "team", hasFilter, firstInt, lastInt, hasAfter, hasBefore)
+
+	defer func() {
+		duration := time.Since(startTime)
+		if err != nil {
+			logQueryError(ctx, "teamSearch", err, duration)
+		}
+	}()
+
+	config := entityConfigs["team"]
+	var teams []*generated.TeamQueryOutput
+
+	count, totalCount, hasNextPage, hasPreviousPage, startCursor, endCursor, searchErr := searchEntities(
+		ctx,
+		r.DBClient,
+		config,
+		where,
+		order,
+		firstInt, after, lastInt, before,
+		&teams,
+	)
+
+	if searchErr != nil {
+		err = searchErr
+		return nil, err
+	}
+
+	duration := time.Since(startTime)
+	logSearchResult(ctx, "team", count, totalCount, duration)
+
+	pageInfo := &generated.PageInfo{
+		HasNextPage:     hasNextPage,
+		HasPreviousPage: hasPreviousPage,
+		StartCursor:     startCursor,
+		EndCursor:       endCursor,
+	}
+
+	result := &generated.QueryOutputOfTeamQueryOutput{
+		Count:      int64(count),
+		Data:       teams,
+		Paging:     pageInfo,
+		TotalCount: int64(totalCount),
+	}
+
+	return result, nil
 }
 
 // TeamByLeaderGet is the resolver for the teamByLeaderGet field.
