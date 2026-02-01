@@ -3,9 +3,7 @@ package resolvers
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"github.com/rs/zerolog/log"
 	"github.com/yourusername/air-go/internal/graphql/generated"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -134,22 +132,7 @@ func appendNullSafeSorting(pipeline []bson.M, field string, sortEnum generated.S
 	return pipeline
 }
 
-// T014: Structured logging helper for query execution
-func logQueryExecution(ctx context.Context, queryName string, duration time.Duration, success bool) {
-	durationMs := duration.Milliseconds()
-
-	if success {
-		log.Info().
-			Str("query", queryName).
-			Int64("duration", durationMs).
-			Msg(fmt.Sprintf("%s query completed", queryName))
-	} else {
-		log.Error().
-			Str("query", queryName).
-			Int64("duration", durationMs).
-			Msg(fmt.Sprintf("%s query failed", queryName))
-	}
-}
+// T014: Structured logging helper exists in logging.go - using that implementation
 
 // T009: Generic getEntity function for single entity retrieval
 // Retrieves a single entity by identifier, excluding deleted entities
@@ -380,13 +363,9 @@ func employeeSorterConverter(sorter interface{}) []bson.M {
 		pipeline = appendNullSafeSorting(pipeline, "userEmail", *sortSpec.UserEmail)
 	}
 
-	if sortSpec.CreateDate != nil {
-		pipeline = append(pipeline, bson.M{"$sort": bson.M{"createDate": sortEnumToInt(*sortSpec.CreateDate)}})
-	}
-
 	// Default to identifier if no fields specified
 	if len(pipeline) == 0 {
-		pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}}}
+		pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}})
 	}
 
 	return pipeline
@@ -406,13 +385,9 @@ func inventorySorterConverter(sorter interface{}) []bson.M {
 		pipeline = appendNullSafeSorting(pipeline, "customerId", *sortSpec.CustomerID)
 	}
 
-	if sortSpec.CreateDate != nil {
-		pipeline = append(pipeline, bson.M{"$sort": bson.M{"createDate": sortEnumToInt(*sortSpec.CreateDate)}})
-	}
-
 	// Default to identifier if no fields specified
 	if len(pipeline) == 0 {
-		pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}}}
+		pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}})
 	}
 
 	return pipeline

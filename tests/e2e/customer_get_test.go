@@ -147,28 +147,29 @@ func TestCustomerGet_NullIdentifier(t *testing.T) {
 	assert.Contains(t, err.Error(), "invalid UUID format")
 }
 
-// Helper: Setup test database
-func setupTestDatabase(t *testing.T) db.Database {
+// Helper: Setup test database - returns db.Client which implements resolvers.DBClient
+func setupTestDatabase(t *testing.T) *db.Client {
 	t.Helper()
 	mongoURI := "mongodb://localhost:27017" // TODO: use testcontainers
-	rawDB := testutil.SetupTestDB(t, mongoURI)
-	
-	// Wrap in db.Database interface
+
 	dbClient := db.NewClient(mongoURI, 5*time.Second)
 	err := dbClient.Connect(context.Background())
 	require.NoError(t, err)
-	
-	return dbClient.Database("test_air_go")
+
+	return dbClient
 }
 
 // Helper: Teardown test database
-func teardownTestDatabase(t *testing.T, dbClient db.Database) {
+func teardownTestDatabase(t *testing.T, dbClient *db.Client) {
 	t.Helper()
-	testutil.TeardownTestDB(t, dbClient.(*db.DatabaseWrapper).RawDatabase())
+	ctx := context.Background()
+	if dbClient != nil {
+		_ = dbClient.Disconnect(ctx)
+	}
 }
 
 // Helper: Seed customer data
-func seedCustomer(t *testing.T, dbClient db.Database, identifier, firstName, lastName, deletionStatus string) {
+func seedCustomer(t *testing.T, dbClient *db.Client, identifier, firstName, lastName, deletionStatus string) {
 	t.Helper()
 	ctx := context.Background()
 

@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -115,7 +116,7 @@ func TestCustomerByKeysGet_OrderByPaymentStatusDESC(t *testing.T) {
 	identifiers := []string{id1, id2}
 	descSort := generated.SortEnumTypeDesc
 	order := []*generated.CustomerQuerySorterInput{
-		{Payment: &generated.PaymentStatusQuerySorterInput{Status: &descSort}},
+		{Payment: &generated.CustomerPaymentObjectSorterInput{Status: &descSort}},
 	}
 	
 	result, err := queryResolver.CustomerByKeysGet(ctx, identifiers, order)

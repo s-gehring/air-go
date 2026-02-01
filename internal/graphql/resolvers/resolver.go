@@ -24,3 +24,10 @@ type Resolver struct {
 	// Database client for health monitoring and data access
 	DBClient DBClient
 }
+
+// NewResolver creates a new Resolver instance with the given database client
+func NewResolver(dbClient DBClient) *Resolver {
+	return &Resolver{
+		DBClient: dbClient,
+	}
+}

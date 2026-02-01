@@ -22,15 +22,10 @@ tests/
 Go 1.21+: Follow standard conventions
 
 ## Recent Changes
+- 005-generic-entity-queries: Added Go 1.25.6 + gqlgen v0.17.86 (GraphQL server), mongo-go-driver v1.13.1 (MongoDB client), zerolog v1.34.0 (structured logging)
 - 001-graphql-queries: Added Go 1.25.6 + gqlgen v0.17.86 (GraphQL server), mongo-go-driver v1.13.1 (MongoDB client), zerolog v1.34.0 (structured logging)
 - 002-mongodb-persistence: Added Official MongoDB Go Driver (mongo-go-driver), testcontainers-go (test automation), Docker Compose (dev environment)
-- 003-customer-get: Implemented the getCustomer graphql query.
-- 004-bykeys-get-query: Implemented the byKeys graphql query. 
 
 
 <!-- MANUAL ADDITIONS START -->
-- My github username is "s-gehring".
-- Commit often, but never to master branch.
-- Only write comment if really necessary.
-- Use docker to start required infrastructure, like a MongoDB database
 <!-- MANUAL ADDITIONS END -->

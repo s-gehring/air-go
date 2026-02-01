@@ -154,7 +154,9 @@ func (r *queryResolver) fetchInventories(ctx context.Context, pipeline []bson.M)
 // T024: ByKeysGet resolver function integrating all logic
 // T025: Error handling with standard GraphQL error format
 // T026-T029: Structured logging per OBS-001 through OBS-004
-func (r *queryResolver) ByKeysGet(
+// ByKeysGetLegacy - OLD IMPLEMENTATION - Replaced by generic implementation in schema.resolvers.go (T063)
+// This function is no longer used. The new ByKeysGet in schema.resolvers.go uses getEntitiesByKeys()
+func (r *queryResolver) ByKeysGetLegacy(
 	ctx context.Context,
 	identifiers []string,
 	order []*generated.InventoryQuerySorterInput,

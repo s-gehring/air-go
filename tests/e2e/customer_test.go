@@ -117,8 +117,8 @@ func TestCustomerGet_Deleted(t *testing.T) {
 	})
 }
 
-// TestCustomerGet_InvalidUUID tests E2E query with invalid UUID (T021)
-func TestCustomerGet_InvalidUUID(t *testing.T) {
+// TestCustomerGet_InvalidUUID_Placeholder - OLD PLACEHOLDER (replaced by customer_get_test.go)
+func TestCustomerGet_InvalidUUID_Placeholder(t *testing.T) {
 	t.Skip("Requires full server and database setup - will implement after basic resolver is working")
 	
 	testCases := []struct {
