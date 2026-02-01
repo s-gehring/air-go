@@ -342,8 +342,34 @@ func convertCustomerFilter(filter *generated.CustomerQueryFilterInput) bson.M {
 		}
 	}
 
-	// Nested object filters (status, payment) - simplified for now
-	// TODO: Implement full nested object filtering
+	// Nested object filters
+	if filter.Status != nil {
+		if filter.Status.Activation != nil {
+			// Convert UserStatus enum to string for generic enum filter
+			var eqStr, neqStr *string
+			if filter.Status.Activation.Eq != nil {
+				s := string(*filter.Status.Activation.Eq)
+				eqStr = &s
+			}
+			if filter.Status.Activation.Neq != nil {
+				s := string(*filter.Status.Activation.Neq)
+				neqStr = &s
+			}
+			if converted := convertEnumFilterGeneric("status.activation", eqStr, neqStr, nil, nil); len(converted) > 0 {
+				conditions = append(conditions, converted)
+			}
+		}
+		if filter.Status.Deletion != nil {
+			if converted := convertEnumFilterDeleteStatus("status.deletion", filter.Status.Deletion); len(converted) > 0 {
+				conditions = append(conditions, converted)
+			}
+		}
+		if filter.Status.Creation != nil {
+			if converted := convertEnumFilterCreateStatus("status.creation", filter.Status.Creation); len(converted) > 0 {
+				conditions = append(conditions, converted)
+			}
+		}
+	}
 
 	// Collection filter
 	if filter.CustomerGroups != nil {
