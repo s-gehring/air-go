@@ -143,8 +143,8 @@ func getEntity(ctx context.Context, dbClient interface{}, config EntityConfig, i
 		return newInvalidInputError("invalid UUID format")
 	}
 
-	// Get database interface
-	db, ok := dbClient.(interface{ Collection(string) interface{} })
+	// Cast to DBClient interface
+	db, ok := dbClient.(DBClient)
 	if !ok {
 		return &QueryError{
 			Message: "Database not available",
@@ -157,45 +157,12 @@ func getEntity(ctx context.Context, dbClient interface{}, config EntityConfig, i
 
 	// Build query filter: match identifier and exclude deleted entities
 	filter := bson.M{
-		"identifier":       identifier,
+		"identifier":         identifier,
 		config.DeletionField: bson.M{"$ne": config.DeletionValue},
 	}
 
 	// Execute FindOne query
-	mongoCollection, ok := collection.(*mongo.Collection)
-	if !ok {
-		// Try to use db.Database interface
-		type DatabaseInterface interface {
-			Collection(string) interface {
-				FindOne(context.Context, interface{}) interface{ Decode(interface{}) error; Err() error }
-			}
-		}
-
-		if dbIface, ok := dbClient.(DatabaseInterface); ok {
-			coll := dbIface.Collection(config.CollectionName)
-			findResult := coll.FindOne(ctx, filter)
-			if findResult.Err() == mongo.ErrNoDocuments {
-				// Entity not found or deleted - return nil (result will have zero values)
-				return nil
-			}
-			if findResult.Err() != nil {
-				return mapMongoError(findResult.Err())
-			}
-
-			if decodeErr := findResult.Decode(result); decodeErr != nil {
-				return mapMongoError(decodeErr)
-			}
-
-			return nil
-		}
-
-		return &QueryError{
-			Message: "Invalid database client type",
-			Code:    ErrCodeDatabaseError,
-		}
-	}
-
-	findResult := mongoCollection.FindOne(ctx, filter)
+	findResult := collection.FindOne(ctx, filter)
 	if findResult.Err() == mongo.ErrNoDocuments {
 		// Entity not found or deleted - return nil (result will have zero values)
 		return nil
@@ -253,14 +220,8 @@ func getEntitiesByKeys(ctx context.Context, dbClient interface{}, config EntityC
 		pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}})
 	}
 
-	// Get database interface
-	type DatabaseInterface interface {
-		Collection(string) interface {
-			Aggregate(context.Context, interface{}) (interface{ All(context.Context, interface{}) error; Close(context.Context) error }, error)
-		}
-	}
-
-	dbIface, ok := dbClient.(DatabaseInterface)
+	// Cast to DBClient interface
+	db, ok := dbClient.(DBClient)
 	if !ok {
 		return &QueryError{
 			Message: "Database not available",
@@ -269,7 +230,7 @@ func getEntitiesByKeys(ctx context.Context, dbClient interface{}, config EntityC
 	}
 
 	// Get collection
-	collection := dbIface.Collection(config.CollectionName)
+	collection := db.Collection(config.CollectionName)
 
 	// Execute aggregation pipeline
 	cursor, err := collection.Aggregate(ctx, pipeline)

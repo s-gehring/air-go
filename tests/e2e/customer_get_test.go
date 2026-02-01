@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/yourusername/air-go/internal/db"
 	"github.com/yourusername/air-go/internal/graphql/resolvers"
-	"github.com/yourusername/air-go/tests/testutil"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -150,11 +150,38 @@ func TestCustomerGet_NullIdentifier(t *testing.T) {
 // Helper: Setup test database - returns db.Client which implements resolvers.DBClient
 func setupTestDatabase(t *testing.T) *db.Client {
 	t.Helper()
-	mongoURI := "mongodb://localhost:27017" // TODO: use testcontainers
 
-	dbClient := db.NewClient(mongoURI, 5*time.Second)
-	err := dbClient.Connect(context.Background())
+	config := &db.DBConfig{
+		URI:              "mongodb://localhost:27017",
+		Database:         "test_air_go",
+		ConnectTimeout:   30 * time.Second,
+		OperationTimeout: 10 * time.Second,
+		MinPoolSize:      5,
+		MaxPoolSize:      10,
+		MaxConnIdleTime:  5 * time.Minute,
+		MaxRetryAttempts: 3,
+		RetryBaseDelay:   1 * time.Second,
+		RetryMaxDelay:    10 * time.Second,
+	}
+
+	logger := zerolog.Nop()
+	dbClient, err := db.NewClient(config, logger)
 	require.NoError(t, err)
+
+	ctx := context.Background()
+	err = dbClient.Connect(ctx)
+	require.NoError(t, err)
+
+	// Verify connection
+	require.True(t, dbClient.IsConnected(), "Database should be connected")
+
+	// Clean all entity collections before each test
+	collections := []string{"customers", "employees", "teams", "inventories", "executionPlans", "referencePortfolios"}
+	for _, collName := range collections {
+		collection := dbClient.Collection(collName)
+		_, err = collection.DeleteMany(ctx, bson.M{})
+		require.NoError(t, err)
+	}
 
 	return dbClient
 }
@@ -178,13 +205,13 @@ func seedCustomer(t *testing.T, dbClient *db.Client, identifier, firstName, last
 		"identifier":  identifier,
 		"firstName":   firstName,
 		"lastName":    lastName,
-		"createDate":  time.Now(),
+		"createDate":  time.Now().Format(time.RFC3339),
 		"status": bson.M{
 			"deletion": deletionStatus,
 		},
 		"actionIndicator": "NONE",
 	}
 
-	err := collection.InsertOne(ctx, doc)
+	_, err := collection.InsertOne(ctx, doc)
 	require.NoError(t, err)
 }

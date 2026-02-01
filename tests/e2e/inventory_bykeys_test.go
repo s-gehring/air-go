@@ -11,7 +11,7 @@ import (
 )
 
 // T051: E2E test for inventoryByKeysGet with ordering by customerId
-func TestInventoryByKeysGet_OrderByCustomerID(t *testing.T) {
+func TestByKeysGet_OrderByCustomerID(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
@@ -37,7 +37,7 @@ func TestInventoryByKeysGet_OrderByCustomerID(t *testing.T) {
 		{CustomerID: &ascSort},
 	}
 	
-	result, err := queryResolver.InventoryByKeysGet(ctx, identifiers, order)
+	result, err := queryResolver.ByKeysGet(ctx, identifiers, order)
 
 	// Assertions
 	require.NoError(t, err)
@@ -45,7 +45,7 @@ func TestInventoryByKeysGet_OrderByCustomerID(t *testing.T) {
 }
 
 // T052: E2E test for inventoryByKeysGet deduplication
-func TestInventoryByKeysGet_Deduplication(t *testing.T) {
+func TestByKeysGet_Deduplication(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
@@ -63,7 +63,7 @@ func TestInventoryByKeysGet_Deduplication(t *testing.T) {
 
 	// Query with duplicate ID
 	identifiers := []string{id1, id1}
-	result, err := queryResolver.InventoryByKeysGet(ctx, identifiers, nil)
+	result, err := queryResolver.ByKeysGet(ctx, identifiers, nil)
 
 	// Assertions - should return inventory only once
 	require.NoError(t, err)

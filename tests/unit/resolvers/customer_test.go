@@ -71,6 +71,14 @@ func (m *MockCollection) Name() string {
 	return args.String(0)
 }
 
+func (m *MockCollection) Aggregate(ctx context.Context, pipeline interface{}, opts ...*options.AggregateOptions) (*mongo.Cursor, error) {
+	args := m.Called(ctx, pipeline, opts)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*mongo.Cursor), args.Error(1)
+}
+
 // MockDBClient is a mock implementation of resolvers.DBClient interface
 type MockCustomerDBClient struct {
 	mock.Mock

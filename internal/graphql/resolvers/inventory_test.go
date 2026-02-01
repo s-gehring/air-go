@@ -31,13 +31,13 @@ func TestByKeysGet_BatchSizeValidation(t *testing.T) {
 			shouldFail:      false,
 		},
 		{
-			name:            "Invalid batch size - 101 identifiers",
-			identifierCount: 101,
-			shouldFail:      true,
+			name:            "Valid batch size - exactly 200 identifiers",
+			identifierCount: 200,
+			shouldFail:      false,
 		},
 		{
-			name:            "Invalid batch size - 200 identifiers",
-			identifierCount: 200,
+			name:            "Invalid batch size - 201 identifiers",
+			identifierCount: 201,
 			shouldFail:      true,
 		},
 	}

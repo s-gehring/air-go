@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/yourusername/air-go/internal/db"
 	"github.com/yourusername/air-go/internal/graphql/generated"
 	"github.com/yourusername/air-go/internal/graphql/resolvers"
 	"go.mongodb.org/mongo-driver/bson"
@@ -302,24 +303,17 @@ func TestCustomerByKeysGet_BatchSizeExceeded(t *testing.T) {
 }
 
 // Helper: Seed customer with payment status
-func seedCustomerWithPaymentStatus(t *testing.T, dbClient interface{}, identifier, firstName, lastName, paymentStatus, deletionStatus string) {
+func seedCustomerWithPaymentStatus(t *testing.T, dbClient *db.Client, identifier, firstName, lastName, paymentStatus, deletionStatus string) {
 	t.Helper()
 	ctx := context.Background()
 
-	type DatabaseInterface interface {
-		Collection(string) interface {
-			InsertOne(context.Context, interface{}) error
-		}
-	}
+	collection := dbClient.Collection("customers")
 
-	db := dbClient.(DatabaseInterface)
-	collection := db.Collection("customers")
-	
 	doc := bson.M{
 		"identifier":  identifier,
 		"firstName":   firstName,
 		"lastName":    lastName,
-		"createDate":  time.Now(),
+		"createDate":  time.Now().Format(time.RFC3339),
 		"status": bson.M{
 			"deletion": deletionStatus,
 		},
@@ -329,29 +323,22 @@ func seedCustomerWithPaymentStatus(t *testing.T, dbClient interface{}, identifie
 		"actionIndicator": "NONE",
 	}
 
-	err := collection.InsertOne(ctx, doc)
+	_, err := collection.InsertOne(ctx, doc)
 	require.NoError(t, err)
 }
 
 // Helper: Seed customer with birthDate
-func seedCustomerWithBirthDate(t *testing.T, dbClient interface{}, identifier, firstName, lastName, birthDate, deletionStatus string) {
+func seedCustomerWithBirthDate(t *testing.T, dbClient *db.Client, identifier, firstName, lastName, birthDate, deletionStatus string) {
 	t.Helper()
 	ctx := context.Background()
 
-	type DatabaseInterface interface {
-		Collection(string) interface {
-			InsertOne(context.Context, interface{}) error
-		}
-	}
+	collection := dbClient.Collection("customers")
 
-	db := dbClient.(DatabaseInterface)
-	collection := db.Collection("customers")
-	
 	doc := bson.M{
 		"identifier":  identifier,
 		"firstName":   firstName,
 		"lastName":    lastName,
-		"createDate":  time.Now(),
+		"createDate":  time.Now().Format(time.RFC3339),
 		"status": bson.M{
 			"deletion": deletionStatus,
 		},
@@ -362,6 +349,6 @@ func seedCustomerWithBirthDate(t *testing.T, dbClient interface{}, identifier, f
 		doc["birthDate"] = birthDate
 	}
 
-	err := collection.InsertOne(ctx, doc)
+	_, err := collection.InsertOne(ctx, doc)
 	require.NoError(t, err)
 }

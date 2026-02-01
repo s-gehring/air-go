@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/yourusername/air-go/internal/db"
 	"github.com/yourusername/air-go/internal/graphql/resolvers"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -62,30 +63,23 @@ func TestTeamGet_NotFound(t *testing.T) {
 }
 
 // Helper: Seed team data
-func seedTeam(t *testing.T, dbClient interface{}, identifier, name, deletionStatus string) {
+func seedTeam(t *testing.T, dbClient *db.Client, identifier, name, deletionStatus string) {
 	t.Helper()
 	ctx := context.Background()
 
-	type DatabaseInterface interface {
-		Collection(string) interface {
-			InsertOne(context.Context, interface{}) error
-		}
-	}
+	collection := dbClient.Collection("teams")
 
-	db := dbClient.(DatabaseInterface)
-	collection := db.Collection("teams")
-	
 	doc := bson.M{
 		"identifier":  identifier,
 		"name":        name,
 		"description": "Test team description",
-		"createDate":  time.Now(),
+		"createDate":  time.Now().Format(time.RFC3339),
 		"status": bson.M{
 			"deletion": deletionStatus,
 		},
 		"actionIndicator": "NONE",
 	}
 
-	err := collection.InsertOne(ctx, doc)
+	_, err := collection.InsertOne(ctx, doc)
 	require.NoError(t, err)
 }

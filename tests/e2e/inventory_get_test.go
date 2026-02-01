@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/yourusername/air-go/internal/db"
 	"github.com/yourusername/air-go/internal/graphql/resolvers"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -61,27 +62,20 @@ func TestInventoryGet_NotFound(t *testing.T) {
 }
 
 // Helper: Seed inventory data
-func seedInventory(t *testing.T, dbClient interface{}, identifier, actionIndicator string) {
+func seedInventory(t *testing.T, dbClient *db.Client, identifier, actionIndicator string) {
 	t.Helper()
 	ctx := context.Background()
 
-	type DatabaseInterface interface {
-		Collection(string) interface {
-			InsertOne(context.Context, interface{}) error
-		}
-	}
+	collection := dbClient.Collection("inventories")
 
-	db := dbClient.(DatabaseInterface)
-	collection := db.Collection("inventories")
-	
 	doc := bson.M{
 		"identifier":      identifier,
-		"createDate":      time.Now(),
+		"createDate":      time.Now().Format(time.RFC3339),
 		"actionIndicator": actionIndicator,
 		"isConsistent":    true,
 		"isComplete":      true,
 	}
 
-	err := collection.InsertOne(ctx, doc)
+	_, err := collection.InsertOne(ctx, doc)
 	require.NoError(t, err)
 }

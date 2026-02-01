@@ -3,13 +3,11 @@ package e2e
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/yourusername/air-go/internal/graphql/generated"
 	"github.com/yourusername/air-go/internal/graphql/resolvers"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 // T047: E2E test for employeeByKeysGet with ordering by lastName ASC

@@ -1,12 +1,26 @@
 package e2e
 
 import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 
+	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/yourusername/air-go/internal/graphql/generated"
+	"github.com/yourusername/air-go/internal/graphql/resolvers"
 	"github.com/yourusername/air-go/tests/testutil"
 )
+
+// GraphQLRequest represents a GraphQL request
+type GraphQLRequest struct {
+	Query     string                 `json:"query"`
+	Variables map[string]interface{} `json:"variables,omitempty"`
+}
 
 // ByKeysGetResponse represents the GraphQL response for byKeysGet query
 type ByKeysGetResponse struct {
@@ -108,12 +122,20 @@ func TestE2E_ByKeysGet_InvalidUUIDError(t *testing.T) {
 
 	// Should have error
 	assert.NotEmpty(t, resp.Errors, "Should have validation error")
-	assert.Contains(t, resp.Errors[0]["message"], "invalid UUID format")
+	assert.Contains(t, resp.Errors[0].Message, "invalid UUID format")
 }
 
 // Helper function to execute GraphQL request
 func executeGraphQLRequest(t *testing.T, query string, variables map[string]interface{}) GraphQLResponse {
 	t.Helper()
+
+	// Set up test database
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Create GraphQL handler directly without authentication middleware for testing
+	resolver := resolvers.NewResolver(dbClient)
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 
 	req := GraphQLRequest{
 		Query:     query,
@@ -123,15 +145,11 @@ func executeGraphQLRequest(t *testing.T, query string, variables map[string]inte
 	body, err := json.Marshal(req)
 	require.NoError(t, err)
 
-	// TODO: Replace with actual server setup when available
-	// For now, this is a placeholder that will fail until implementation
 	httpReq := httptest.NewRequest(http.MethodPost, "/graphql", bytes.NewReader(body))
 	httpReq.Header.Set("Content-Type", "application/json")
 
 	recorder := httptest.NewRecorder()
-
-	// TODO: Call actual GraphQL handler here
-	// handler.ServeHTTP(recorder, httpReq)
+	srv.ServeHTTP(recorder, httpReq)
 
 	var resp GraphQLResponse
 	err = json.NewDecoder(recorder.Body).Decode(&resp)
