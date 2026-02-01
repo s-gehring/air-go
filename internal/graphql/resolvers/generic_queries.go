@@ -50,7 +50,7 @@ var entityConfigs = map[string]EntityConfig{
 		CollectionName:  "teams",
 		DeletionField:   "status.deletion",
 		DeletionValue:   "DELETED",
-		SorterConverter: nil, // No QuerySorterInput defined for teams
+		SorterConverter: teamSorterConverter, // T044: Added team sorter converter
 		FilterConverter: func(filter interface{}) bson.M {
 			if f, ok := filter.(*generated.TeamQueryFilterInput); ok {
 				return convertTeamFilter(f)
@@ -69,7 +69,7 @@ var entityConfigs = map[string]EntityConfig{
 		CollectionName:  "executionPlans",
 		DeletionField:   "actionIndicator",
 		DeletionValue:   "DELETE",
-		SorterConverter: nil, // No QuerySorterInput defined for execution plans
+		SorterConverter: executionPlanSorterConverter, // T044: Added execution plan sorter converter
 		FilterConverter: func(filter interface{}) bson.M {
 			if f, ok := filter.(*generated.ExecutionPlanQueryFilterInput); ok {
 				return convertExecutionPlanFilter(f)
@@ -81,7 +81,7 @@ var entityConfigs = map[string]EntityConfig{
 		CollectionName:  "referencePortfolios",
 		DeletionField:   "actionIndicator",
 		DeletionValue:   "DELETE",
-		SorterConverter: nil, // No QuerySorterInput defined for reference portfolios
+		SorterConverter: referencePortfolioSorterConverter, // T044: Added reference portfolio sorter converter
 		FilterConverter: func(filter interface{}) bson.M {
 			if f, ok := filter.(*generated.ReferencePortfolioQueryFilterInput); ok {
 				return convertReferencePortfolioFilter(f)
@@ -368,6 +368,84 @@ func employeeSorterConverter(sorter interface{}) []bson.M {
 // T059: Inventory sorter converter
 func inventorySorterConverter(sorter interface{}) []bson.M {
 	s, ok := sorter.([]*generated.InventoryQuerySorterInput)
+	if !ok || len(s) == 0 {
+		return []bson.M{{"$sort": bson.M{"identifier": 1}}}
+	}
+
+	sortSpec := s[0]
+	pipeline := []bson.M{}
+
+	if sortSpec.CustomerID != nil {
+		pipeline = appendNullSafeSorting(pipeline, "customerId", *sortSpec.CustomerID)
+	}
+
+	// Default to identifier if no fields specified
+	if len(pipeline) == 0 {
+		pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}})
+	}
+
+	return pipeline
+}
+
+// T041: Team sorter converter
+func teamSorterConverter(sorter interface{}) []bson.M {
+	s, ok := sorter.([]*generated.TeamQuerySorterInput)
+	if !ok || len(s) == 0 {
+		return []bson.M{{"$sort": bson.M{"identifier": 1}}}
+	}
+
+	sortSpec := s[0]
+	pipeline := []bson.M{}
+
+	if sortSpec.Name != nil {
+		pipeline = appendNullSafeSorting(pipeline, "name", *sortSpec.Name)
+	}
+
+	if sortSpec.Description != nil {
+		pipeline = appendNullSafeSorting(pipeline, "description", *sortSpec.Description)
+	}
+
+	if sortSpec.IsShared != nil {
+		pipeline = appendNullSafeSorting(pipeline, "isShared", *sortSpec.IsShared)
+	}
+
+	if sortSpec.EmployeeID != nil {
+		pipeline = appendNullSafeSorting(pipeline, "employeeId", *sortSpec.EmployeeID)
+	}
+
+	// Default to identifier if no fields specified
+	if len(pipeline) == 0 {
+		pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}})
+	}
+
+	return pipeline
+}
+
+// T042: ExecutionPlan sorter converter
+func executionPlanSorterConverter(sorter interface{}) []bson.M {
+	s, ok := sorter.([]*generated.ExecutionPlanQuerySorterInput)
+	if !ok || len(s) == 0 {
+		return []bson.M{{"$sort": bson.M{"identifier": 1}}}
+	}
+
+	sortSpec := s[0]
+	pipeline := []bson.M{}
+
+	if sortSpec.CustomerID != nil {
+		pipeline = appendNullSafeSorting(pipeline, "customerId", *sortSpec.CustomerID)
+	}
+
+	// Default to identifier if no fields specified
+	if len(pipeline) == 0 {
+		pipeline = append(pipeline, bson.M{"$sort": bson.M{"identifier": 1}})
+	}
+
+	return pipeline
+}
+
+// T043: ReferencePortfolio sorter converter
+func referencePortfolioSorterConverter(sorter interface{}) []bson.M {
+	s, ok := sorter.([]*generated.ReferencePortfolioQuerySorterInput)
 	if !ok || len(s) == 0 {
 		return []bson.M{{"$sort": bson.M{"identifier": 1}}}
 	}

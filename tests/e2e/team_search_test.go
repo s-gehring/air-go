@@ -43,7 +43,7 @@ func TestTeamSearch_BasicFiltering_NameStartsWith(t *testing.T) {
 	}
 
 	// Execute teamSearch query
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.TeamSearch(ctx, filter, nil, &first, nil, nil, nil)
 
 	// Assertions
@@ -71,28 +71,30 @@ func TestTeamSearch_MultiFieldSorting(t *testing.T) {
 	dbClient := setupTestDatabase(t)
 	defer teardownTestDatabase(t, dbClient)
 
-	// Seed test teams with same name but different createDates
-	seedTeamWithDate(t, dbClient, "team-010", "Alpha Team", "2025-01-01T00:00:00Z", "INIT")
-	seedTeamWithDate(t, dbClient, "team-011", "Alpha Team", "2025-01-02T00:00:00Z", "INIT")
-	seedTeamWithDate(t, dbClient, "team-012", "Beta Team", "2025-01-03T00:00:00Z", "INIT")
-	seedTeamWithDate(t, dbClient, "team-013", "Beta Team", "2025-01-04T00:00:00Z", "INIT")
+	// Seed test teams with same name but different descriptions
+	seedTeamWithDescription(t, dbClient, "team-010", "Alpha Team", "AAA Description", "INIT")
+	seedTeamWithDescription(t, dbClient, "team-011", "Alpha Team", "ZZZ Description", "INIT")
+	seedTeamWithDescription(t, dbClient, "team-012", "Beta Team", "BBB Description", "INIT")
+	seedTeamWithDescription(t, dbClient, "team-013", "Beta Team", "YYY Description", "INIT")
 
 	// Create resolver
 	resolver := resolvers.NewResolver(dbClient)
 	queryResolver := resolver.Query()
 
-	// Build sorter: name ASC, then createDate DESC
+	// Build sorter: name ASC, then description DESC
+	sortAsc := generated.SortEnumTypeAsc
+	sortDesc := generated.SortEnumTypeDesc
 	sorter := []*generated.TeamQuerySorterInput{
 		{
-			Name: generated.SortEnumTypeAscPointer(),
+			Name: &sortAsc,
 		},
 		{
-			CreateDate: generated.SortEnumTypeDescPointer(),
+			Description: &sortDesc,
 		},
 	}
 
 	// Execute teamSearch query
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.TeamSearch(ctx, nil, sorter, &first, nil, nil, nil)
 
 	// Assertions
@@ -101,15 +103,15 @@ func TestTeamSearch_MultiFieldSorting(t *testing.T) {
 	assert.Equal(t, 4, result.Count)
 	assert.Len(t, result.Data, 4)
 
-	// Verify sorting: Alpha teams first (newer first), then Beta teams (newer first)
+	// Verify sorting: Alpha teams first (Z before A in DESC), then Beta teams (Y before B in DESC)
 	assert.Equal(t, "Alpha Team", *result.Data[0].Name)
-	assert.Equal(t, "2025-01-02T00:00:00Z", *result.Data[0].CreateDate) // Newer Alpha
+	assert.Equal(t, "ZZZ Description", *result.Data[0].Description) // Z comes first in DESC
 	assert.Equal(t, "Alpha Team", *result.Data[1].Name)
-	assert.Equal(t, "2025-01-01T00:00:00Z", *result.Data[1].CreateDate) // Older Alpha
+	assert.Equal(t, "AAA Description", *result.Data[1].Description) // A comes after in DESC
 	assert.Equal(t, "Beta Team", *result.Data[2].Name)
-	assert.Equal(t, "2025-01-04T00:00:00Z", *result.Data[2].CreateDate) // Newer Beta
+	assert.Equal(t, "YYY Description", *result.Data[2].Description) // Y comes first in DESC
 	assert.Equal(t, "Beta Team", *result.Data[3].Name)
-	assert.Equal(t, "2025-01-03T00:00:00Z", *result.Data[3].CreateDate) // Older Beta
+	assert.Equal(t, "BBB Description", *result.Data[3].Description) // B comes after in DESC
 }
 
 // T062: E2E test for nested OR filters (multiple OR conditions)
@@ -151,7 +153,7 @@ func TestTeamSearch_NestedORFilters(t *testing.T) {
 	}
 
 	// Execute teamSearch query
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.TeamSearch(ctx, filter, nil, &first, nil, nil, nil)
 
 	// Assertions
@@ -208,6 +210,27 @@ func seedTeamWithDate(t *testing.T, dbClient *db.Client, identifier, name, creat
 		"identifier":      identifier,
 		"name":            name,
 		"createDate":      createDate,
+		"status": bson.M{
+			"deletion": deletionStatus,
+		},
+		"actionIndicator": "NONE",
+	}
+
+	_, err := collection.InsertOne(ctx, doc)
+	require.NoError(t, err)
+}
+
+// Helper: Seed team with name and description
+func seedTeamWithDescription(t *testing.T, dbClient *db.Client, identifier, name, description, deletionStatus string) {
+	t.Helper()
+	ctx := context.Background()
+
+	collection := dbClient.Collection("teams")
+	doc := bson.M{
+		"identifier":      identifier,
+		"name":            name,
+		"description":     description,
+		"createDate":      time.Now().Format(time.RFC3339),
 		"status": bson.M{
 			"deletion": deletionStatus,
 		},

@@ -30,6 +30,11 @@ func encodeCursor(cursor Cursor) (string, error) {
 // decodeCursor deserializes a base64-encoded cursor string back to a Cursor struct
 // Returns error if cursor format is invalid (invalid base64 or malformed JSON)
 func decodeCursor(cursorStr string) (*Cursor, error) {
+	return DecodeCursor(cursorStr)
+}
+
+// DecodeCursor is the exported version for testing
+func DecodeCursor(cursorStr string) (*Cursor, error) {
 	if cursorStr == "" {
 		return nil, newInvalidInputError("cursor cannot be empty")
 	}

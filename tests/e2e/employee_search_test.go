@@ -42,7 +42,7 @@ func TestEmployeeSearch_BasicFiltering_UserEmail(t *testing.T) {
 	}
 
 	// Execute employeeSearch query
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.EmployeeSearch(ctx, filter, nil, &first, nil, nil, nil)
 
 	// Assertions
@@ -81,14 +81,15 @@ func TestEmployeeSearch_SingleFieldSorting_LastNameASC(t *testing.T) {
 	queryResolver := resolver.Query()
 
 	// Build sorter: lastName ASC
+	sortAsc := generated.SortEnumTypeAsc
 	sorter := []*generated.EmployeeQuerySorterInput{
 		{
-			LastName: generated.SortEnumTypeAscPointer(),
+			LastName: &sortAsc,
 		},
 	}
 
 	// Execute employeeSearch query
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.EmployeeSearch(ctx, nil, sorter, &first, nil, nil, nil)
 
 	// Assertions
@@ -126,7 +127,7 @@ func TestEmployeeSearch_BackwardPagination(t *testing.T) {
 	queryResolver := resolver.Query()
 
 	// Execute employeeSearch query with last: 10 (backward pagination)
-	last := 10
+	last := int64(10)
 	result, err := queryResolver.EmployeeSearch(ctx, nil, nil, nil, nil, &last, nil)
 
 	// Assertions
@@ -167,7 +168,7 @@ func TestEmployeeSearch_CountWithPartialPage(t *testing.T) {
 	queryResolver := resolver.Query()
 
 	// Execute employeeSearch query requesting first 20 (but only 5 exist)
-	first := 20
+	first := int64(20)
 	result, err := queryResolver.EmployeeSearch(ctx, nil, nil, &first, nil, nil, nil)
 
 	// Assertions
@@ -180,6 +181,47 @@ func TestEmployeeSearch_CountWithPartialPage(t *testing.T) {
 	assert.Len(t, result.Data, 5)
 	assert.False(t, result.Paging.HasNextPage)
 	assert.False(t, result.Paging.HasPreviousPage)
+}
+
+// T060: E2E test for AND filter combination
+func TestEmployeeSearch_ComplexFilter_AndCombination(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed test employees
+	seedEmployeeForSearch(t, dbClient, "emp-and-1", "John", "Smith", "john.smith@test.com", "INIT")
+	seedEmployeeForSearch(t, dbClient, "emp-and-2", "John", "Doe", "john.doe@test.com", "INIT")
+	seedEmployeeForSearch(t, dbClient, "emp-and-3", "Jane", "Smith", "jane.smith@test.com", "INIT")
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Build filter: firstName="John" AND lastName="Smith"
+	firstNameJohn := "John"
+	lastNameSmith := "Smith"
+	filter := &generated.EmployeeQueryFilterInput{
+		And: []*generated.EmployeeQueryFilterInput{
+			{FirstName: &generated.StringFilterInput{Eq: &firstNameJohn}},
+			{LastName: &generated.StringFilterInput{Eq: &lastNameSmith}},
+		},
+	}
+
+	// Execute employeeSearch
+	first := int64(10)
+	result, err := queryResolver.EmployeeSearch(ctx, filter, nil, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	assert.Equal(t, 1, result.Count) // Only John Smith
+	assert.Equal(t, "John", *result.Data[0].FirstName)
+	assert.Equal(t, "Smith", *result.Data[0].LastName)
 }
 
 // Helper: Seed employee for search tests

@@ -788,3 +788,12 @@ func convertReferencePortfolioFilter(filter *generated.ReferencePortfolioQueryFi
 	}
 	return bson.M{"$and": conditions}
 }
+
+// Test helpers - exported for unit testing
+func ConvertCustomerFilterForTest(filter *generated.CustomerQueryFilterInput) bson.M {
+	return convertCustomerFilter(filter)
+}
+
+func ConvertEmployeeFilterForTest(filter *generated.EmployeeQueryFilterInput) bson.M {
+	return convertEmployeeFilter(filter)
+}

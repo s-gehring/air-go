@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -42,7 +43,7 @@ func TestCustomerSearch_BasicFiltering_FirstName(t *testing.T) {
 	}
 
 	// Execute customerSearch query
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.CustomerSearch(ctx, filter, nil, &first, nil, nil, nil)
 
 	// Assertions
@@ -81,17 +82,17 @@ func TestCustomerSearch_StatusFiltering_Activation(t *testing.T) {
 	queryResolver := resolver.Query()
 
 	// Build filter: status.activation eq ACTIVE
-	activeStatus := generated.CustomerActivationStatusActive
+	activeStatus := generated.UserStatusActive
 	filter := &generated.CustomerQueryFilterInput{
 		Status: &generated.CustomerStatusObjectFilterInput{
-			Activation: &generated.CustomerActivationStatusFilterInput{
+			Activation: &generated.EnumFilterOfNullableOfUserStatusInput{
 				Eq: &activeStatus,
 			},
 		},
 	}
 
 	// Execute customerSearch query
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.CustomerSearch(ctx, filter, nil, &first, nil, nil, nil)
 
 	// Assertions
@@ -105,7 +106,7 @@ func TestCustomerSearch_StatusFiltering_Activation(t *testing.T) {
 
 	// Verify all results have ACTIVE status
 	for _, customer := range result.Data {
-		assert.Equal(t, generated.CustomerActivationStatusActive, customer.Status.Activation)
+		assert.Equal(t, generated.UserStatusActive, customer.Status.Activation)
 	}
 }
 
@@ -136,7 +137,7 @@ func TestCustomerSearch_EmptyResultSet(t *testing.T) {
 	}
 
 	// Execute customerSearch query
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.CustomerSearch(ctx, filter, nil, &first, nil, nil, nil)
 
 	// Assertions
@@ -174,7 +175,7 @@ func TestCustomerSearch_EmptyFilter(t *testing.T) {
 	queryResolver := resolver.Query()
 
 	// Execute customerSearch query with no filter (nil)
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
 
 	// Assertions
@@ -211,7 +212,7 @@ func TestCustomerSearch_InvalidCursor(t *testing.T) {
 	queryResolver := resolver.Query()
 
 	// Execute customerSearch query with invalid cursor
-	first := 10
+	first := int64(10)
 	invalidCursor := "not-a-valid-base64-cursor"
 	result, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, &invalidCursor, nil, nil)
 
@@ -239,8 +240,8 @@ func TestCustomerSearch_ConflictingPaginationParams(t *testing.T) {
 	queryResolver := resolver.Query()
 
 	// Execute customerSearch query with both first and last
-	first := 10
-	last := 5
+	first := int64(10)
+	last := int64(5)
 	result, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, &last, nil)
 
 	// Assertions
@@ -277,7 +278,7 @@ func TestCustomerSearch_NullValueFilter(t *testing.T) {
 	}
 
 	// Execute customerSearch query
-	first := 10
+	first := int64(10)
 	result, err := queryResolver.CustomerSearch(ctx, filter, nil, &first, nil, nil, nil)
 
 	// Assertions
@@ -348,7 +349,7 @@ func TestCustomerSearch_CursorBeyondDataset(t *testing.T) {
 	queryResolver := resolver.Query()
 
 	// Get first page to obtain cursor
-	first := 10
+	first := int64(10)
 	result1, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
 	require.NoError(t, err)
 	require.False(t, result1.Paging.HasNextPage) // No more pages
@@ -363,6 +364,121 @@ func TestCustomerSearch_CursorBeyondDataset(t *testing.T) {
 		assert.Equal(t, 0, result2.Count)
 		assert.False(t, result2.Paging.HasNextPage)
 	}
+}
+
+// T061: E2E test for complex AND/OR filter (firstName AND (status OR status))
+func TestCustomerSearch_ComplexAndOrFilter(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed test customers with different combinations
+	seedCustomerForSearch(t, dbClient, "cust-complex-1", "Sarah", "Active1", "ACTIVE", "INIT")
+	seedCustomerForSearch(t, dbClient, "cust-complex-2", "Sarah", "Blocked1", "BLOCKED", "INIT")
+	seedCustomerForSearch(t, dbClient, "cust-complex-3", "Sarah", "Init1", "INIT", "INIT")
+	seedCustomerForSearch(t, dbClient, "cust-complex-4", "John", "Active2", "ACTIVE", "INIT")
+	seedCustomerForSearch(t, dbClient, "cust-complex-5", "John", "Blocked2", "BLOCKED", "INIT")
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Build filter: firstName contains "Sarah" AND (status.activation eq ACTIVE OR BLOCKED)
+	searchName := "Sarah"
+	statusActive := generated.UserStatusActive
+	statusBlocked := generated.UserStatusBlocked
+	filter := &generated.CustomerQueryFilterInput{
+		And: []*generated.CustomerQueryFilterInput{
+			{FirstName: &generated.StringFilterInput{Contains: &searchName}},
+			{Or: []*generated.CustomerQueryFilterInput{
+				{Status: &generated.CustomerStatusObjectFilterInput{
+					Activation: &generated.EnumFilterOfNullableOfUserStatusInput{Eq: &statusActive},
+				}},
+				{Status: &generated.CustomerStatusObjectFilterInput{
+					Activation: &generated.EnumFilterOfNullableOfUserStatusInput{Eq: &statusBlocked},
+				}},
+			}},
+		},
+	}
+
+	// Execute customerSearch
+	first := int64(10)
+	result, err := queryResolver.CustomerSearch(ctx, filter, nil, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	assert.Equal(t, 2, result.Count) // Should match Sarah+ACTIVE and Sarah+BLOCKED only
+	assert.Len(t, result.Data, 2)
+
+	// Verify all results match the filter criteria
+	for _, customer := range result.Data {
+		assert.Contains(t, *customer.FirstName, "Sarah")
+		assert.True(t, *customer.Status.Activation == generated.UserStatusActive || *customer.Status.Activation == generated.UserStatusBlocked)
+	}
+}
+
+// T063: E2E test for deeply nested filters (multiple nesting levels)
+func TestCustomerSearch_DeeplyNestedFilters(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed test customers
+	seedCustomerForSearch(t, dbClient, "cust-nested-1", "Alice", "ActiveAlice", "ACTIVE", "INIT")
+	seedCustomerForSearch(t, dbClient, "cust-nested-2", "Alice", "BlockedAlice", "BLOCKED", "INIT")
+	seedCustomerForSearch(t, dbClient, "cust-nested-3", "Bob", "ActiveBob", "ACTIVE", "INIT")
+	seedCustomerForSearch(t, dbClient, "cust-nested-4", "Bob", "BlockedBob", "BLOCKED", "INIT")
+	seedCustomerForSearch(t, dbClient, "cust-nested-5", "Charlie", "ActiveCharlie", "ACTIVE", "INIT")
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Build deeply nested filter: (Alice AND ACTIVE) OR (Bob AND BLOCKED)
+	nameAlice := "Alice"
+	nameBob := "Bob"
+	statusActive := generated.UserStatusActive
+	statusBlocked := generated.UserStatusBlocked
+	filter := &generated.CustomerQueryFilterInput{
+		Or: []*generated.CustomerQueryFilterInput{
+			{And: []*generated.CustomerQueryFilterInput{
+				{FirstName: &generated.StringFilterInput{Eq: &nameAlice}},
+				{Status: &generated.CustomerStatusObjectFilterInput{
+					Activation: &generated.EnumFilterOfNullableOfUserStatusInput{Eq: &statusActive},
+				}},
+			}},
+			{And: []*generated.CustomerQueryFilterInput{
+				{FirstName: &generated.StringFilterInput{Eq: &nameBob}},
+				{Status: &generated.CustomerStatusObjectFilterInput{
+					Activation: &generated.EnumFilterOfNullableOfUserStatusInput{Eq: &statusBlocked},
+				}},
+			}},
+		},
+	}
+
+	// Execute customerSearch
+	first := int64(10)
+	result, err := queryResolver.CustomerSearch(ctx, filter, nil, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	assert.Equal(t, 2, result.Count) // Should match Alice+ACTIVE and Bob+BLOCKED
+	assert.Len(t, result.Data, 2)
+
+	// Verify results
+	names := []string{*result.Data[0].FirstName, *result.Data[1].FirstName}
+	assert.Contains(t, names, "Alice")
+	assert.Contains(t, names, "Bob")
 }
 
 // Helper: Seed customer for search tests
@@ -413,7 +529,372 @@ func seedCustomerWithEmployeeEmail(t *testing.T, dbClient *db.Client, identifier
 	require.NoError(t, err)
 }
 
+// T034: E2E test for customerSearch single-field sorting (createDate DESC)
+func TestCustomerSearch_Sorting_CreateDateDesc(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed test customers with specific createDate values
+	now := time.Now()
+	seedCustomerWithCreateDate(t, dbClient, "customer-sort-1", "Alice", "First", "ACTIVE", "INIT", now.Add(-3*24*time.Hour))
+	seedCustomerWithCreateDate(t, dbClient, "customer-sort-2", "Bob", "Second", "ACTIVE", "INIT", now.Add(-1*24*time.Hour))
+	seedCustomerWithCreateDate(t, dbClient, "customer-sort-3", "Carol", "Third", "ACTIVE", "INIT", now.Add(-2*24*time.Hour))
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Build sorter: createDate DESC
+	sortDesc := generated.SortEnumTypeDesc
+	sorter := []*generated.CustomerQuerySorterInput{
+		{CreateDate: &sortDesc},
+	}
+
+	// Execute customerSearch query
+	first := int64(10)
+	result, err := queryResolver.CustomerSearch(ctx, nil, sorter, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	assert.Equal(t, 3, result.Count)
+	assert.Len(t, result.Data, 3)
+
+	// Verify results are sorted by createDate DESC (newest first)
+	assert.Equal(t, "Bob", *result.Data[0].FirstName)      // Most recent
+	assert.Equal(t, "Carol", *result.Data[1].FirstName)    // Middle
+	assert.Equal(t, "Alice", *result.Data[2].FirstName)    // Oldest
+}
+
+// T036: E2E test for null value sorting
+func TestCustomerSearch_Sorting_NullHandling(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed test customers with some having null employeeEmail
+	seedCustomerWithEmployeeEmail(t, dbClient, "customer-null-1", "Alice", "HasEmail", "ACTIVE", "INIT", strPtr("alice@company.com"))
+	seedCustomerWithEmployeeEmail(t, dbClient, "customer-null-2", "Bob", "NoEmail", "ACTIVE", "INIT", nil)
+	seedCustomerWithEmployeeEmail(t, dbClient, "customer-null-3", "Carol", "HasEmail", "ACTIVE", "INIT", strPtr("carol@company.com"))
+	seedCustomerWithEmployeeEmail(t, dbClient, "customer-null-4", "Dave", "NoEmail", "ACTIVE", "INIT", nil)
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Build sorter: employeeEmail ASC (non-nulls first, nulls last)
+	sortAsc := generated.SortEnumTypeAsc
+	sorter := []*generated.CustomerQuerySorterInput{
+		{EmployeeEmail: &sortAsc},
+	}
+
+	// Execute customerSearch query
+	first := int64(10)
+	result, err := queryResolver.CustomerSearch(ctx, nil, sorter, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	assert.Equal(t, 4, result.Count)
+	assert.Len(t, result.Data, 4)
+
+	// Verify ASC sorting: non-nulls first, nulls last
+	// First two should have non-null employeeEmail (sorted alphabetically)
+	assert.NotNil(t, result.Data[0].EmployeeEmail)
+	assert.NotNil(t, result.Data[1].EmployeeEmail)
+
+	// Last two should have null employeeEmail
+	assert.Nil(t, result.Data[2].EmployeeEmail)
+	assert.Nil(t, result.Data[3].EmployeeEmail)
+}
+
+// T045: E2E test for forward pagination (first page)
+func TestCustomerSearch_Pagination_ForwardFirstPage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed 25 test customers (more than typical page size of 20)
+	for i := 1; i <= 25; i++ {
+		seedCustomerForSearch(t, dbClient, fmt.Sprintf("customer-page-%03d", i), fmt.Sprintf("First%d", i), fmt.Sprintf("Last%d", i), "ACTIVE", "INIT")
+	}
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Execute customerSearch with first: 20
+	first := int64(20)
+	result, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	assert.Equal(t, 20, result.Count)
+	assert.Equal(t, 25, result.TotalCount)
+	assert.True(t, result.Paging.HasNextPage) // Should have more results
+	assert.NotNil(t, result.Paging.EndCursor) // Should have cursor for next page
+	assert.NotNil(t, result.Paging.StartCursor)
+}
+
+// T046: E2E test for forward pagination (next page)
+func TestCustomerSearch_Pagination_ForwardNextPage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed 25 test customers
+	for i := 1; i <= 25; i++ {
+		seedCustomerForSearch(t, dbClient, fmt.Sprintf("customer-page-%03d", i), fmt.Sprintf("First%d", i), fmt.Sprintf("Last%d", i), "ACTIVE", "INIT")
+	}
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Get first page
+	first := int64(20)
+	result1, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
+	require.NoError(t, err)
+	require.NotNil(t, result1.Paging.EndCursor)
+
+	// Get next page using endCursor from first page
+	result2, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, result1.Paging.EndCursor, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	require.NotNil(t, result2)
+	assert.Equal(t, 5, result2.Count) // Remaining 5 items
+	assert.Equal(t, 25, result2.TotalCount)
+	assert.False(t, result2.Paging.HasNextPage) // No more results
+	assert.True(t, result2.Paging.HasPreviousPage) // Has previous page
+}
+
+// T047: E2E test for pagination last page
+func TestCustomerSearch_Pagination_LastPage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed exactly 25 customers
+	for i := 1; i <= 25; i++ {
+		seedCustomerForSearch(t, dbClient, fmt.Sprintf("customer-last-%03d", i), fmt.Sprintf("First%d", i), fmt.Sprintf("Last%d", i), "ACTIVE", "INIT")
+	}
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Get first page (20 items)
+	first := int64(20)
+	result1, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
+	require.NoError(t, err)
+	require.NotNil(t, result1.Paging.EndCursor)
+
+	// Get last page (remaining 5 items)
+	result2, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, result1.Paging.EndCursor, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	assert.Equal(t, 5, result2.Count)
+	assert.False(t, result2.Paging.HasNextPage) // This is the last page
+}
+
+// T049: E2E test for bidirectional pagination
+func TestCustomerSearch_Pagination_Bidirectional(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed 30 customers
+	for i := 1; i <= 30; i++ {
+		seedCustomerForSearch(t, dbClient, fmt.Sprintf("customer-bidir-%03d", i), fmt.Sprintf("First%d", i), fmt.Sprintf("Last%d", i), "ACTIVE", "INIT")
+	}
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Navigate forward: page 1
+	first := int64(10)
+	page1, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
+	require.NoError(t, err)
+	assert.Equal(t, 10, page1.Count)
+
+	// Navigate forward: page 2
+	page2, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, page1.Paging.EndCursor, nil, nil)
+	require.NoError(t, err)
+	assert.Equal(t, 10, page2.Count)
+	assert.True(t, page2.Paging.HasPreviousPage)
+
+	// Navigate backward: back to page 1
+	last := int64(10)
+	pageBack, err := queryResolver.CustomerSearch(ctx, nil, nil, nil, nil, &last, page2.Paging.StartCursor)
+	require.NoError(t, err)
+	assert.Equal(t, 10, pageBack.Count)
+
+	// Verify we got back to the same identifiers
+	assert.Equal(t, page1.Data[0].Identifier, pageBack.Data[0].Identifier)
+}
+
+// Helper: Seed customer with specific createDate
+func seedCustomerWithCreateDate(t *testing.T, dbClient *db.Client, identifier, firstName, lastName, activationStatus, deletionStatus string, createDate time.Time) {
+	t.Helper()
+	ctx := context.Background()
+
+	collection := dbClient.Collection("customers")
+	doc := bson.M{
+		"identifier":      identifier,
+		"firstName":       firstName,
+		"lastName":        lastName,
+		"createDate":      createDate.Format(time.RFC3339),
+		"status": bson.M{
+			"activation": activationStatus,
+			"deletion":   deletionStatus,
+		},
+		"actionIndicator": "NONE",
+	}
+
+	_, err := collection.InsertOne(ctx, doc)
+	require.NoError(t, err)
+}
+
 // Helper: String pointer utility
 func strPtr(s string) *string {
 	return &s
+}
+
+// T073: E2E test for count and totalCount with full page (first 20 of 147 entities)
+func TestCustomerSearch_CountAndTotalCount_FullPage(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed exactly 147 customers
+	for i := 1; i <= 147; i++ {
+		seedCustomerForSearch(t, dbClient, fmt.Sprintf("cust-count-%03d", i), fmt.Sprintf("First%d", i), fmt.Sprintf("Last%d", i), "ACTIVE", "INIT")
+	}
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Execute customerSearch query requesting first 20
+	first := int64(20)
+	result, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	assert.Equal(t, int64(20), result.Count)      // Current page has 20
+	assert.Equal(t, int64(147), result.TotalCount) // Total across all pages is 147
+	assert.Len(t, result.Data, 20)
+	assert.True(t, result.Paging.HasNextPage) // More pages available
+}
+
+// T075: E2E test for count and totalCount with no filters (first 50 of 1000 total)
+func TestCustomerSearch_CountAndTotalCount_NoFilters(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed exactly 1000 customers
+	for i := 1; i <= 1000; i++ {
+		seedCustomerForSearch(t, dbClient, fmt.Sprintf("cust-nofilter-%04d", i), fmt.Sprintf("First%d", i), fmt.Sprintf("Last%d", i), "ACTIVE", "INIT")
+	}
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Execute customerSearch query with no filter, requesting first 50
+	first := int64(50)
+	result, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
+
+	// Assertions
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	assert.Equal(t, int64(50), result.Count)       // Current page has 50
+	assert.Equal(t, int64(1000), result.TotalCount) // Total across all pages is 1000
+	assert.Len(t, result.Data, 50)
+	assert.True(t, result.Paging.HasNextPage) // More pages available
+}
+
+// T076: E2E test for consistent totalCount across pages
+func TestCustomerSearch_TotalCount_ConsistentAcrossPages(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	dbClient := setupTestDatabase(t)
+	defer teardownTestDatabase(t, dbClient)
+
+	// Seed exactly 150 customers
+	for i := 1; i <= 150; i++ {
+		seedCustomerForSearch(t, dbClient, fmt.Sprintf("cust-consistent-%03d", i), fmt.Sprintf("First%d", i), fmt.Sprintf("Last%d", i), "ACTIVE", "INIT")
+	}
+
+	// Create resolver
+	resolver := resolvers.NewResolver(dbClient)
+	queryResolver := resolver.Query()
+
+	// Get page 1
+	first := int64(50)
+	page1, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
+	require.NoError(t, err)
+	require.NotNil(t, page1)
+
+	// Get page 2
+	page2, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, page1.Paging.EndCursor, nil, nil)
+	require.NoError(t, err)
+	require.NotNil(t, page2)
+
+	// Get page 3
+	page3, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, page2.Paging.EndCursor, nil, nil)
+	require.NoError(t, err)
+	require.NotNil(t, page3)
+
+	// Assertions: totalCount should be same across all pages
+	assert.Equal(t, int64(150), page1.TotalCount)
+	assert.Equal(t, int64(150), page2.TotalCount)
+	assert.Equal(t, int64(150), page3.TotalCount)
+
+	// But count should reflect actual page sizes
+	assert.Equal(t, int64(50), page1.Count)
+	assert.Equal(t, int64(50), page2.Count)
+	assert.Equal(t, int64(50), page3.Count) // Exactly 150 items, so page 3 has 50
 }
