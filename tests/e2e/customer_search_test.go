@@ -361,7 +361,7 @@ func TestCustomerSearch_CursorBeyondDataset(t *testing.T) {
 		// Assertions
 		require.NoError(t, err)
 		require.NotNil(t, result2)
-		assert.Equal(t, 0, result2.Count)
+		assert.Equal(t, int64(0), result2.Count)
 		assert.False(t, result2.Paging.HasNextPage)
 	}
 }
