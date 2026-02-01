@@ -681,8 +681,8 @@ func TestCustomerSearch_Pagination_ForwardNextPage(t *testing.T) {
 	// Assertions
 	require.NoError(t, err)
 	require.NotNil(t, result2)
-	assert.Equal(t, 5, result2.Count) // Remaining 5 items
-	assert.Equal(t, 25, result2.TotalCount)
+	assert.Equal(t, int64(5), result2.Count) // Remaining 5 items
+	assert.Equal(t, int64(25), result2.TotalCount)
 	assert.False(t, result2.Paging.HasNextPage) // No more results
 	assert.True(t, result2.Paging.HasPreviousPage) // Has previous page
 }
@@ -717,7 +717,7 @@ func TestCustomerSearch_Pagination_LastPage(t *testing.T) {
 
 	// Assertions
 	require.NoError(t, err)
-	assert.Equal(t, 5, result2.Count)
+	assert.Equal(t, int64(5), result2.Count)
 	assert.False(t, result2.Paging.HasNextPage) // This is the last page
 }
 
@@ -744,19 +744,19 @@ func TestCustomerSearch_Pagination_Bidirectional(t *testing.T) {
 	first := int64(10)
 	page1, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, nil, nil, nil)
 	require.NoError(t, err)
-	assert.Equal(t, 10, page1.Count)
+	assert.Equal(t, int64(10), page1.Count)
 
 	// Navigate forward: page 2
 	page2, err := queryResolver.CustomerSearch(ctx, nil, nil, &first, page1.Paging.EndCursor, nil, nil)
 	require.NoError(t, err)
-	assert.Equal(t, 10, page2.Count)
+	assert.Equal(t, int64(10), page2.Count)
 	assert.True(t, page2.Paging.HasPreviousPage)
 
 	// Navigate backward: back to page 1
 	last := int64(10)
 	pageBack, err := queryResolver.CustomerSearch(ctx, nil, nil, nil, nil, &last, page2.Paging.StartCursor)
 	require.NoError(t, err)
-	assert.Equal(t, 10, pageBack.Count)
+	assert.Equal(t, int64(10), pageBack.Count)
 
 	// Verify we got back to the same identifiers
 	assert.Equal(t, page1.Data[0].Identifier, pageBack.Data[0].Identifier)

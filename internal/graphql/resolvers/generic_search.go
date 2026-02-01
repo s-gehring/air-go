@@ -46,8 +46,19 @@ func validatePaginationParams(first, last *int) error {
 // The filter ensures we only get documents after/before the cursor position
 // Based on sort fields and identifier in the cursor
 func buildPaginationFilter(cursor *Cursor, sortFields []string, isForward bool) bson.M {
-	if cursor == nil || len(cursor.SortFields) == 0 {
+	if cursor == nil {
 		return bson.M{}
+	}
+
+	// Determine comparison operator based on direction
+	gtOp := "$gt"
+	if !isForward {
+		gtOp = "$lt"
+	}
+
+	// Special case: if only sorting by identifier (default), just filter by identifier
+	if len(cursor.SortFields) == 0 && cursor.Identifier != "" {
+		return bson.M{"identifier": bson.M{gtOp: cursor.Identifier}}
 	}
 
 	// Build $or conditions for pagination
@@ -57,26 +68,27 @@ func buildPaginationFilter(cursor *Cursor, sortFields []string, isForward bool) 
 
 	orConditions := []bson.M{}
 
-	// Determine comparison operator based on direction
-	gtOp := "$gt"
-	if !isForward {
-		gtOp = "$lt"
+	// Build cascading OR conditions for sort fields (excluding identifier)
+	nonIdentifierFields := []string{}
+	for _, field := range sortFields {
+		if field != "identifier" {
+			nonIdentifierFields = append(nonIdentifierFields, field)
+		}
 	}
 
-	// Build cascading OR conditions
-	for i := 0; i < len(sortFields); i++ {
+	for i := 0; i < len(nonIdentifierFields); i++ {
 		condition := bson.M{}
 
 		// All previous fields must equal cursor values
 		for j := 0; j < i; j++ {
 			if j < len(cursor.SortFields) {
-				condition[sortFields[j]] = cursor.SortFields[j]
+				condition[nonIdentifierFields[j]] = cursor.SortFields[j]
 			}
 		}
 
 		// Current field must be greater/less than cursor value
 		if i < len(cursor.SortFields) {
-			condition[sortFields[i]] = bson.M{gtOp: cursor.SortFields[i]}
+			condition[nonIdentifierFields[i]] = bson.M{gtOp: cursor.SortFields[i]}
 		}
 
 		orConditions = append(orConditions, condition)
@@ -84,10 +96,8 @@ func buildPaginationFilter(cursor *Cursor, sortFields []string, isForward bool) 
 
 	// Final condition: all sort fields equal, identifier greater/less than cursor identifier
 	finalCondition := bson.M{}
-	for i, field := range sortFields {
-		if i < len(cursor.SortFields) {
-			finalCondition[field] = cursor.SortFields[i]
-		}
+	for i := 0; i < len(cursor.SortFields) && i < len(nonIdentifierFields); i++ {
+		finalCondition[nonIdentifierFields[i]] = cursor.SortFields[i]
 	}
 	finalCondition["identifier"] = bson.M{gtOp: cursor.Identifier}
 	orConditions = append(orConditions, finalCondition)
